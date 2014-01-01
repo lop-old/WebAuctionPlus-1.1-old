@@ -182,7 +182,7 @@ public class WebAuctionPlus extends JavaPlugin {
 		if(msg != null && !msg.isEmpty()) {
 			log.severe(logPrefix + msg);
 			if(failMsg == null) failMsg = "";
-			if(!failMsg.isEmpty()) failMsg += " ";
+			if(!failMsg.isEmpty()) failMsg += "|";
 			failMsg += msg;
 		}
 		onDisable();

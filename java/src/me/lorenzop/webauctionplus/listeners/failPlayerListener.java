@@ -51,10 +51,19 @@ public class failPlayerListener implements Listener {
 		if(p == null) return;
 		if(p.hasPermission("wa.webadmin") || p.isOp()) {
 			final String failMsg = WebAuctionPlus.getFailMsg();
-			if(failMsg == null || failMsg.isEmpty())
+			if(failMsg == null || failMsg.isEmpty()) {
 				p.sendMessage(WebAuctionPlus.chatPrefix + "Failed to load plugin. Please check the console log.");
-			else
-				p.sendMessage(WebAuctionPlus.chatPrefix + failMsg);
+			} else{
+				if(failMsg.contains("|")) {
+					for(String m : failMsg.split("|")) {
+						if(m == null || m.isEmpty() || m.equals("|"))
+							continue;
+						p.sendMessage(WebAuctionPlus.chatPrefix + m);
+					}
+				} else {
+					p.sendMessage(WebAuctionPlus.chatPrefix + failMsg);
+				}
+			}
 		}
 	}
 
