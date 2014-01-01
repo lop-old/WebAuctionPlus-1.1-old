@@ -34,6 +34,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -136,6 +137,8 @@ public class WebAuctionPlus extends JavaPlugin {
 	public void onDisable() {
 		isOk = false;
 		failPlayerListener.stop();
+		// unregister listeners
+		HandlerList.unregisterAll(this);
 		// stop schedulers
 		try {
 			getServer().getScheduler().cancelTasks(this);
