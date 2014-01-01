@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +19,7 @@ import me.lorenzop.webauctionplus.listeners.WebAuctionBlockListener;
 import me.lorenzop.webauctionplus.listeners.WebAuctionCommands;
 import me.lorenzop.webauctionplus.listeners.WebAuctionPlayerListener;
 import me.lorenzop.webauctionplus.listeners.WebAuctionServerListener;
+import me.lorenzop.webauctionplus.listeners.failPlayerListener;
 import me.lorenzop.webauctionplus.mysql.DataQueries;
 import me.lorenzop.webauctionplus.mysql.MySQLTables;
 import me.lorenzop.webauctionplus.mysql.MySQLUpdate;
@@ -44,8 +44,9 @@ import org.w3c.dom.NodeList;
 
 public class WebAuctionPlus extends JavaPlugin {
 
-	private static boolean isOk    = false;
-	private static boolean isDebug = false;
+	private static volatile boolean isOk    = false;
+	private static volatile boolean isDebug = false;
+	private static volatile String failMsg = null;
 
 	public static final String logPrefix  = "[WebAuction+] ";
 	public static final String chatPrefix = ChatColor.DARK_GREEN+"["+ChatColor.WHITE+"WebAuction+"+ChatColor.DARK_GREEN+"] ";
@@ -64,10 +65,10 @@ public class WebAuctionPlus extends JavaPlugin {
 	public static waSettings settings = null;
 
 	// language
-	public static Language Lang;
+	public static volatile Language Lang;
 
-	public static DataQueries dataQueries = null;
-	public WebAuctionCommands WebAuctionCommandsListener = new WebAuctionCommands(this);
+	public static volatile DataQueries dataQueries = null;
+	public volatile WebAuctionCommands WebAuctionCommandsListener = new WebAuctionCommands(this);
 
 	public Map<String,   Long>    lastSignUse = new HashMap<String , Long>();
 	public Map<Location, Integer> recentSigns = new HashMap<Location, Integer>();
@@ -110,13 +111,15 @@ public class WebAuctionPlus extends JavaPlugin {
 			return;
 		}
 		isOk = false;
+		failMsg = null;
 		currentVersion = getDescription().getVersion();
 
 		// Command listener
 		getCommand("wa").setExecutor(WebAuctionCommandsListener);
 
 		// load config.yml
-		if(!onLoadConfig()) {onDisable(); return;}
+		if(!onLoadConfig())
+			return;
 
 		// load more services
 		onLoadMetrics();
@@ -132,6 +135,7 @@ public class WebAuctionPlus extends JavaPlugin {
 
 	public void onDisable() {
 		isOk = false;
+		failPlayerListener.stop();
 		// stop schedulers
 		try {
 			getServer().getScheduler().cancelTasks(this);
@@ -145,19 +149,21 @@ public class WebAuctionPlus extends JavaPlugin {
 		} catch (Exception ignore) {}
 		// close mysql connection
 		try {
-			if(dataQueries != null) dataQueries.forceCloseConnections();
+			if(dataQueries != null)
+				dataQueries.forceCloseConnections();
 		} catch (Exception ignore) {}
-		log.info(logPrefix + "Disabled, bye for now :-)");
 		// close config
 		try {
-			if(config != null) config = null;
+			config = null;
 		} catch (Exception ignore) {}
 		settings = null;
 		Lang = null;
+		log.info(logPrefix + "Disabled, bye for now :-)");
 	}
 
 
 	public void onReload() {
+		failMsg = null;
 		onDisable();
 		// load config.yml
 		if(!onLoadConfig()) return;
@@ -169,6 +175,23 @@ public class WebAuctionPlus extends JavaPlugin {
 	public static boolean isDebug() {return isDebug;}
 
 
+	public void fail(String msg) {
+		if(msg != null && !msg.isEmpty()) {
+			log.severe(logPrefix + msg);
+			if(failMsg == null) failMsg = "";
+			if(!failMsg.isEmpty()) failMsg += " ";
+			failMsg += msg;
+		}
+		onDisable();
+		failPlayerListener.start(this);
+	}
+	public static String getFailMsg() {
+		if(failMsg == null || failMsg.isEmpty())
+			return null;
+		return failMsg;
+	}
+
+
 	public boolean onLoadConfig() {
 		// init configs
 		if(config != null) config = null;
@@ -177,11 +200,8 @@ public class WebAuctionPlus extends JavaPlugin {
 
 		// connect MySQL
 		if(dataQueries == null)
-			if(!ConnectDB()) {
-				log.severe(logPrefix+"*** Failed to load WebAuctionPlus. Please check your config.");
-				onDisable();
+			if(!ConnectDB())
 				return false;
-			}
 
 		// load stats class
 		if(Stats == null) Stats = new waStats();
@@ -190,7 +210,10 @@ public class WebAuctionPlus extends JavaPlugin {
 		if(settings != null) settings = null;
 		settings = new waSettings(this);
 		settings.LoadSettings();
-		if(!settings.isOk()) {onDisable(); return false;}
+		if(!settings.isOk()) {
+			fail("Failed to load settings from database.");
+			return false;
+		}
 
 		// update the version in db
 		if(! currentVersion.equals(settings.getString("Version")) ){
@@ -206,7 +229,10 @@ public class WebAuctionPlus extends JavaPlugin {
 		if(Lang != null) Lang = null;
 		Lang = new Language(this);
 		Lang.loadLanguage(settings.getString("Language"));
-		if(!Lang.isOk()) {onDisable(); return false;}
+		if(!Lang.isOk()) {
+			fail("Failed to load language file.");
+			return false;
+		}
 
 		try {
 			isDebug = config.getBoolean("Development.Debug");
@@ -281,8 +307,8 @@ public class WebAuctionPlus extends JavaPlugin {
 				log.info(logPrefix + "Enabled Task: Recent Sign (using " + (UseMultithreads?"multiple threads":"single thread") + ")");
 			}
 		} catch (Exception e) {
-			log.severe("Unable to load config");
 			e.printStackTrace();
+			fail("Failed loading the config.");
 			return false;
 		}
 		return true;
@@ -294,11 +320,13 @@ public class WebAuctionPlus extends JavaPlugin {
 
 	// Init database
 	public synchronized boolean ConnectDB() {
-		if(config.getString("MySQL.Password").equals("password123"))
+		if(config.getString("MySQL.Password").equals("password123")) {
+			fail("Please set the database connection info in the config.");
 			return false;
+		}
 		log.info(logPrefix + "MySQL Initializing.");
 		if(dataQueries != null) {
-			log.severe("Database connection already made?");
+			fail("Database connection already made?");
 			return false;
 		}
 		try {
@@ -318,14 +346,14 @@ public class WebAuctionPlus extends JavaPlugin {
 			// create/update tables
 			MySQLTables dbTables = new MySQLTables(this);
 			if(!dbTables.isOk()) {
-				log.severe(logPrefix+"Error loading db updater class!");
+				fail(logPrefix+"Error loading db updater class.");
 				return false;
 			}
 			dbTables = null;
+		//} catch (SQLException e) {
 		} catch (Exception e) {
-			if (e.getCause() instanceof SQLException)
-				log.severe(logPrefix + "Unable to connect to MySQL database.");
 			e.printStackTrace();
+			fail(logPrefix+"Unable to connect to MySQL database.");
 			return false;
 		}
 		return true;
