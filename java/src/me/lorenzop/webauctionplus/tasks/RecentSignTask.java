@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import me.lorenzop.webauctionplus.WebAuctionPlus;
 
@@ -14,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 
 import com.bergerkiller.bukkit.sl.API.TickMode;
@@ -139,24 +142,30 @@ public class RecentSignTask implements Runnable {
 
 	private void UpdateRecentSigns(int offset, String[] lines) {
 		List<Location> SignsToRemove = new ArrayList<Location>();
-		try {
-			for(Entry<Location, Integer> entry : plugin.recentSigns.entrySet()) {
+		for(Entry<Location, Integer> entry : plugin.recentSigns.entrySet()) {
+			try {
 				if(entry.getValue() != offset) continue;
 				Location loc = entry.getKey();
-				// sign exists?
-				Material mat = loc.getBlock().getType();
-				if(mat != Material.SIGN && mat != Material.WALL_SIGN) {
+				// block exists?
+				final Block block = getBlockSafely(loc);
+				if(block == null) {
 					SignsToRemove.add(loc);
 					continue;
 				}
-				Sign sign = (Sign) loc.getBlock().getState();
+				// sign exists?
+				Material mat = block.getType();
+				if(!Material.SIGN.equals(mat) && !Material.WALL_SIGN.equals(mat)) {
+					SignsToRemove.add(loc);
+					continue;
+				}
+				Sign sign = (Sign) block.getState();
 				sign.setLine(1, lines[0]);
 				sign.setLine(2, lines[1]);
 				sign.setLine(3, lines[2]);
 				sign.update();
+			} catch(Exception e) {
+				e.printStackTrace();
 			}
-		} catch(Exception e) {
-			e.printStackTrace();
 		}
 		try {
 			if(SignsToRemove.size() > 0)
@@ -169,6 +178,25 @@ public class RecentSignTask implements Runnable {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+	// get block material safely
+	public Block getBlockSafely(final Location loc) {
+		if(loc == null) return null;
+		// already in main thread
+		if(Bukkit.isPrimaryThread())
+			return loc.getBlock();
+		// run in main thread
+		Callable<Block> task = new Callable<Block>() {
+			@Override
+			public Block call() throws Exception {
+				return loc.getBlock();
+			}
+		};
+		try {
+			return Bukkit.getScheduler().callSyncMethod(plugin, task).get();
+		} catch (InterruptedException ignore) {
+		} catch (ExecutionException ignore) {}
+		return null;
 	}
 
 
