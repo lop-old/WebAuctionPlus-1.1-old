@@ -3973,13 +3973,6 @@ ItemFuncs::$Items=array(
         ''=>''),
       'icon'=>'Potion_Mundane.png',
       'stack'=>1),
-    8192 =>array(
-      'name'=>array(
-        'en'=>'Mundane Potion',
-        ''=>'',
-        ''=>''),
-      'icon'=>'Potion_Mundane.png',
-      'stack'=>1),
     16384=>array(
       'name'=>array(
         'en'=>'Mundane Splash Potion',
@@ -4077,7 +4070,6 @@ ItemFuncs::$Items=array(
       'stack'=>1),
     // fire resistance
     8195 =>array(
-c:8227
       'name'=>array(
         'en'=>'Fire Resistance Potion (3:00)',
         ''=>'',
@@ -4093,7 +4085,6 @@ c:8227
       'stack'=>1),
     // fire resistance splash
     16387=>array(
-c:16419
       'name'=>array(
         'en'=>'Fire Resistance Splash Potion (2:15)',
         ''=>'',
@@ -4130,7 +4121,6 @@ c:16419
       'icon'=>'Potion_Poison.png',
       'stack'=>1),
     8204 =>array(
-c:8268
       'name'=>array(
         'en'=>'Instant Damage',
         ''=>'',
@@ -4138,7 +4128,6 @@ c:8268
       'icon'=>'Potion_Harming.png',
       'stack'=>1),
     8236 =>array(
-c:8236
       'name'=>array(
         'en'=>'Instant Damage II',
         ''=>'',
@@ -4168,7 +4157,6 @@ c:8236
       'icon'=>'Potion_Poison_Splash.png',
       'stack'=>1),
     16396=>array(
-c:16460
       'name'=>array(
         'en'=>'Instant Damage Splash',
         ''=>'',
@@ -4184,7 +4172,6 @@ c:16460
       'stack'=>1),
     // healing
     8197 =>array(
-c:8261
       'name'=>array(
         'en'=>'Instant Health',
         ''=>'',
@@ -4200,7 +4187,6 @@ c:8261
       'stack'=>1),
     // healing splash
     16389=>array(
-c:16453
       'name'=>array(
         'en'=>'Instant Health Splash',
         ''=>'',
@@ -4216,7 +4202,6 @@ c:16453
       'stack'=>1),
     // weakness
     8200 =>array(
-c:8232
       'name'=>array(
         'en'=>'Potion of Weakness (1:30) -0.5 attack',
         ''=>'',
@@ -4224,7 +4209,6 @@ c:8232
       'icon'=>'Potion_Weakness.png',
       'stack'=>1),
     8264 =>array(
-c:8264
       'name'=>array(
         'en'=>'Potion of Weakness (4:00) -0.5 attack',
         ''=>'',
@@ -4233,7 +4217,6 @@ c:8264
       'stack'=>1),
     // weakness splash
     16392=>array(
-c:16424
       'name'=>array(
         'en'=>'Splash Potion of Weakness (1:07) -0.5 attack',
         ''=>'',
@@ -4293,7 +4276,6 @@ c:16424
       'stack'=>1),
     // slowness
     8202 =>array(
-c:8234
       'name'=>array(
         'en'=>'Slowness Potion (1:30) -15% speed',
         ''=>'',
@@ -4309,7 +4291,6 @@ c:8234
       'stack'=>1),
     // slowness splash
     16394=>array(
-c:16426
       'name'=>array(
         'en'=>'Slowness Splash Potion (1:07) -15% speed',
         ''=>'',
@@ -4325,7 +4306,6 @@ c:16426
       'stack'=>1),
     // water breathing
     8205 =>array(
-c:8237
       'name'=>array(
         'en'=>'Water Breathing (3:00)',
         ''=>'',
@@ -4341,7 +4321,6 @@ c:8237
       'stack'=>1),
     // water breathing splash
     16397=>array(
-c:16429
       'name'=>array(
         'en'=>'Splash of Water Breathing (2:15)',
         ''=>'',
@@ -4357,7 +4336,6 @@ c:16429
       'stack'=>1),
     // invisibility
     8206 =>array(
-c:8238
       'name'=>array(
         'en'=>'Potion of Invisibility (3:00)',
         ''=>'',
@@ -4373,7 +4351,6 @@ c:8238
       'stack'=>1),
     // invisibility splash
     16398=>array(
-c:16430
       'name'=>array(
         'en'=>'Splash Potion of Invisibility (2:15)',
         ''=>'',
@@ -4389,7 +4366,6 @@ c:16430
       'stack'=>1),
     // night vision
     8198 =>array(
-c:8230
       'name'=>array(
         'en'=>'Potion of Night Vision (3:00)',
         ''=>'',
@@ -4405,7 +4381,6 @@ c:8230
       'stack'=>1),
     // night vision splash
     16390=>array(
-c:16422
       'name'=>array(
         'en'=>'Splash Potion of Night Vision (2:15)',
         ''=>'',
@@ -4967,106 +4942,43 @@ c:16422
 );
 
 
-// survival potions
-
+// creative potion aliases
+$aliases = &ItemFuncs::$Items[373];
 // Mundane Potion
-ItemFuncs::$Items[373][8192] = &ItemFuncs::$Items[373][64];
-// Regeneration Potion (0:45)
-ItemFuncs::$Items[373][8193] = &ItemFuncs::$Items[373][16273];
-// Speed Potion (3:00)
-ItemFuncs::$Items[373][8194] = &ItemFuncs::$Items[373][16274];
-// Fire Resistance Potion (3:00)
-ItemFuncs::$Items[373][8195] = &ItemFuncs::$Items[373][16307];
-// Poison Potion (0:45)
-ItemFuncs::$Items[373][8196] = &ItemFuncs::$Items[373][16276];
-// Potion of Night Vision (2:15)
-ItemFuncs::$Items[373][8198] = &ItemFuncs::$Items[373][32694];
-// Weakness Potion (1:30)
-ItemFuncs::$Items[373][8200] = &ItemFuncs::$Items[373][16312];
-// Strength Potion (3:00)
-ItemFuncs::$Items[373][8201] = &ItemFuncs::$Items[373][16281];
-// Slowness Potion (1:30)
-ItemFuncs::$Items[373][8202] = &ItemFuncs::$Items[373][16314];
-// Instant Damage
-ItemFuncs::$Items[373][8204] = &ItemFuncs::$Items[373][32732];
-// Potion of Invisibility (2:15)
-ItemFuncs::$Items[373][8206] = &ItemFuncs::$Items[373][32702];
-// Regeneration Potion II (0:22)
-ItemFuncs::$Items[373][8225] = &ItemFuncs::$Items[373][16305];
-// Speed Potion II (1:30)
-ItemFuncs::$Items[373][8226] = &ItemFuncs::$Items[373][16306];
-// Poison Potion II (0:22)
-ItemFuncs::$Items[373][8228] = &ItemFuncs::$Items[373][16308];
-// Instant Health II
-ItemFuncs::$Items[373][8229] = &ItemFuncs::$Items[373][32757];
-// Strength Potion II (1:30)
-ItemFuncs::$Items[373][8233] = &ItemFuncs::$Items[373][16313];
-// Regeneration Potion (2:00)
-ItemFuncs::$Items[373][8257] = &ItemFuncs::$Items[373][16337];
-// Speed Potion (8:00)
-ItemFuncs::$Items[373][8258] = &ItemFuncs::$Items[373][16338];
-// Fire Resistance Potion (8:00)
-ItemFuncs::$Items[373][8259] = &ItemFuncs::$Items[373][16371];
-// Poison Potion (2:00)
-ItemFuncs::$Items[373][8260] = &ItemFuncs::$Items[373][16340];
-// Potion of Night Vision (6:00)
-ItemFuncs::$Items[373][8262] = &ItemFuncs::$Items[373][32758];
-// Weakness Potion (4:00)
-ItemFuncs::$Items[373][8264] = &ItemFuncs::$Items[373][16376];
-// Strength Potion (8:00)
-ItemFuncs::$Items[373][8265] = &ItemFuncs::$Items[373][16345];
-// Slowness Potion (4:00)
-ItemFuncs::$Items[373][8266] = &ItemFuncs::$Items[373][16378];
-// Potion of Invisibility (6:00)
-ItemFuncs::$Items[373][8270] = &ItemFuncs::$Items[373][32766];
-// Speed Potion II (4:00)
-ItemFuncs::$Items[373][8290] = &ItemFuncs::$Items[373][16370];
-// Poison Potion II (1:00)
-ItemFuncs::$Items[373][8292] = &ItemFuncs::$Items[373][16372];
-// Strength Potion II (4:00)
-ItemFuncs::$Items[373][8297] = &ItemFuncs::$Items[373][16377];
-// Splash of Regeneration (0:33)
-ItemFuncs::$Items[373][16385] = &ItemFuncs::$Items[373][32657];
-// Splash of Speed (2:15)
-ItemFuncs::$Items[373][16386] = &ItemFuncs::$Items[373][32658];
-// Splash of Fire Resistance (2:15)
-ItemFuncs::$Items[373][16387] = &ItemFuncs::$Items[373][32691];
-// Splash of Poison (0:33)
-ItemFuncs::$Items[373][16388] = &ItemFuncs::$Items[373][32660];
-// Instant Health
-ItemFuncs::$Items[373][16389] = &ItemFuncs::$Items[373][32725];
-// Splash of Weakness (1:07)
-ItemFuncs::$Items[373][16392] = &ItemFuncs::$Items[373][32696];
-// Splash of Strength (2:15)
-ItemFuncs::$Items[373][16393] = &ItemFuncs::$Items[373][32665];
-// Splash of Slowness (1:07)
-ItemFuncs::$Items[373][16394] = &ItemFuncs::$Items[373][32698];
-// Splash of Regeneration II (0:16)
-ItemFuncs::$Items[373][16417] = &ItemFuncs::$Items[373][32689];
-// Splash of Speed II (1:07)
-ItemFuncs::$Items[373][16418] = &ItemFuncs::$Items[373][32690];
-// Splash of Poison II (0:45)
-ItemFuncs::$Items[373][16420] = &ItemFuncs::$Items[373][32756];
-// Instant Health II
-ItemFuncs::$Items[373][16421] = &ItemFuncs::$Items[373][32757];
-// Splash of Strength II (1:07)
-ItemFuncs::$Items[373][16425] = &ItemFuncs::$Items[373][32697];
-// Instant Damage II
-ItemFuncs::$Items[373][16428] = &ItemFuncs::$Items[373][32764];
-// Splash of Regeneration (1:30)
-ItemFuncs::$Items[373][16449] = &ItemFuncs::$Items[373][32721];
-// Splash of Speed (6:00)
-ItemFuncs::$Items[373][16450] = &ItemFuncs::$Items[373][32722];
-// Splash of Poison II (0:16)
-ItemFuncs::$Items[373][16451] = &ItemFuncs::$Items[373][32692];
-// Splash of Poison (1:30)
-ItemFuncs::$Items[373][16452] = &ItemFuncs::$Items[373][32724];
-// Splash of Weakness (3:00)
-ItemFuncs::$Items[373][16456] = &ItemFuncs::$Items[373][32760];
-// Splash of Strength (6:00)
-ItemFuncs::$Items[373][16457] = &ItemFuncs::$Items[373][32729];
-// Splash of Slowness (3:00)
-ItemFuncs::$Items[373][16458] = &ItemFuncs::$Items[373][32762];
+$aliases[8192] = &$aliases[64];
+// fire resistance
+$aliases[8227] = &$aliases[8195];
+// fire resistance splash
+$aliases[16419] = &$aliases[16387];
+// poisons
+$aliases[8268] = &$aliases[8204];
+$aliases[8236] = &$aliases[8236];
+// poison splash
+$aliases[16460] = &$aliases[16396];
+// healing
+$aliases[8261] = &$aliases[8197];
+// healing splash
+$aliases[16453] = &$aliases[16389];
+// weakness
+$aliases[8232] = &$aliases[8200];
+// weakness splash
+$aliases[16424] = &$aliases[16392];
+// slowness
+$aliases[8234] = &$aliases[8202];
+// slowness splash
+$aliases[16426] = &$aliases[16394];
+// water breathing
+$aliases[8237] = &$aliases[8205];
+// water breathing splash
+$aliases[16429] = &$aliases[16397];
+// invisibility
+$aliases[8238] = &$aliases[8206];
+// invisibility splash
+$aliases[16430] = &$aliases[16398];
+// night vision
+$aliases[8230] = &$aliases[8198];
+// night vision splash
+$aliases[16422] = &$aliases[16390];
 
 
 ?>
