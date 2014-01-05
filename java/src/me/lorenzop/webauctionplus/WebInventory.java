@@ -20,6 +20,7 @@ public class WebInventory {
 	// inventory instances
 	protected static final Map<String, WebInventory> openInvs = new HashMap<String, WebInventory>();
 
+	protected final Player player;
 	protected final String playerName;
 	protected final Inventory chest;
 	protected final Map<Integer, Integer> tableRowIds = new HashMap<Integer, Integer>();
@@ -28,12 +29,13 @@ public class WebInventory {
 
 	public WebInventory(final Player player) {
 		if(player == null) throw new NullPointerException();
+		this.player = player;
 		this.playerName = player.getName();
 		int numSlots = WebAuctionPlus.MinMax( WebAuctionPlus.settings.getInteger("Inventory Rows"), 1, 6) * 9;
 		String invTitle = WebAuctionPlus.Lang.getString("mailbox_title");
 		if(invTitle == null || invTitle.isEmpty())
 			invTitle = "WebAuction+ MailBox";
-		this.chest = Bukkit.getServer().createInventory(null, numSlots, invTitle);
+		this.chest = Bukkit.createInventory(null, numSlots, invTitle);
 		loadInventory();
 		player.openInventory(chest);
 	}
@@ -83,7 +85,6 @@ public class WebInventory {
 	public static void ForceCloseAll() {
 		if(openInvs==null || openInvs.size()==0) return;
 		for(final String playerName : openInvs.keySet()) {
-			final Player player = Bukkit.getServer().getPlayerExact(playerName);
 			player.closeInventory();
 			WebInventory.onInventoryClose(player);
 		}
@@ -233,7 +234,7 @@ public class WebInventory {
 		}
 		// add enchantments
 		if(enchStr != null && !enchStr.isEmpty())
-			DataQueries.decodeEnchantments(Bukkit.getPlayer(playerName), stack, enchStr);
+			DataQueries.decodeEnchantments(player, stack, enchStr);
 		return stack;
 	}
 	// save inventory to db
@@ -277,7 +278,7 @@ public class WebInventory {
 				final int itemId = getTypeId(item);
 				final short itemDamage = item.getDurability();
 				final int itemQty = item.getAmount();
-				final String enchStr = DataQueries.encodeEnchantments(Bukkit.getPlayer(playerName), item);
+				String enchStr = DataQueries.encodeEnchantments(player, item);
 
 				// update existing item
 				if(tableRowIds.containsKey(i)) {
