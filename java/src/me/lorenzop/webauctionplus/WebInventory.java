@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 
 import me.lorenzop.webauctionplus.mysql.DataQueries;
 
@@ -17,34 +18,33 @@ import org.bukkit.inventory.ItemStack;
 public class WebInventory {
 
 	// inventory instances
-	protected static HashMap<String, WebInventory> openInvs = new HashMap<String, WebInventory>();
+	protected static final Map<String, WebInventory> openInvs = new HashMap<String, WebInventory>();
 
-	protected String playerName = null;
-	protected Inventory chest = null;
-	protected HashMap<Integer, Integer> tableRowIds = new HashMap<Integer, Integer>();
+	protected final String playerName;
+	protected final Inventory chest;
+	protected final Map<Integer, Integer> tableRowIds = new HashMap<Integer, Integer>();
 //	protected List<Integer> slotChanged = new ArrayList<Integer>();
 
 
-	public WebInventory(Player player) {
-		if(player == null) return;
-		playerName = player.getName();
+	public WebInventory(final Player player) {
+		if(player == null) throw new NullPointerException();
+		this.playerName = player.getName();
 		int numSlots = WebAuctionPlus.MinMax( WebAuctionPlus.settings.getInteger("Inventory Rows"), 1, 6) * 9;
 		String invTitle = WebAuctionPlus.Lang.getString("mailbox_title");
 		if(invTitle == null || invTitle.isEmpty()) invTitle = "WebAuction+ MailBox";
-		chest = Bukkit.getServer().createInventory(null, numSlots, invTitle);
+		this.chest = Bukkit.getServer().createInventory(null, numSlots, invTitle);
 		loadInventory();
 		player.openInventory(chest);
 	}
 
 
 	// open mailbox
-	public static void onInventoryOpen(Player player){
+	public static void onInventoryOpen(final Player player){
 		if(player == null) return;
-		String playerName = player.getName();
+		final String playerName = player.getName();
 		synchronized(openInvs){
 			// lock inventory
 			setLocked(playerName, true);
-			WebInventory inventory;
 			if(openInvs.containsKey(playerName)) {
 				// chest already open
 				player.sendMessage(WebAuctionPlus.chatPrefix+"MailBox already opened!");
@@ -55,19 +55,19 @@ public class WebInventory {
 			} else {
 				// create new virtual chest
 				WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Inventory opened for: "+playerName);
-				inventory = new WebInventory(player);
+				final WebInventory inventory = new WebInventory(player);
 				openInvs.put(playerName, inventory);
 			}
 		}
 		player.sendMessage(WebAuctionPlus.chatPrefix+WebAuctionPlus.Lang.getString("mailbox_opened"));
 	}
 	// close mailbox
-	public static void onInventoryClose(Player player){
+	public static void onInventoryClose(final Player player){
 		if(player == null) return;
-		String playerName = player.getName();
+		final String playerName = player.getName();
 		synchronized(openInvs){
 			if(!openInvs.containsKey(playerName)) return;
-			WebInventory inventory = openInvs.get(playerName);
+			final WebInventory inventory = openInvs.get(playerName);
 			// save inventory
 			inventory.saveInventory();
 			// remove inventory chest
@@ -80,8 +80,8 @@ public class WebInventory {
 	}
 	public static void ForceCloseAll() {
 		if(openInvs==null || openInvs.size()==0) return;
-		for(String playerName : openInvs.keySet()) {
-			Player player = Bukkit.getServer().getPlayerExact(playerName);
+		for(final String playerName : openInvs.keySet()) {
+			final Player player = Bukkit.getServer().getPlayerExact(playerName);
 			player.closeInventory();
 			WebInventory.onInventoryClose(player);
 		}
@@ -127,7 +127,7 @@ public class WebInventory {
 //		return locked;
 //	}
 	// set inventory lock
-	public static void setLocked(String playerName, boolean locked) {
+	public static void setLocked(final String playerName, final boolean locked) {
 		Connection conn = WebAuctionPlus.dataQueries.getConnection();
 		PreparedStatement st = null;
 		try {
@@ -171,7 +171,8 @@ public class WebInventory {
 				i++; if(i >= chest.getSize()) break;
 				tableRowIds.put(i, rs.getInt("id"));
 				// create/split item stack
-				stacks[i] = getSplitItemStack( rs.getInt("id"), rs.getInt("itemId"), rs.getShort("itemDamage"), rs.getInt("qty"), rs.getString("enchantments"), rs.getString("itemTitle") );
+//				stacks[i] = getSplitItemStack( rs.getInt("id"), rs.getInt("itemId"), rs.getShort("itemDamage"), rs.getInt("qty"), rs.getString("enchantments"), rs.getString("itemTitle") );
+				stacks[i] = getSplitItemStack( rs.getInt("itemId"), rs.getShort("itemDamage"), rs.getInt("qty"), rs.getString("enchantments"), rs.getString("itemTitle") );
 				if(stacks[i] == null) tableRowIds.remove(i);
 			}
 			chest.setContents(stacks);
@@ -183,23 +184,25 @@ public class WebInventory {
 		}
 	}
 	// create/split item stack
-	private ItemStack getSplitItemStack(int itemRowId, int itemId, short itemDamage, int qty, String enchStr, String itemTitle) {
-		Material mat = Material.matchMaterial(Integer.toString(itemId));
+//	private ItemStack getSplitItemStack(int itemRowId, int itemId, short itemDamage, int qty, String enchStr, String itemTitle) {
+	private ItemStack getSplitItemStack(final int itemId, final short itemDamage, final int qty, final String enchStr, final String itemTitle) {
+		final Material mat = Material.matchMaterial(Integer.toString(itemId));
 		if(mat == null) {
 			(new NullPointerException("Unknown material id: "+Integer.toString(itemId)))
 				.printStackTrace();
 			return null;
 		}
-		ItemStack stack = new ItemStack(mat, qty, itemDamage);
-		int maxSize = stack.getMaxStackSize();
+		int tmpQty = qty;
+		final ItemStack stack = new ItemStack(mat, qty, itemDamage);
+		final int maxSize = stack.getMaxStackSize();
 		if(maxSize < 1) return null;
 		// split stack
 		if(qty > maxSize) {
 			Connection conn = WebAuctionPlus.dataQueries.getConnection();
 			PreparedStatement st = null;
-			while(qty > maxSize) {
+			while(tmpQty > maxSize) {
 				try {
-					if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: getSplitItemStack  qty:"+Integer.toString(qty)+"  max:"+Integer.toString(maxSize));
+					if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: getSplitItemStack  qty:"+Integer.toString(tmpQty)+"  max:"+Integer.toString(maxSize));
 					st = conn.prepareStatement("INSERT INTO `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` ( "+
 						"`playerName`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle` )VALUES( ?, ?, ?, ?, ?, ? )");
 					st.setString(1, playerName);
@@ -216,7 +219,7 @@ public class WebInventory {
 				} finally {
 					WebAuctionPlus.dataQueries.closeResources(st, null);
 				}
-				qty -= maxSize;
+				tmpQty -= maxSize;
 			}
 			stack.setAmount(qty);
 			WebAuctionPlus.dataQueries.closeResources(conn);
@@ -323,7 +326,7 @@ public class WebInventory {
 
 
 	@SuppressWarnings("deprecation")
-	private static Integer getTypeId(ItemStack item) {
+	private static Integer getTypeId(final ItemStack item) {
 		if(item == null)
 			return null;
 		return item.getTypeId();
