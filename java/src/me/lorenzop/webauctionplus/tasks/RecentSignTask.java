@@ -98,8 +98,8 @@ public class RecentSignTask implements Runnable {
 					String[] lines = {
 						strTitle,
 						strQtyPrice,
-//						strSeller
-						strType
+						strSeller
+//						strType
 					};
 					UpdateRecentSigns(offset, lines);
 				}
