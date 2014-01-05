@@ -267,16 +267,21 @@ public class WebInventory {
 			// item in slot
 			} else {
 
+				final int itemId = getTypeId(item);
+				final short itemDamage = item.getDurability();
+				final int itemQty = item.getAmount();
+				final String enchStr = DataQueries.encodeEnchantments(Bukkit.getPlayer(playerName), item);
+
 				// update existing item
 				if(tableRowIds.containsKey(i)) {
 					try {
 						if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: saveInventory::update slot "+Integer.toString(i));
 						st = conn.prepareStatement("UPDATE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` SET "+
 							"`itemId` = ?, `itemDamage` = ?, `qty` = ?, `enchantments` = ? WHERE `id` = ? LIMIT 1");
-						st.setInt   (1, getTypeId(item));
-						st.setShort (2, item.getDurability());
-						st.setInt   (3, item.getAmount());
-						st.setString(4, DataQueries.encodeEnchantments(Bukkit.getPlayer(playerName), item));
+						st.setInt   (1, itemId);
+						st.setShort (2, itemDamage);
+						st.setInt   (3, itemQty);
+						st.setString(4, enchStr);
 						st.setInt   (5, tableRowIds.get(i));
 						st.executeUpdate();
 					} catch(SQLException e) {
@@ -295,10 +300,10 @@ public class WebInventory {
 						st = conn.prepareStatement("INSERT INTO `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` ( "+
 							"`playerName`, `itemId`, `itemDamage`, `qty`, `enchantments` )VALUES( ?, ?, ?, ?, ? )");
 						st.setString(1, playerName);
-						st.setInt   (2, getTypeId(item));
-						st.setShort (3, item.getDurability());
-						st.setInt   (4, item.getAmount());
-						st.setString(5, DataQueries.encodeEnchantments(Bukkit.getPlayer(playerName), item));
+						st.setInt   (2, itemId);
+						st.setShort (3, itemDamage);
+						st.setInt   (4, itemQty);
+						st.setString(5, enchStr);
 						st.executeUpdate();
 					} catch(SQLException e) {
 						WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Unable to insert new item to inventory!");
