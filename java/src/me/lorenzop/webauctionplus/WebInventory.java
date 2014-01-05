@@ -235,10 +235,10 @@ public class WebInventory {
 		int countDeleted  = 0;
 		for(int i = 0; i < chest.getSize(); i++) {
 //			if(!slotChanged.contains(i)) continue;
-			ItemStack Item = chest.getItem(i);
+			ItemStack item = chest.getItem(i);
 
 			// empty slot
-			if(Item == null || getTypeId(Item) == 0) {
+			if(item == null || getTypeId(item) == 0) {
 
 				// delete item
 				if(tableRowIds.containsKey(i)) {
@@ -270,10 +270,10 @@ public class WebInventory {
 						if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: saveInventory::update slot "+Integer.toString(i));
 						st = conn.prepareStatement("UPDATE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` SET "+
 							"`itemId` = ?, `itemDamage` = ?, `qty` = ?, `enchantments` = ? WHERE `id` = ? LIMIT 1");
-						st.setInt   (1, getTypeId(Item));
-						st.setShort (2, Item.getDurability());
-						st.setInt   (3, Item.getAmount());
-						st.setString(4, DataQueries.encodeEnchantments(Bukkit.getPlayer(playerName), Item));
+						st.setInt   (1, getTypeId(item));
+						st.setShort (2, item.getDurability());
+						st.setInt   (3, item.getAmount());
+						st.setString(4, DataQueries.encodeEnchantments(Bukkit.getPlayer(playerName), item));
 						st.setInt   (5, tableRowIds.get(i));
 						st.executeUpdate();
 					} catch(SQLException e) {
@@ -292,10 +292,10 @@ public class WebInventory {
 						st = conn.prepareStatement("INSERT INTO `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` ( "+
 							"`playerName`, `itemId`, `itemDamage`, `qty`, `enchantments` )VALUES( ?, ?, ?, ?, ? )");
 						st.setString(1, playerName);
-						st.setInt   (2, getTypeId(Item));
-						st.setShort (3, Item.getDurability());
-						st.setInt   (4, Item.getAmount());
-						st.setString(5, DataQueries.encodeEnchantments(Bukkit.getPlayer(playerName), Item));
+						st.setInt   (2, getTypeId(item));
+						st.setShort (3, item.getDurability());
+						st.setInt   (4, item.getAmount());
+						st.setString(5, DataQueries.encodeEnchantments(Bukkit.getPlayer(playerName), item));
 						st.executeUpdate();
 					} catch(SQLException e) {
 						WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Unable to insert new item to inventory!");
