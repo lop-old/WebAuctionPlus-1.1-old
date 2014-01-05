@@ -31,7 +31,8 @@ public class WebInventory {
 		this.playerName = player.getName();
 		int numSlots = WebAuctionPlus.MinMax( WebAuctionPlus.settings.getInteger("Inventory Rows"), 1, 6) * 9;
 		String invTitle = WebAuctionPlus.Lang.getString("mailbox_title");
-		if(invTitle == null || invTitle.isEmpty()) invTitle = "WebAuction+ MailBox";
+		if(invTitle == null || invTitle.isEmpty())
+			invTitle = "WebAuction+ MailBox";
 		this.chest = Bukkit.getServer().createInventory(null, numSlots, invTitle);
 		loadInventory();
 		player.openInventory(chest);
@@ -40,7 +41,7 @@ public class WebInventory {
 
 	// open mailbox
 	public static void onInventoryOpen(final Player player){
-		if(player == null) return;
+		if(player == null) throw new NullPointerException();
 		final String playerName = player.getName();
 		synchronized(openInvs){
 			// lock inventory
@@ -63,8 +64,9 @@ public class WebInventory {
 	}
 	// close mailbox
 	public static void onInventoryClose(final Player player){
-		if(player == null) return;
+		if(player == null) throw new NullPointerException();
 		final String playerName = player.getName();
+		if(playerName == null || playerName.isEmpty()) throw new NullPointerException();
 		synchronized(openInvs){
 			if(!openInvs.containsKey(playerName)) return;
 			final WebInventory inventory = openInvs.get(playerName);
@@ -128,6 +130,7 @@ public class WebInventory {
 //	}
 	// set inventory lock
 	public static void setLocked(final String playerName, final boolean locked) {
+		if(playerName == null || playerName.isEmpty()) throw new NullPointerException();
 		Connection conn = WebAuctionPlus.dataQueries.getConnection();
 		PreparedStatement st = null;
 		try {
@@ -171,8 +174,13 @@ public class WebInventory {
 				i++; if(i >= chest.getSize()) break;
 				tableRowIds.put(i, rs.getInt("id"));
 				// create/split item stack
-//				stacks[i] = getSplitItemStack( rs.getInt("id"), rs.getInt("itemId"), rs.getShort("itemDamage"), rs.getInt("qty"), rs.getString("enchantments"), rs.getString("itemTitle") );
-				stacks[i] = getSplitItemStack( rs.getInt("itemId"), rs.getShort("itemDamage"), rs.getInt("qty"), rs.getString("enchantments"), rs.getString("itemTitle") );
+				stacks[i] = getSplitItemStack(
+					rs.getInt("itemId"),
+					rs.getShort("itemDamage"),
+					rs.getInt("qty"),
+					rs.getString("enchantments"),
+					rs.getString("itemTitle")
+				);
 				if(stacks[i] == null) tableRowIds.remove(i);
 			}
 			chest.setContents(stacks);
@@ -184,7 +192,6 @@ public class WebInventory {
 		}
 	}
 	// create/split item stack
-//	private ItemStack getSplitItemStack(int itemRowId, int itemId, short itemDamage, int qty, String enchStr, String itemTitle) {
 	private ItemStack getSplitItemStack(final int itemId, final short itemDamage, final int qty, final String enchStr, final String itemTitle) {
 		final Material mat = Material.matchMaterial(Integer.toString(itemId));
 		if(mat == null) {
@@ -221,7 +228,7 @@ public class WebInventory {
 				}
 				tmpQty -= maxSize;
 			}
-			stack.setAmount(qty);
+			stack.setAmount(tmpQty);
 			WebAuctionPlus.dataQueries.closeResources(conn);
 		}
 		// add enchantments
