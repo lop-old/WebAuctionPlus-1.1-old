@@ -25,65 +25,65 @@ public class WebInventory {
 //	protected List<Integer> slotChanged = new ArrayList<Integer>();
 
 
-	public WebInventory(Player p) {
-		if(p == null) return;
-		playerName = p.getName();
+	public WebInventory(Player player) {
+		if(player == null) return;
+		playerName = player.getName();
 		int numSlots = WebAuctionPlus.MinMax( WebAuctionPlus.settings.getInteger("Inventory Rows"), 1, 6) * 9;
 		String invTitle = WebAuctionPlus.Lang.getString("mailbox_title");
 		if(invTitle == null || invTitle.isEmpty()) invTitle = "WebAuction+ MailBox";
 		chest = Bukkit.getServer().createInventory(null, numSlots, invTitle);
 		loadInventory();
-		p.openInventory(chest);
+		player.openInventory(chest);
 	}
 
 
 	// open mailbox
-	public static void onInventoryOpen(Player p){
-		if(p == null) return;
-		String player = p.getName();
+	public static void onInventoryOpen(Player player){
+		if(player == null) return;
+		String playerName = player.getName();
 		synchronized(openInvs){
 			// lock inventory
-			setLocked(player, true);
+			setLocked(playerName, true);
 			WebInventory inventory;
-			if(openInvs.containsKey(player)) {
+			if(openInvs.containsKey(playerName)) {
 				// chest already open
-				p.sendMessage(WebAuctionPlus.chatPrefix+"MailBox already opened!");
-				WebAuctionPlus.log.warning("Inventory already open for "+player+"!");
+				player.sendMessage(WebAuctionPlus.chatPrefix+"MailBox already opened!");
+				WebAuctionPlus.log.warning("Inventory already open for "+playerName+"!");
 				return;
 //				inventory = openInvs.get(player);
 //				p.openInventory(inventory.chest);
 			} else {
 				// create new virtual chest
-				WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Inventory opened for: "+player);
-				inventory = new WebInventory(p);
-				openInvs.put(player, inventory);
+				WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Inventory opened for: "+playerName);
+				inventory = new WebInventory(player);
+				openInvs.put(playerName, inventory);
 			}
 		}
-		p.sendMessage(WebAuctionPlus.chatPrefix+WebAuctionPlus.Lang.getString("mailbox_opened"));
+		player.sendMessage(WebAuctionPlus.chatPrefix+WebAuctionPlus.Lang.getString("mailbox_opened"));
 	}
 	// close mailbox
-	public static void onInventoryClose(Player p){
-		if(p == null) return;
-		String player = p.getName();
+	public static void onInventoryClose(Player player){
+		if(player == null) return;
+		String playerName = player.getName();
 		synchronized(openInvs){
-			if(!openInvs.containsKey(player)) return;
-			WebInventory inventory = openInvs.get(player);
+			if(!openInvs.containsKey(playerName)) return;
+			WebInventory inventory = openInvs.get(playerName);
 			// save inventory
 			inventory.saveInventory();
 			// remove inventory chest
-			openInvs.remove(player);
+			openInvs.remove(playerName);
 			// unlock inventory
-			setLocked(player, false);
+			setLocked(playerName, false);
 		}
 		WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"MailBox inventory closed and saved");
-		p.sendMessage(WebAuctionPlus.chatPrefix+WebAuctionPlus.Lang.getString("mailbox_closed"));
+		player.sendMessage(WebAuctionPlus.chatPrefix+WebAuctionPlus.Lang.getString("mailbox_closed"));
 	}
 	public static void ForceCloseAll() {
 		if(openInvs==null || openInvs.size()==0) return;
-		for(String player : openInvs.keySet()) {
-			Player p = Bukkit.getServer().getPlayerExact(player);
-			p.closeInventory();
-			WebInventory.onInventoryClose(p);
+		for(String playerName : openInvs.keySet()) {
+			Player player = Bukkit.getServer().getPlayerExact(playerName);
+			player.closeInventory();
+			WebInventory.onInventoryClose(player);
 		}
 	}
 
@@ -127,7 +127,7 @@ public class WebInventory {
 //		return locked;
 //	}
 	// set inventory lock
-	public static void setLocked(String player, boolean locked) {
+	public static void setLocked(String playerName, boolean locked) {
 		Connection conn = WebAuctionPlus.dataQueries.getConnection();
 		PreparedStatement st = null;
 		try {
@@ -138,7 +138,7 @@ public class WebInventory {
 				st.setInt(1, 1);
 			else
 				st.setInt(1, 0);
-			st.setString(2, player);
+			st.setString(2, playerName);
 			st.executeUpdate();
 		} catch(SQLException e) {
 			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Unable to set inventory lock");
