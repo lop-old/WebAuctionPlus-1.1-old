@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.lorenzop.webauctionplus.mysql.DataQueries;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -235,7 +233,7 @@ public class WebInventory {
 		}
 		// add enchantments
 		if(enchStr != null && !enchStr.isEmpty())
-			DataQueries.decodeEnchantments(player, stack, enchStr);
+			WebItemMeta.decodeEnchantments(player, stack, enchStr);
 		return stack;
 	}
 	// save inventory to db
@@ -279,7 +277,7 @@ public class WebInventory {
 				final int itemId = getTypeId(item);
 				final short itemDamage = item.getDurability();
 				final int itemQty = item.getAmount();
-				String enchStr = DataQueries.encodeEnchantments(player, item);
+				String enchStr = WebItemMeta.encodeEnchantments(player, item);
 
 				// update existing item
 				if(tableRowIds.containsKey(i)) {
