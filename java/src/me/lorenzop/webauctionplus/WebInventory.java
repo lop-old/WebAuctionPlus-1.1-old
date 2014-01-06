@@ -233,7 +233,7 @@ public class WebInventory {
 		}
 		// add enchantments
 		if(enchStr != null && !enchStr.isEmpty())
-			WebItemMeta.decodeEnchantments(player, stack, enchStr);
+			WebItemMeta.decodeEnchants(stack, player, enchStr);
 		return stack;
 	}
 	// save inventory to db
@@ -245,10 +245,10 @@ public class WebInventory {
 		int countDeleted  = 0;
 		for(int i = 0; i < chest.getSize(); i++) {
 //			if(!slotChanged.contains(i)) continue;
-			ItemStack item = chest.getItem(i);
+			ItemStack stack = chest.getItem(i);
 
 			// empty slot
-			if(item == null || getTypeId(item) == 0) {
+			if(stack == null || getTypeId(stack) == 0) {
 
 				// delete item
 				if(tableRowIds.containsKey(i)) {
@@ -274,10 +274,10 @@ public class WebInventory {
 			// item in slot
 			} else {
 
-				final int itemId = getTypeId(item);
-				final short itemDamage = item.getDurability();
-				final int itemQty = item.getAmount();
-				String enchStr = WebItemMeta.encodeEnchantments(player, item);
+				final int itemId = getTypeId(stack);
+				final short itemDamage = stack.getDurability();
+				final int itemQty = stack.getAmount();
+				String enchStr = WebItemMeta.encodeEnchants(stack, player);
 
 				// update existing item
 				if(tableRowIds.containsKey(i)) {

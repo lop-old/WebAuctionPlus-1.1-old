@@ -2,12 +2,15 @@ package me.lorenzop.webauctionplus;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 
 public class WebItemMeta {
@@ -18,46 +21,69 @@ public class WebItemMeta {
 	private WebItemMeta() {}
 
 
-	// encode/decode enchantments for database storage
-	public static String encodeEnchantments(Player p, ItemStack stack) {
-		if(stack == null) return "";
-		Map<Enchantment, Integer> enchantments = stack.getEnchantments();
-		if(enchantments==null || enchantments.isEmpty()) return "";
-		// get enchantments
-		HashMap<Integer, Integer> enchMap = new HashMap<Integer, Integer>();
+	// encode enchantments for database storage
+	public static String encodeEnchants(final ItemStack stack, final Player player) {
+		if(player == null) throw new NullPointerException();
+		if(stack  == null) throw new NullPointerException();
+		return encodeEnchants(getItemEnchants(stack, player));
+	}
+	private static String encodeEnchants(final Map<Enchantment, Integer> enchants) {
+		if(enchants == null || enchants.isEmpty()) return null;
+		// convert enchantments to int id for sorting
+		final Map<Integer, Integer> intMap = new HashMap<Integer, Integer>();
+		for(final Entry<Enchantment, Integer> entry : enchants.entrySet()) {
+			intMap.put(
+				getEnchId(entry.getKey()),
+				entry.getValue()
+			);
+		}
+		// sort by enchantment id
+		final SortedSet<Integer> sorted = new TreeSet<Integer>(intMap.keySet());
+		// build string
+		final StringBuilder str = new StringBuilder();
+		for(final Integer id : sorted) {
+			final int level = intMap.get(id);
+			if(str.length() > 0)
+				str.append(",");
+			str.append(Integer.toString(id));
+			str.append(":");
+			str.append(Integer.toString(level));
+		}
+		return str.toString();
+	}
+
+
+	// decode enchantments from string
+	public static void decodeEnchants(final ItemStack stack, final Player player, final String str) {
+		if(str == null || str.isEmpty()) return;
+		// parse string
+		final Map<Enchantment, Integer> tmpEnchants = decodeEnchants(str);
+		if(tmpEnchants == null || tmpEnchants.isEmpty()) return;
+		// check safe enchantments
 		boolean removedUnsafe = false;
-		for(Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
-			// check safe enchantments
-			int level = checkSafeEnchantments(stack, entry.getKey(), entry.getValue() );
+		final Map<Enchantment, Integer> enchants = new HashMap<Enchantment, Integer>();
+		for(Entry<Enchantment, Integer> entry : tmpEnchants.entrySet()) {
+			final Enchantment ench = entry.getKey();
+			final int level = checkSafeEnchantment(stack, ench, entry.getValue());
 			if(level == 0) {
 				removedUnsafe = true;
 				continue;
 			}
-			enchMap.put(getEnchId(entry.getKey()), level);
+			enchants.put(ench, level);
 		}
-		if(removedUnsafe && p != null) p.sendMessage(WebAuctionPlus.logPrefix+WebAuctionPlus.Lang.getString("removed_enchantments"));
-		// sort by enchantment id
-		SortedSet<Integer> enchSorted = new TreeSet<Integer> (enchMap.keySet());
-		// build string
-		String enchStr = "";
-		for(int enchId : enchSorted) {
-			int level = enchMap.get(enchId);
-			if(!enchStr.isEmpty()) enchStr += ",";
-			enchStr += Integer.toString(enchId)+":"+Integer.toString(level);
-		}
-		return enchStr;
+		if(removedUnsafe)
+			player.sendMessage(WebAuctionPlus.logPrefix+WebAuctionPlus.Lang.getString("removed_enchantments"));
+		applyItemEnchants(stack, player, enchants);
 	}
-	// decode enchantments from database
-	public static boolean decodeEnchantments(Player p, ItemStack stack, String enchStr) {
-		if(enchStr == null || enchStr.isEmpty()) return false;
-		Map<Enchantment, Integer> ench = new HashMap<Enchantment, Integer>();
-		String[] parts = enchStr.split(",");
-		boolean removedUnsafe = false;
-		for(String part : parts) {
+	private static Map<Enchantment, Integer> decodeEnchants(final String str) {
+		if(str == null || str.isEmpty()) return null;
+		final Map<Enchantment, Integer> enchants = new HashMap<Enchantment, Integer>();
+		// parse string
+		for(String part : str.split(",")) {
 			if(part==null || part.isEmpty()) continue;
 			String[] split = part.split(":");
 			if(split.length != 2) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Invalid enchantment data found: "+part);
+				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Invalid enchantment data: "+part);
 				continue;
 			}
 			int enchId = -1;
@@ -66,34 +92,95 @@ public class WebItemMeta {
 				enchId = Integer.valueOf(split[0]);
 				level  = Integer.valueOf(split[1]);
 			} catch(Exception ignore) {}
-			if(enchId<0 || level<1) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Invalid enchantment data found: "+part);
+			if(enchId < 0 || level < 1) {
+				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Invalid enchantment data: "+part);
 				continue;
 			}
-			Enchantment enchantment = getEnchById(enchId);
+			final Enchantment enchantment = getEnchById(enchId);
 			if(enchantment == null) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Invalid enchantment id found: "+part);
-				continue;
-			}
-			// check safe enchantments
-			level = checkSafeEnchantments(stack, enchantment, level);
-			if(level == 0) {
-				removedUnsafe = true;
+				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Invalid enchantment id: "+part);
 				continue;
 			}
 			// add enchantment to map
-			ench.put(enchantment, level);
+			enchants.put(enchantment, level);
 		}
-		if(removedUnsafe) p.sendMessage(WebAuctionPlus.logPrefix+WebAuctionPlus.Lang.getString("removed_enchantments"));
-		// add enchantments to stack
-		if(WebAuctionPlus.timEnabled())
-			stack.addUnsafeEnchantments(ench);
-		else
-			stack.addEnchantments(ench);
-		return removedUnsafe;
+		if(enchants.isEmpty())
+			return null;
+		return enchants;
 	}
+
+
+	// safely get enchantments from an item
+	public static Map<Enchantment, Integer> getItemEnchants(final ItemStack stack, final Player player) {
+		if(stack == null) return null;
+		final Map<Enchantment, Integer> enchants = new HashMap<Enchantment, Integer>();
+		Map<Enchantment, Integer> tmpEnchants = null;
+
+		// item meta
+//		if(stack.hasItemMeta()) {
+			final ItemMeta meta = stack.getItemMeta();
+			// enchanted book
+			if(meta instanceof EnchantmentStorageMeta) {
+				EnchantmentStorageMeta bookMeta = (EnchantmentStorageMeta) meta;
+				tmpEnchants = bookMeta.getStoredEnchants();
+			}
+//		}
+		// normal item
+		if(tmpEnchants == null)
+			tmpEnchants = stack.getEnchantments();
+
+		// check safe enchantments
+		boolean removedUnsafe = false;
+		for(Entry<Enchantment, Integer> entry : tmpEnchants.entrySet()) {
+			final Enchantment ench = entry.getKey();
+			final int level = checkSafeEnchantment(stack, ench, entry.getValue());
+			if(level <= 0) {
+				removedUnsafe = true;
+				continue;
+			}
+			enchants.put(ench, level);
+		}
+		if(removedUnsafe && player != null)
+			player.sendMessage(WebAuctionPlus.logPrefix+WebAuctionPlus.Lang.getString("removed_enchantments"));
+		return enchants;
+	}
+	// safely apply enchantments to a stack
+	private static void applyItemEnchants(final ItemStack stack, final Player player,
+			Map<Enchantment, Integer> enchants) {
+		if(stack == null || enchants == null || enchants.isEmpty()) return;
+		boolean removedUnsafe = false;
+		for(Entry<Enchantment, Integer> entry : enchants.entrySet()) {
+			final Enchantment ench = entry.getKey();
+			final int level = checkSafeEnchantment(stack, ench, entry.getValue());
+			if(level <= 0) {
+				removedUnsafe = true;
+				continue;
+			}
+
+			// item meta
+			final ItemMeta meta = stack.getItemMeta();
+			// enchanted book
+			if(meta instanceof EnchantmentStorageMeta) {
+				EnchantmentStorageMeta bookMeta = (EnchantmentStorageMeta) meta;
+				bookMeta.addStoredEnchant(ench, level, WebAuctionPlus.timEnabled());
+				stack.setItemMeta(bookMeta);
+				continue;
+			}
+			// normal item
+			if(WebAuctionPlus.timEnabled())
+				stack.addUnsafeEnchantment(ench, level);
+			else
+				stack.addEnchantment(ench, level);
+		}
+		if(removedUnsafe && player != null)
+			player.sendMessage(WebAuctionPlus.logPrefix+WebAuctionPlus.Lang.getString("removed_enchantments"));
+	}
+
+
 	// check natural enchantment
-	public static int checkSafeEnchantments(ItemStack stack, Enchantment enchantment, int level) {
+	private static int checkSafeEnchantment(
+			final ItemStack stack, final Enchantment ench, final int level) {
+/*
 		if(stack == null || enchantment == null) return 0;
 		if(level < 1) return 0;
 		// can enchant item
@@ -117,6 +204,7 @@ public class WebItemMeta {
 				level = enchantment.getMaxLevel();
 			}
 		}
+*/
 		return level;
 	}
 
