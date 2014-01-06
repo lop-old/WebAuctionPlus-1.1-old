@@ -58,21 +58,6 @@ public class WebItemMeta {
 		if(str == null || str.isEmpty()) return;
 		// parse string
 		final Map<Enchantment, Integer> tmpEnchants = decodeEnchants(str);
-		if(tmpEnchants == null || tmpEnchants.isEmpty()) return;
-		// check safe enchantments
-		boolean removedUnsafe = false;
-		final Map<Enchantment, Integer> enchants = new HashMap<Enchantment, Integer>();
-		for(Entry<Enchantment, Integer> entry : tmpEnchants.entrySet()) {
-			final Enchantment ench = entry.getKey();
-			final int level = checkSafeEnchantment(stack, ench, entry.getValue());
-			if(level < 1) {
-				removedUnsafe = true;
-				continue;
-			}
-			enchants.put(ench, level);
-		}
-		if(removedUnsafe)
-			player.sendMessage(WebAuctionPlus.logPrefix+WebAuctionPlus.Lang.getString("removed_enchantments"));
 		applyItemEnchants(stack, player, enchants);
 	}
 	private static Map<Enchantment, Integer> decodeEnchants(final String str) {
