@@ -1,6 +1,8 @@
 package me.lorenzop.webauctionplus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
@@ -23,32 +25,54 @@ public class WebItemMeta {
 
 	// encode enchantments for database storage
 	public static String encodeEnchants(final ItemStack stack, final Player player) {
-		if(player == null) throw new NullPointerException();
 		if(stack  == null) throw new NullPointerException();
-		return encodeEnchants(getItemEnchants(stack, player));
-	}
-	private static String encodeEnchants(final Map<Enchantment, Integer> enchants) {
-		if(enchants == null || enchants.isEmpty()) return null;
-		// convert enchantments to int id for sorting
-		final Map<Integer, Integer> intMap = new HashMap<Integer, Integer>();
-		for(final Entry<Enchantment, Integer> entry : enchants.entrySet()) {
-			intMap.put(
-				getEnchId(entry.getKey()),
-				entry.getValue()
-			);
-		}
-		// sort by enchantment id
-		final SortedSet<Integer> sorted = new TreeSet<Integer>(intMap.keySet());
-		// build string
+		final Map<Enchantment, Integer> enchants = getItemEnchants(stack, player);
+		final boolean hasEnchants = !enchants.isEmpty();
 		final StringBuilder str = new StringBuilder();
-		for(final Integer id : sorted) {
-			final int level = intMap.get(id);
-			if(str.length() > 0)
-				str.append(",");
-			str.append(Integer.toString(id));
-			str.append(":");
-			str.append(Integer.toString(level));
+		if(hasEnchants) {
+			// convert enchantments to int id for sorting
+			final Map<Integer, Integer> intMap = new HashMap<Integer, Integer>();
+			for(final Entry<Enchantment, Integer> entry : enchants.entrySet()) {
+				intMap.put(
+					getEnchId(entry.getKey()),
+					entry.getValue()
+				);
+			}
+			// sort by enchantment id
+			final SortedSet<Integer> sorted = new TreeSet<Integer>(intMap.keySet());
+			// append enchantments to string
+			for(final Integer id : sorted) {
+				final int level = intMap.get(id);
+				if(str.length() > 0)
+					str.append(",");
+				str.append(Integer.toString(id));
+				str.append(":");
+				str.append(Integer.toString(level));
+			}
 		}
+		if(stack.hasItemMeta()) {
+			final ItemMeta meta = stack.getItemMeta();
+			// append display name to string
+			if(meta.hasDisplayName()) {
+				if(str.length() > 0)
+					str.append(",");
+				str.append("<NAME>:");
+				str.append( meta.getDisplayName().replace(":", "").replace(",", "").trim() );
+			}
+			// append lore to string
+			if(meta.hasLore()) {
+				final String[] lore = meta.getLore().toArray(new String[0]);
+				for(final String line : lore) {
+					if(line == null) continue;
+					if(str.length() > 0)
+						str.append(",");
+					str.append("<LORE>:");
+					str.append( line.replace(":", "").replace(",", "").trim() );
+				}
+			}
+		}
+		if(str.length() == 0)
+			return null;
 		return str.toString();
 	}
 
@@ -56,12 +80,6 @@ public class WebItemMeta {
 	// decode enchantments from string
 	public static void decodeEnchants(final ItemStack stack, final Player player, final String str) {
 		if(str == null || str.isEmpty()) return;
-		// parse string
-		final Map<Enchantment, Integer> tmpEnchants = decodeEnchants(str);
-		applyItemEnchants(stack, player, enchants);
-	}
-	private static Map<Enchantment, Integer> decodeEnchants(final String str) {
-		if(str == null || str.isEmpty()) return null;
 		final Map<Enchantment, Integer> enchants = new HashMap<Enchantment, Integer>();
 		// parse string
 		for(String part : str.split(",")) {
@@ -71,6 +89,24 @@ public class WebItemMeta {
 				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Invalid enchantment data: "+part);
 				continue;
 			}
+			// custom name
+			if(split[0].equals("<NAME>")) {
+				final ItemMeta meta = stack.getItemMeta();
+				meta.setDisplayName(split[1].trim());
+				stack.setItemMeta(meta);
+				continue;
+			}
+			// lore
+			if(split[0].equals("<LORE>")) {
+				final ItemMeta meta = stack.getItemMeta();
+				List<String> lore = meta.getLore();
+				if(lore == null) lore = new ArrayList<String>();
+				lore.add(split[1].trim());
+				meta.setLore(lore);
+				stack.setItemMeta(meta);
+				continue;
+			}
+			// enchantment
 			int enchId = -1;
 			int level  = -1;
 			try {
@@ -89,27 +125,27 @@ public class WebItemMeta {
 			// add enchantment to map
 			enchants.put(enchantment, level);
 		}
-		if(enchants.isEmpty())
-			return null;
-		return enchants;
+		// apply enchantments to item
+		if(enchants != null && !enchants.isEmpty())
+			applyItemEnchants(stack, player, enchants);
 	}
 
 
 	// safely get enchantments from an item
-	public static Map<Enchantment, Integer> getItemEnchants(final ItemStack stack, final Player player) {
+	private static Map<Enchantment, Integer> getItemEnchants(final ItemStack stack, final Player player) {
 		if(stack == null) return null;
 		final Map<Enchantment, Integer> enchants = new HashMap<Enchantment, Integer>();
 		Map<Enchantment, Integer> tmpEnchants = null;
 
 		// item meta
-//		if(stack.hasItemMeta()) {
+		if(stack.hasItemMeta()) {
 			final ItemMeta meta = stack.getItemMeta();
 			// enchanted book
 			if(meta instanceof EnchantmentStorageMeta) {
 				EnchantmentStorageMeta bookMeta = (EnchantmentStorageMeta) meta;
 				tmpEnchants = bookMeta.getStoredEnchants();
 			}
-//		}
+		}
 		// normal item
 		if(tmpEnchants == null)
 			tmpEnchants = stack.getEnchantments();
@@ -165,12 +201,16 @@ public class WebItemMeta {
 	// check natural enchantment
 	private static int checkSafeEnchantment(final ItemStack stack, final Enchantment ench, int level) {
 		final int FAIL_VALUE = -1;
+		// enchanted book
+		final boolean isContainer = (stack.getItemMeta() instanceof EnchantmentStorageMeta);
 		if(stack == null || ench == null) return FAIL_VALUE;
 		if(level < 1) return FAIL_VALUE;
 		// can enchant item
-		if(!ench.canEnchantItem(stack)) {
-			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Removed unsafe enchantment: "+stack.toString()+"  "+ench.toString());
-			return FAIL_VALUE;
+		if(!isContainer) {
+			if(!ench.canEnchantItem(stack)) {
+				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Removed unsafe enchantment: "+stack.toString()+"  "+ench.toString());
+				return FAIL_VALUE;
+			}
 		}
 		if(WebAuctionPlus.timEnabled()) {
 			if(level > 127) level = 127;
