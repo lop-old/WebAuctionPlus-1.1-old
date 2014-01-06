@@ -65,7 +65,7 @@ public class WebItemMeta {
 		for(Entry<Enchantment, Integer> entry : tmpEnchants.entrySet()) {
 			final Enchantment ench = entry.getKey();
 			final int level = checkSafeEnchantment(stack, ench, entry.getValue());
-			if(level == 0) {
+			if(level < 1) {
 				removedUnsafe = true;
 				continue;
 			}
@@ -134,7 +134,7 @@ public class WebItemMeta {
 		for(Entry<Enchantment, Integer> entry : tmpEnchants.entrySet()) {
 			final Enchantment ench = entry.getKey();
 			final int level = checkSafeEnchantment(stack, ench, entry.getValue());
-			if(level <= 0) {
+			if(level < 1) {
 				removedUnsafe = true;
 				continue;
 			}
@@ -152,7 +152,7 @@ public class WebItemMeta {
 		for(Entry<Enchantment, Integer> entry : enchants.entrySet()) {
 			final Enchantment ench = entry.getKey();
 			final int level = checkSafeEnchantment(stack, ench, entry.getValue());
-			if(level <= 0) {
+			if(level < 1) {
 				removedUnsafe = true;
 				continue;
 			}
@@ -178,33 +178,31 @@ public class WebItemMeta {
 
 
 	// check natural enchantment
-	private static int checkSafeEnchantment(
-			final ItemStack stack, final Enchantment ench, final int level) {
-/*
-		if(stack == null || enchantment == null) return 0;
-		if(level < 1) return 0;
+	private static int checkSafeEnchantment(final ItemStack stack, final Enchantment ench, int level) {
+		final int FAIL_VALUE = -1;
+		if(stack == null || ench == null) return FAIL_VALUE;
+		if(level < 1) return FAIL_VALUE;
 		// can enchant item
-		if(!enchantment.canEnchantItem(stack)) {
-			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Removed unsafe enchantment: "+stack.toString()+"  "+enchantment.toString());
-			return 0;
+		if(!ench.canEnchantItem(stack)) {
+			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Removed unsafe enchantment: "+stack.toString()+"  "+ench.toString());
+			return FAIL_VALUE;
 		}
 		if(WebAuctionPlus.timEnabled()) {
 			if(level > 127) level = 127;
 		} else {
 			// level too low
-			if(level < enchantment.getStartLevel()) {
+			if(level < ench.getStartLevel()) {
 				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Raised unsafe enchantment: "+
-					Integer.toString(level)+"  "+stack.toString()+"  "+enchantment.toString()+"  to level: "+enchantment.getStartLevel() );
-				level = enchantment.getStartLevel();
+					Integer.toString(level)+"  "+stack.toString()+"  "+ench.toString()+"  to level: "+ench.getStartLevel() );
+				level = ench.getStartLevel();
 			}
 			// level too high
-			if(level > enchantment.getMaxLevel()) {
+			if(level > ench.getMaxLevel()) {
 				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Lowered unsafe enchantment: "+
-					Integer.toString(level)+"  "+stack.toString()+"  "+enchantment.toString()+"  to level: "+enchantment.getMaxLevel() );
-				level = enchantment.getMaxLevel();
+					Integer.toString(level)+"  "+stack.toString()+"  "+ench.toString()+"  to level: "+ench.getMaxLevel() );
+				level = ench.getMaxLevel();
 			}
 		}
-*/
 		return level;
 	}
 
