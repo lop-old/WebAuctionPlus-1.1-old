@@ -578,8 +578,9 @@ public class WebAuctionPlus extends JavaPlugin {
 			}
 //			log.info(logPrefix+"Starting metrics");
 			// Create graphs for total Buy Nows / Auctions
-			pxnMetrics.Graph lineGraph = metrics.createGraph("Stacks For Sale");
-			pxnMetrics.Graph pieGraph  = metrics.createGraph("Selling Method");
+			final pxnMetrics.Graph lineGraph  = metrics.createGraph("Stacks For Sale");
+			final pxnMetrics.Graph pieGraph   = metrics.createGraph("Selling Method");
+			final pxnMetrics.Graph stockTrend = metrics.createGraph("Stock Trend");
 			// buy now count
 			pxnMetrics.Plotter plotterBuyNows = new pxnMetrics.Plotter("Buy Nows") {
 				@Override
@@ -600,6 +601,20 @@ public class WebAuctionPlus extends JavaPlugin {
 			// selling ratio
 			pieGraph.addPlotter(plotterBuyNows);
 			pieGraph.addPlotter(plotterAuctions);
+			// stock trends
+			stockTrend.addPlotter(new pxnMetrics.Plotter("New") {
+				@Override
+				public int getValue() {
+					return stats.getNewAuctionsCount();
+				}
+			});
+			stockTrend.addPlotter(new pxnMetrics.Plotter("Ended") {
+				@Override
+				public int getValue() {
+					return stats.getEndedAuctionsCount();
+				}
+			});
+			// start reporting
 			metrics.start();
 		} catch (IOException e) {
 			// Failed to submit the stats :-(

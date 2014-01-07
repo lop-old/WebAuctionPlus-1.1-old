@@ -14,6 +14,10 @@ public class waStats {
 	private volatile int totalBuyNowCount  = 0;
 	private volatile int totalAuctionCount = 0;
 	private volatile int maxAuctionId      =-1;
+	private volatile int newAuctionsCount        = 0;
+	private volatile int newAuctionsCount_lastId = 0;
+	private volatile int endAuctionsCount        = 0;
+	private volatile int endAuctionsCount_lastId = 0;
 
 	private volatile long lastUpdate = -1;
 	private final Object lock = new Object();
@@ -98,6 +102,77 @@ public class waStats {
 			}
 		}
 
+
+		// get new auctions count
+		{
+			PreparedStatement st = null;
+			ResultSet rs = null;
+			this.newAuctionsCount = 0;
+			try {
+				final boolean isFirst = (this.newAuctionsCount_lastId < 1);
+				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Stats::getNewAuctionsCount"+(isFirst ? " -first-" : ""));
+				if(isFirst) {
+					// first query
+					st = conn.prepareStatement("SELECT MAX(`id`) AS `id` FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`");
+					rs = st.executeQuery();
+					if(rs.next()) {
+						this.newAuctionsCount = 0;
+						this.newAuctionsCount_lastId = rs.getInt("id");
+					}
+				} else {
+					// refresher query
+					st = conn.prepareStatement("SELECT COUNT(*) AS `count`, MAX(`id`) AS `id` FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` WHERE `id` > ?");
+					st.setInt(1, this.newAuctionsCount_lastId);
+					rs = st.executeQuery();
+					if(rs.next()) {
+						this.newAuctionsCount = rs.getInt("count");
+						if(this.newAuctionsCount > 0)
+							this.newAuctionsCount_lastId = rs.getInt("id");
+					}
+				}
+			} catch (SQLException e) {
+				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to query for new auctions count");
+				e.printStackTrace();
+			} finally {
+				DataQueries.closeResources(st, rs);
+			}
+		}
+
+		// get ended auctions count
+		{
+			PreparedStatement st = null;
+			ResultSet rs = null;
+			this.endAuctionsCount = 0;
+			try {
+				final boolean isFirst = (this.endAuctionsCount_lastId < 1);
+				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Stats::getNewSalesCount"+(isFirst ? " -first-" : ""));
+				if(isFirst) {
+					// first query
+					st = conn.prepareStatement("SELECT MAX(`id`) AS `id` FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales`");
+					rs = st.executeQuery();
+					if(rs.next()) {
+						this.endAuctionsCount = 0;
+						this.endAuctionsCount_lastId = rs.getInt("id");
+					}
+				} else {
+					// refresher query
+					st = conn.prepareStatement("SELECT COUNT(*) AS `count`, MAX(`id`) AS `id` FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales` WHERE `id` > ?");
+					st.setInt(1, this.endAuctionsCount_lastId);
+					rs = st.executeQuery();
+					if(rs.next()) {
+						this.endAuctionsCount = rs.getInt("count");
+						if(this.endAuctionsCount > 0)
+							this.endAuctionsCount_lastId = rs.getInt("id");
+					}
+				}
+			} catch (SQLException e) {
+				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to query for new sales count");
+				e.printStackTrace();
+			} finally {
+				DataQueries.closeResources(st, rs);
+			}
+		}
+
 		WebAuctionPlus.dataQueries.closeResources(conn);
 	}
 
@@ -114,6 +189,14 @@ public class waStats {
 	public int getMaxAuctionID() {
 		Update();
 		return maxAuctionId;
+	}
+	public int getNewAuctionsCount() {
+		Update();
+		return newAuctionsCount;
+	}
+	public int getEndedAuctionsCount() {
+		Update();
+		return endAuctionsCount;
 	}
 
 
