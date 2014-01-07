@@ -96,16 +96,55 @@ public static function getDisplay($tableRowId, $itemId, $itemDamage, $qty, $ench
   if(!is_array($outputs)) {echo 'Failed to load html!'; exit();}
   // render enchantments
   $enchOutput = '';
-  foreach($enchantments as $enchId=>$level){
-    $htmlRow = $outputs['enchantment'];
+  $nameOutput = '';
+  $loreOutput = '';
+  foreach($enchantments as $key=>$value){
+    if(empty($key) || empty($value)) continue;
+
+    // custom name
+    if($key == "<NAME>") {
+      $nameOutput = $outputs['custom name'];
+      $tags = array(
+        'name' => $value
+      );
+      RenderHTML::RenderTags($nameOutput, $tags);
+      reset($tags);
+      continue;
+    }
+
+    // lore
+    if($key == "<LORE>") {
+      $loreOutput = '';
+      foreach(explode("\\n", trim($value)) as $line) {
+        if(!empty($loreOutput))
+          $loreOutput .= $outputs['lore split'];
+        $tags = array(
+          'line' => $line,
+        );
+        $tmp = $outputs['lore line'];
+        RenderHTML::RenderTags($tmp, $tags);
+        $loreOutput .= $tmp;
+        reset($tmp, $tags);
+      }
+      continue;
+    }
+
+    // enchantment
+    $tmp = $outputs['enchantment'];
+    $enchId = (int) $key;
+    $level  = (int) $value;
     $tags = array(
       'ench id'    => $enchId,
       'ench name'  => self::getEnchantmentTitle($enchId),
       'ench title' => self::getEnchantmentTitle($enchId),
       'ench level' => numberToRoman($level)
     );
-    RenderHTML::RenderTags($htmlRow, $tags);
-    $enchOutput .= $htmlRow;
+    RenderHTML::RenderTags($tmp, $tags);
+    if(!empty($enchOutput))
+      $enchOutput .= $outputs['enchantment split'];
+    $enchOutput .= $tmp;
+    reset($tmp, $tags);
+
   }
   // render item block
   $output = $outputs['item'];
@@ -114,6 +153,8 @@ public static function getDisplay($tableRowId, $itemId, $itemDamage, $qty, $ench
     'item id'            => $itemId,
     'item damage'        => self::getDamagedChargedStr($itemId, $itemDamage),
     'item qty'           => $qty,
+    'custom name'        => $nameOutput,
+    'lore'               => $loreOutput,
     'enchantments'       => $enchOutput,
     'item name'          => self::getItemName    ($itemId, $itemDamage),
     'item title'         => self::getItemTitle   ($itemId, $itemDamage),
@@ -124,7 +165,9 @@ public static function getDisplay($tableRowId, $itemId, $itemDamage, $qty, $ench
   $itemType = self::getItemType($itemId);
   if($itemType != 'tool') $tags['enchantments'] = '';
   RenderHTML::RenderTags($output, $tags);
-  RenderHTML::Block($output, 'has damage'      , !empty($tags['item damage'])  );
+  RenderHTML::Block($output, 'has damage',       !empty($tags['item damage'])  );
+  RenderHTML::Block($output, 'has custom name',  !empty($tags['custom name'])  );
+  RenderHTML::Block($output, 'has lore',         !empty($tags['lore'])         );
   RenderHTML::Block($output, 'has enchantments', !empty($tags['enchantments']) );
   return($output);
 }

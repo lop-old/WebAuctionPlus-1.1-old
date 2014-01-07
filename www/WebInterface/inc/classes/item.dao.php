@@ -96,7 +96,8 @@ public static function parseEnchantments($enchStr) {
   foreach($lines as $line){
     $parts = explode(':', $line);
     if(count($parts) != 2) continue;
-    $output[(int)$parts[0]] = (int)$parts[1];
+//    $output[(int)$parts[0]] = (int)$parts[1];
+    $output[$parts[0]] = $parts[1];
   }
   return($output);
 }

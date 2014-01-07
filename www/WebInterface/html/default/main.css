@@ -158,3 +158,10 @@ label {
 table.display {
   text-align: center;
 }
+
+.display_custom_name {
+  color: #aa00aa;
+}
+.display_lore {
+  color: #aa00aa;
+}
