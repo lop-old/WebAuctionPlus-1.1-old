@@ -516,8 +516,8 @@ public class MySQLTables {
 	public void closeResources(Connection conn) {
 		dataQueries.closeResources(conn);
 	}
-	public void closeResources(Statement st, ResultSet rs) {
-		dataQueries.closeResources(st, rs);
+	public static void closeResources(Statement st, ResultSet rs) {
+		DataQueries.closeResources(st, rs);
 	}
 	public void executeRawSQL(String sql) {
 		dataQueries.executeRawSQL(sql);

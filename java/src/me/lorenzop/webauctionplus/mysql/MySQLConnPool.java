@@ -124,7 +124,7 @@ public class MySQLConnPool {
 			}
 		}
 	}
-	public void closeResources(Statement st, ResultSet rs) {
+	public static void closeResources(Statement st, ResultSet rs) {
 		if (rs != null) {
 			try {
 				rs.close();

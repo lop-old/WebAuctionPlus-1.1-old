@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import me.lorenzop.webauctionplus.mysql.DataQueries;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -224,7 +226,7 @@ public class WebInventory {
 					e.printStackTrace();
 					return null;
 				} finally {
-					WebAuctionPlus.dataQueries.closeResources(st, null);
+					DataQueries.closeResources(st, null);
 				}
 				tmpQty -= maxSize;
 			}
@@ -261,7 +263,7 @@ public class WebInventory {
 						WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Unable to delete item from inventory!");
 						e.printStackTrace();
 					} finally {
-						WebAuctionPlus.dataQueries.closeResources(st, null);
+						DataQueries.closeResources(st, null);
 					}
 					countDeleted++;
 					continue;
@@ -295,7 +297,7 @@ public class WebInventory {
 						WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Unable to update item to inventory!");
 						e.printStackTrace();
 					} finally {
-						WebAuctionPlus.dataQueries.closeResources(st, null);
+						DataQueries.closeResources(st, null);
 					}
 					countUpdated++;
 					continue;
@@ -316,7 +318,7 @@ public class WebInventory {
 						WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Unable to insert new item to inventory!");
 						e.printStackTrace();
 					} finally {
-						WebAuctionPlus.dataQueries.closeResources(st, null);
+						DataQueries.closeResources(st, null);
 					}
 					countInserted++;
 					continue;

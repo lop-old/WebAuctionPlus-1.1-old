@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import me.lorenzop.webauctionplus.WebAuctionPlus;
+import me.lorenzop.webauctionplus.mysql.DataQueries;
 
 public class waStats {
 
@@ -49,7 +50,7 @@ public class waStats {
 			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to get total buy now count");
 			e.printStackTrace();
 		} finally {
-			WebAuctionPlus.dataQueries.closeResources(st, rs);
+			DataQueries.closeResources(st, rs);
 		}
 
 		// total auctions
@@ -65,7 +66,7 @@ public class waStats {
 			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to get total auction count");
 			e.printStackTrace();
 		} finally {
-			WebAuctionPlus.dataQueries.closeResources(st, rs);
+			DataQueries.closeResources(st, rs);
 		}
 
 		// get max auction id
@@ -81,7 +82,7 @@ public class waStats {
 			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to query for max Auction ID");
 			e.printStackTrace();
 		} finally {
-			WebAuctionPlus.dataQueries.closeResources(st, rs);
+			DataQueries.closeResources(st, rs);
 		}
 
 		WebAuctionPlus.dataQueries.closeResources(conn);
