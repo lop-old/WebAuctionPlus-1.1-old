@@ -54,7 +54,7 @@ public class WebAuctionPlus extends JavaPlugin {
 	public static final Logger log = Logger.getLogger("Minecraft");
 
 	public static pxnMetrics metrics;
-	public static waStats Stats;
+	public static waStats stats;
 
 	// plugin version
 	public static String currentVersion = null;
@@ -207,7 +207,7 @@ public class WebAuctionPlus extends JavaPlugin {
 				return false;
 
 		// load stats class
-		if(Stats == null) Stats = new waStats();
+		if(stats == null) stats = new waStats();
 
 		// load settings from db
 		if(settings != null) settings = null;
@@ -584,14 +584,14 @@ public class WebAuctionPlus extends JavaPlugin {
 			pxnMetrics.Plotter plotterBuyNows = new pxnMetrics.Plotter("Buy Nows") {
 				@Override
 				public int getValue(){
-					return Stats.getTotalBuyNows();
+					return stats.getTotalBuyNows();
 				}
 			};
 			// auction count
 			pxnMetrics.Plotter plotterAuctions = new pxnMetrics.Plotter("Auctions") {
 				@Override
 				public int getValue(){
-					return Stats.getTotalAuctions();
+					return stats.getTotalAuctions();
 				}
 			};
 			// total selling

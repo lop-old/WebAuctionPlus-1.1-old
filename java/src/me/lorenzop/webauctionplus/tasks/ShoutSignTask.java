@@ -21,13 +21,13 @@ public class ShoutSignTask implements Runnable {
 	public ShoutSignTask(WebAuctionPlus plugin) {
 		this.plugin = plugin;
 		// Get current auction ID
-		lastAuction = WebAuctionPlus.Stats.getMaxAuctionID();
+		lastAuction = WebAuctionPlus.stats.getMaxAuctionID();
 		if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Current Auction id = "+lastAuction);
 	}
 
 	public void run() {
 		// check for new auctions
-		int latestAuctionID = WebAuctionPlus.Stats.getMaxAuctionID();
+		int latestAuctionID = WebAuctionPlus.stats.getMaxAuctionID();
 		if(lastAuction >= latestAuctionID) return;
 		lastAuction = latestAuctionID;
 		if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Current Auction id = "+lastAuction);
