@@ -29,8 +29,9 @@ $output.='
   <p style="margin-bottom: 10px; font-size: smaller; color: #FFFFFF;">'.
     '<b>&nbsp;Rendered page in '.GetRenderTime().' Seconds with '.((int)@$num_queries).' Queries&nbsp;</b></p>
   <p style="font-size: smaller; color: #FFFFFF;">'.
-    '<a href="http://validator.w3.org/#validate_by_input" target="_blank">'.
-    '<img src="{path=static}/valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" width="88" height="31" style="border-width: 0px;" /></a></p>
+//    '<a href="http://validator.w3.org/#validate_by_input" target="_blank">'.
+//    '<img src="{path=static}/valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" width="88" height="31" style="border-width: 0px;" /></a></p>
+'
 </div>
 ';
 switch($html->getPageFrame()){
