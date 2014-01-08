@@ -115,7 +115,7 @@ public static function getDisplay($tableRowId, $itemId, $itemDamage, $qty, $ench
     // lore
     if($key == "<LORE>") {
       $loreOutput = '';
-      foreach(explode("\\n", trim($value)) as $line) {
+      foreach(explode("\\\\n", trim($value)) as $line) {
         if(!empty($loreOutput))
           $loreOutput .= $outputs['lore split'];
         $tags = array(
