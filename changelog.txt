@@ -1,5 +1,18 @@
 WebAuctionPlus - Change Log
 
+
+2014-01-08 WA+ 1.1.14 beta
+==========================
+* updated to bukkit 1.7.2-R0.2 beta and fixed depreciated calls
+* added many new items (more than 100)
+* added support for enchanted books, lore, and custom item names
+* fixed (hopefully) all potions displaying on the website
+* fixed a glitch causing items to fail displaying on the website when player has caps in their name
+* improved fail messages when plugin doesn't load
+* fixed a few threading bugs causing rare crashes, more to find
+* updated metrics class and added new/ended stats
+
+
 2013-02-25 WA+ 1.1.9 beta r336
 ==========================
 * updated to bukkit 1.4.7-R1.0 and removed depreciated calls
