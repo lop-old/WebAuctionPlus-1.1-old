@@ -61,13 +61,13 @@ public class WebItemMeta {
 			}
 			// append lore to string
 			if(meta.hasLore()) {
+				str.append("<LORE>:");
 				final String[] lore = meta.getLore().toArray(new String[0]);
 				for(final String line : lore) {
 					if(line == null) continue;
 					if(str.length() > 0)
-						str.append(",");
-					str.append("<LORE>:");
-					str.append( line.replace(":", "").replace(",", "").trim() );
+						str.append("\\n");
+					str.append( line.replace(":", "").replace(",", "").replace("\\n", "").trim() );
 				}
 			}
 		}
@@ -101,7 +101,8 @@ public class WebItemMeta {
 				final ItemMeta meta = stack.getItemMeta();
 				List<String> lore = meta.getLore();
 				if(lore == null) lore = new ArrayList<String>();
-				lore.add(split[1].trim());
+				for(final String s : split[1].split("\\n"))
+					lore.add(s.trim());
 				meta.setLore(lore);
 				stack.setItemMeta(meta);
 				continue;
