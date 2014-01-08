@@ -62,7 +62,7 @@ public class WebInventory {
 				openInvs.put(playerName, inventory);
 			}
 		}
-		player.sendMessage(WebAuctionPlus.chatPrefix+WebAuctionPlus.Lang.getString("mailbox_opened"));
+//		player.sendMessage(WebAuctionPlus.chatPrefix+WebAuctionPlus.Lang.getString("mailbox_opened"));
 	}
 	// close mailbox
 	public static void onInventoryClose(final Player player){

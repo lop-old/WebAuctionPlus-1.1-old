@@ -186,7 +186,7 @@ public class RecentSignTask implements Runnable {
 		if(Bukkit.isPrimaryThread())
 			return loc.getBlock();
 		// run in main thread
-		Callable<Block> task = new Callable<Block>() {
+		final Callable<Block> task = new Callable<Block>() {
 			@Override
 			public Block call() throws Exception {
 				return loc.getBlock();
