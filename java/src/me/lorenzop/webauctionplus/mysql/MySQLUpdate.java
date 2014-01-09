@@ -14,9 +14,57 @@ public class MySQLUpdate {
 		// update potions  (< 1.1.6)
 		if(WebAuctionPlus.compareVersions(fromVersion, "1.1.6").equals("<"))
 			UpdatePotions1_1_6();
+		// update db fields  (< 1.1.14)
+		if(WebAuctionPlus.compareVersions(fromVersion, "1.1.14").equals("<"))
+			UpdateFields1_1_14();
 	}
 
 
+	public static boolean execQuery(final Connection conn, final String sql) {
+		if(conn == null) return false;
+		if(sql == null || sql.isEmpty()) return false;
+		PreparedStatement st = null;
+		try {
+			st = conn.prepareStatement(sql);
+			st.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("FAILED QUERY: "+sql);
+			return false;
+		} finally {
+			DataQueries.closeResources(st, null);
+		}
+		return true;
+	}
+
+
+	// update broken fields
+	private static void UpdateFields1_1_14() {
+		final Connection conn = WebAuctionPlus.dataQueries.getConnection();
+		try {
+			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updating db fields for 1.1.14");
+			final String[] queries = new String[]{
+				// enchantment/meta fields
+				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` CHANGE `enchantments` `enchantments` VARCHAR(255) NULL DEFAULT NULL",
+				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items`    CHANGE `enchantments` `enchantments` VARCHAR(255) NULL DEFAULT NULL",
+				// enums
+				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales` CHANGE `logType`  `logType`  ENUM('', 'new', 'sale', 'cancel') NULL DEFAULT NULL",
+				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales` CHANGE `saleType` `saleType` ENUM('', 'buynow', 'auction') NULL DEFAULT NULL",
+				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales` CHANGE `itemType` `itemType` ENUM('', 'tool', 'map', 'book') NULL DEFAULT NULL",
+				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players`  CHANGE `Permissions` `Permissions` SET('', 'canBuy', 'canSell', 'isAdmin') NULL DEFAULT NULL"
+			};
+			// execute queries
+			for(final String sql : queries) {
+				if(sql == null || sql.isEmpty()) continue;
+				if(!execQuery(conn, sql)) {
+					WebAuctionPlus.fail("Failed to update from 1.1.9! Check console log for details.");
+					throw new RuntimeException();
+				}
+			}
+		} finally {
+			WebAuctionPlus.dataQueries.closeResources(conn);
+		}
+	}
 	// update potions
 	private static void UpdatePotions1_1_6() {
 		WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updating potions for Minecraft 1.3");

@@ -134,7 +134,7 @@ public class MySQLTables {
 				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`itemsBought`	`itemsBought`	INT    (11)		NOT NULL	DEFAULT '0'");
 				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`earnt`			`earnt`			DECIMAL(11,2) 	NOT NULL	DEFAULT '0.00'");
 				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`spent`			`spent`			DECIMAL(11,2) 	NOT NULL	DEFAULT '0.00'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Players`	ADD			`Permissions`	SET( 'canBuy', 'canSell', 'isAdmin' )	NULL	DEFAULT NULL");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Players`	ADD			`Permissions`	SET( '', 'canBuy', 'canSell', 'isAdmin' )	NULL	DEFAULT NULL");
 			} else
 				setTableExists("Players",
 					"`id`				INT    (11)		NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
@@ -145,7 +145,7 @@ public class MySQLTables {
 					"`itemsBought`		INT    (11)		NOT NULL	DEFAULT '0'		, " +
 					"`earnt`			DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'	, " +
 					"`spent`			DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'	, " +
-					"`Permissions`		SET( 'canBuy', 'canSell', 'isAdmin' ) NULL DEFAULT NULL ," +
+					"`Permissions`		SET( '', 'canBuy', 'canSell', 'isAdmin' ) NULL DEFAULT NULL ," +
 					"`Locked`			TINYINT(1)		NOT NULL	DEFAULT '0'		");
 		// RecentSigns
 		else if (tableName.equals("RecentSigns"))
@@ -215,10 +215,10 @@ public class MySQLTables {
 			} else
 				setTableExists("LogSales",
 					"`id`				INT(11)			NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
-					"`logType`			ENUM('new','sale','cancel')	NULL	DEFAULT NULL	, " +
-					"`saleType`			ENUM('buynow','auction')	NULL	DEFAULT NULL	, " +
+					"`logType`			ENUM('', 'new','sale','cancel')	NULL	DEFAULT NULL	, " +
+					"`saleType`			ENUM('', 'buynow','auction')	NULL	DEFAULT NULL	, " +
 					"`timestamp`		DATETIME		NOT NULL	DEFAULT '0000-00-00 00:00:00'	, " +
-					"`itemType`			ENUM('tool','map','book')	NULL	DEFAULT NULL	, " +
+					"`itemType`			ENUM('', 'tool','map','book')	NULL	DEFAULT NULL	, " +
 					"`itemId`			INT(11)			NOT NULL	DEFAULT 0		, " +
 					"`itemDamage`		INT(11)			NOT NULL	DEFAULT 0		, " +
 					"`enchantments`		VARCHAR(255)	NULL		DEFAULT NULL	, " +
