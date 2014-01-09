@@ -45,6 +45,7 @@ import org.w3c.dom.NodeList;
 
 public class WebAuctionPlus extends JavaPlugin {
 
+	private static volatile WebAuctionPlus instance = null;
 	private static volatile boolean isOk    = false;
 	private static volatile boolean isDebug = false;
 	private static volatile String failMsg = null;
@@ -111,6 +112,7 @@ public class WebAuctionPlus extends JavaPlugin {
 			getServer().getConsoleSender().sendMessage(ChatColor.RED+"********************************************");
 			return;
 		}
+		instance = this;
 		isOk = false;
 		failMsg = null;
 		currentVersion = getDescription().getVersion();
@@ -174,19 +176,22 @@ public class WebAuctionPlus extends JavaPlugin {
 	}
 
 
+	private static WebAuctionPlus getPlugin() {
+		return instance;
+	}
 	public static boolean isOk()    {return isOk;}
 	public static boolean isDebug() {return isDebug;}
 
 
-	public void fail(String msg) {
+	public static void fail(String msg) {
 		if(msg != null && !msg.isEmpty()) {
 			log.severe(logPrefix + msg);
 			if(failMsg == null) failMsg = "";
 			if(!failMsg.isEmpty()) failMsg += "|";
 			failMsg += msg;
 		}
-		onDisable();
-		failPlayerListener.start(this);
+		getPlugin().onDisable();
+		failPlayerListener.start(getPlugin());
 	}
 	public static String getFailMsg() {
 		if(failMsg == null || failMsg.isEmpty())
