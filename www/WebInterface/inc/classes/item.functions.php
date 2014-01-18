@@ -108,7 +108,7 @@ public static function getDisplay($tableRowId, $itemId, $itemDamage, $qty, $ench
         'name' => $value
       );
       RenderHTML::RenderTags($nameOutput, $tags);
-      reset($tags);
+      unset($tags);
       continue;
     }
 
@@ -124,7 +124,7 @@ public static function getDisplay($tableRowId, $itemId, $itemDamage, $qty, $ench
         $tmp = $outputs['lore line'];
         RenderHTML::RenderTags($tmp, $tags);
         $loreOutput .= $tmp;
-        reset($tmp, $tags);
+        unset($tmp, $tags);
       }
       continue;
     }
@@ -143,7 +143,7 @@ public static function getDisplay($tableRowId, $itemId, $itemDamage, $qty, $ench
     if(!empty($enchOutput))
       $enchOutput .= $outputs['enchantment split'];
     $enchOutput .= $tmp;
-    reset($tmp, $tags);
+    unset($tmp, $tags);
 
   }
   // render item block
