@@ -71,10 +71,13 @@ public static function getItemTitle($itemId=0, $itemDamage=0){
   else                      $title = $item['name'];
   // multi-language
   $title = self::getItemLangData($title);
-  if(@$item['type'] == 'tool'){$title=str_replace('%damaged%', self::getPercentDamagedStr($itemDamage,$item['damage']), $title);
-                               $title=str_replace('%charged%', self::getPercentChargedStr($itemDamage,$item['damage']), $title);
-                               $title=str_replace('%painted%', self::getPercentPaintedStr($itemDamage,$item['damage']), $title);}
-  if(@$item['type'] == 'map' ) $title=str_replace('#map#'    , $itemDamage                                            , $title);
+  if(@$item['type'] == 'tool' && isset($item['damage'])){
+    $title=str_replace('%damaged%', self::getPercentDamagedStr($itemDamage,$item['damage']), $title);
+    $title=str_replace('%charged%', self::getPercentChargedStr($itemDamage,$item['damage']), $title);
+    $title=str_replace('%painted%', self::getPercentPaintedStr($itemDamage,$item['damage']), $title);
+  }
+  if(@$item['type'] == 'map' )
+    $title=str_replace('#map#'    , $itemDamage                                            , $title);
   return($title);
 }
 
@@ -214,6 +217,8 @@ public static function getDamagedChargedStr($itemId=0, $itemDamage=0){
 private static function getPercentDamaged($itemDamage, $maxDamage){
   $a = (float)$itemDamage;
   $b = (float)$maxDamage;
+  if($a == 0.0 || $b == 0.0)
+    return '0';
   $damaged = ($a / $b) * 100.0;
   if($damaged > 0 && (string)round($damaged,1) == '0') return( (string)round($damaged, 2) );
   else                                                 return( (string)round($damaged, 1) );
