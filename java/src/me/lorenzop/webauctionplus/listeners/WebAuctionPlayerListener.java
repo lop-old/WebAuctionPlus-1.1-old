@@ -114,7 +114,7 @@ public class WebAuctionPlayerListener implements Listener {
 			double amount = 0.0D;
 			if(!lines[2].equals("All")) {
 				try {
-					amount = WebAuctionPlus.ParseDouble(lines[2]);
+					amount = WebAuctionPlus.ParseDouble(lines[2].replace(",", "."));
 				} catch(NumberFormatException ignore) {}
 			}
 			// player has enough money
@@ -158,7 +158,7 @@ public class WebAuctionPlayerListener implements Listener {
 					amount = currentMoney;
 				} else {
 					try {
-						amount = WebAuctionPlus.ParseDouble(lines[2]);
+						amount = WebAuctionPlus.ParseDouble(lines[2].replace(",", "."));
 					} catch(NumberFormatException ignore) {}
 				}
 				if(currentMoney < amount) {
