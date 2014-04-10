@@ -283,7 +283,6 @@ public class MySQLTables {
 			st    = null;
 			stNew = null;
 			rs    = null;
-			rs2   = null;
 			try {
 				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Convert Database Players");
 				// get total players
@@ -317,7 +316,7 @@ public class MySQLTables {
 				e.printStackTrace();
 			} finally {
 				closeResources(st, rs);
-				closeResources(stNew, rs2);
+				closeResources(stNew, null);
 			}
 		}
 		// move mail to items table
@@ -327,7 +326,6 @@ public class MySQLTables {
 			st    = null;
 			stNew = null;
 			rs    = null;
-			rs2   = null;
 			try {
 				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Convert Database Mail");
 				// get total mail
@@ -359,7 +357,7 @@ public class MySQLTables {
 				e.printStackTrace();
 			} finally {
 				closeResources(st, rs);
-				closeResources(stNew, rs2);
+				closeResources(stNew, null);
 			}
 			// make sure nothing's null
 			executeRawSQL("UPDATE `"+dbPrefix+"Items` SET `ItemTable`='Items' WHERE `ItemTable` IS NULL");
@@ -443,7 +441,6 @@ public class MySQLTables {
 		PreparedStatement st	= null;
 		PreparedStatement stNew	= null;
 		ResultSet rs			= null;
-		ResultSet rs2			= null;
 
 		if(tableExists("ItemEnchantments")) {
 			int totalItemEnchantments = 0;
@@ -451,7 +448,6 @@ public class MySQLTables {
 			st    = null;
 			stNew = null;
 			rs    = null;
-			rs2   = null;
 			try {
 				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Convert ItemEnchantments");
 				// get total enchantments
@@ -503,7 +499,7 @@ public class MySQLTables {
 				e.printStackTrace();
 			} finally {
 				closeResources(st, rs);
-				closeResources(stNew, rs2);
+				closeResources(stNew, null);
 			}
 		}
 		closeResources(conn);

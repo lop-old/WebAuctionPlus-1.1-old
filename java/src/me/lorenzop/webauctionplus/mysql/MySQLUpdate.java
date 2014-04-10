@@ -268,7 +268,7 @@ public class MySQLUpdate {
 			for(final String sql : queries) {
 				if(sql == null || sql.isEmpty()) continue;
 				if(!execQuery(conn, sql)) {
-					WebAuctionPlus.fail("Failed to update from 1.1.9! Check console log for details.");
+					WebAuctionPlus.fail("Failed to update from 1.1.9 to 1.1.14! Check console log for details.");
 					throw new RuntimeException();
 				}
 			}
@@ -276,6 +276,8 @@ public class MySQLUpdate {
 			WebAuctionPlus.dataQueries.closeResources(conn);
 		}
 	}
+
+
 	// update potions
 	private static void UpdatePotions1_1_6() {
 		WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updating potions for Minecraft 1.3");
