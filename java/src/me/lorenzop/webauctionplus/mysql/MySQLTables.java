@@ -48,7 +48,7 @@ public class MySQLTables {
 			sqlTables("ItemEnchantments");
 
 		// update 1.0 to 1.1
-		if(setColumnExists("Players",	"Locked",		"tinyint(1)   DEFAULT '0'") ) {
+		if(setColumnExists("Players",	"Locked",		"tinyint(1)   DEFAULT 0") ) {
 			setColumnExists("Auctions",	"enchantments",	"varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
 			setColumnExists("Items",	"enchantments",	"varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
 			ConvertDatabase1_1_1();
@@ -70,44 +70,45 @@ public class MySQLTables {
 		// auctions
 		if (tableName.equals("Auctions"))
 			if (alter) {
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`player`		`playerName`	VARCHAR(16)		CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`name`			`itemId`		INT    (11)		NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`damage`		`itemDamage`	INT    (11)		NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`quantity`		`qty`			INT    (11)		NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`price`			`price`			DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`player`		`player_name`	VARCHAR(16)		CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`name`			`item_id`		INT    (11)		NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`damage`		`item_damage`	INT    (11)		NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`quantity`		`item_qty`		INT    (11)		NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`price`			`price`			DECIMAL(11,2)	NOT NULL	DEFAULT 0.00");
 				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`created`		`created`		DATETIME		NOT NULL	DEFAULT '0000-00-00 00:00:00'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`allowBids`		`allowBids`		TINYINT(1)		NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`currentBid`	`currentBid`	DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`currentWinner` `currentWinner`	VARCHAR(16)		CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`allowBids`		`allow_bids`	TINYINT(1)		NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`currentBid`	`winner_bid`	DECIMAL(11,2)	NOT NULL	DEFAULT 0.00");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions`	CHANGE		`currentWinner` `winner_id`		VARCHAR(16)		CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
 			} else
 				setTableExists("Auctions",
 					"`id`				INT    (11)		NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
-					"`playerName`		VARCHAR(16)		NULL		DEFAULT NULL	, " +
-					"`itemId`			INT    (11)		NOT NULL	DEFAULT '0'		, " +
-					"`itemDamage`		INT    (11)		NOT NULL	DEFAULT '0'		, " +
-					"`qty`				INT    (11)		NOT NULL	DEFAULT '0'		, " +
-					"`enchantments`		VARCHAR(255)	NULL		DEFAULT NULL	, " +
-					"`price`			DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'	, " +
+					"`seller_id`		INT    (11)		NOT NULL	DEFAULT 0		, " +
+					"`item_id`			INT    (11)		NOT NULL	DEFAULT 0		, " +
+					"`item_damage`		INT    (11)		NOT NULL	DEFAULT 0		, " +
+					"`item_qty`			INT    (11)		NOT NULL	DEFAULT 0		, " +
+					"`item_meta`		VARCHAR(255)	NULL		DEFAULT NULL	, " +
+					"`item_title`		VARCHAR(255)	NULL		DEFAULT NULL	, " +
+					"`price`			DECIMAL(11,2)	NOT NULL	DEFAULT 0.00	, " +
 					"`created`			DATETIME		NOT NULL	DEFAULT '0000-00-00 00:00:00', " +
-					"`allowBids`		TINYINT(1)		NOT NULL	DEFAULT '0'		, " +
-					"`currentBid`		DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'	, " +
-					"`currentWinner`	VARCHAR(16)		NULL		DEFAULT NULL	");
+					"`allow_bids`		TINYINT(1)		NOT NULL	DEFAULT 0		, " +
+					"`winner_bid`		DECIMAL(11,2)	NOT NULL	DEFAULT 0.00	, " +
+					"`winner_id`		INT    (11)		NOT NULL	DEFAULT 0		");
 		// Items
 		else if (tableName.equals("Items"))
 			if (alter) {
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Items`		CHANGE		`player`		`playerName`	VARCHAR(16)		CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Items`		CHANGE		`name`			`itemId`		INT    (11)		NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Items`		CHANGE		`damage`		`itemDamage`	INT    (11)		NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Items`		CHANGE		`quantity`		`qty`			INT    (11)		NOT NULL	DEFAULT '0'");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Items`		CHANGE		`player`		`player_name`	VARCHAR(16)		CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Items`		CHANGE		`name`			`item_id`		INT    (11)		NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Items`		CHANGE		`damage`		`item_damage`	INT    (11)		NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Items`		CHANGE		`quantity`		`item_qty`		INT    (11)		NOT NULL	DEFAULT 0");
 			} else
 				setTableExists("Items",
 					"`id`				INT    (11)		NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
-					"`playerName`		VARCHAR(16)		NULL		DEFAULT NULL	, " +
-					"`itemId`			INT    (11)		NOT NULL	DEFAULT '0'		, " +
-					"`itemDamage`		INT    (11)		NOT NULL	DEFAULT '0'		, " +
-					"`qty`				INT    (11)		NOT NULL	DEFAULT '0'		, " +
-					"`enchantments`		VARCHAR(255)	NULL		DEFAULT NULL	, " +
-					"`itemTitle`		VARCHAR(32)		NULL		DEFAULT NULL	");
+					"`player_id`		INT    (11)		NOT NULL	DEFAULT 0		, " +
+					"`item_id`			INT    (11)		NOT NULL	DEFAULT 0		, " +
+					"`item_damage`		INT    (11)		NOT NULL	DEFAULT 0		, " +
+					"`item_qty`			INT    (11)		NOT NULL	DEFAULT 0		, " +
+					"`item_meta`		VARCHAR(255)	NULL		DEFAULT NULL	, " +
+					"`item_title`		VARCHAR(255)	NULL		DEFAULT NULL	");
 //		// MarketPrices
 //		else if (tableName.equals("MarketPrices"))
 //			if (alter) {
@@ -119,58 +120,58 @@ public class MySQLTables {
 //			} else
 //				setTableExists("MarketPrices",
 //					"`id`				INT    (11)		NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
-//					"`itemId`			INT    (11)		NOT NULL	DEFAULT '0'		, " +
-//					"`itemDamage`		INT    (11)		NOT NULL	DEFAULT '0'		, " +
-//					"`time`				DATETIME		NOT NULL	DEFAULT '0000-00-00 00:00:00', " +
-//					"`marketprice`		DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'	, " +
-//					"`ref`				INT    (11)		NOT NULL	DEFAULT '0'		");
+//					"`itemId`			INT    (11)		NOT NULL	DEFAULT 0		, " +
+//					"`itemDamage`		INT    (11)		NOT NULL	DEFAULT 0		, " +
+//					"`time`				DATETIME		NOT NULL	DEFAULT 0000-00-00 00:00:00, " +
+//					"`marketprice`		DECIMAL(11,2)	NOT NULL	DEFAULT 0.00	, " +
+//					"`ref`				INT    (11)		NOT NULL	DEFAULT 0		");
 		// Players
 		else if (tableName.equals("Players"))
 			if (alter) {
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Players`	CHANGE		`name`			`playerName`	VARCHAR(16)		CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Players`	CHANGE		`name`			`player_name`	VARCHAR(16)		CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
 				executeRawSQL("ALTER TABLE `"+dbPrefix+"Players`	CHANGE		`pass`			`password`		VARCHAR(32)		CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"Players`	CHANGE		`money`			`money`			DECIMAL(11,2) 	NOT NULL	DEFAULT '0.00'");
-				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`itemsSold`		`itemsSold`		INT    (11)		NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`itemsBought`	`itemsBought`	INT    (11)		NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`earnt`			`earnt`			DECIMAL(11,2) 	NOT NULL	DEFAULT '0.00'");
-				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`spent`			`spent`			DECIMAL(11,2) 	NOT NULL	DEFAULT '0.00'");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"Players`	CHANGE		`money`			`money`			DECIMAL(11,2) 	NOT NULL	DEFAULT 0.00");
+				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`itemsSold`		`items_sold`	INT    (11)		NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`itemsBought`	`items_bought`	INT    (11)		NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`earnt`			`earnt`			DECIMAL(11,2) 	NOT NULL	DEFAULT 0.00");
+				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`spent`			`spent`			DECIMAL(11,2) 	NOT NULL	DEFAULT 0.00");
 				executeRawSQL("ALTER TABLE `"+dbPrefix+"Players`	ADD			`Permissions`	SET( '', 'canBuy', 'canSell', 'isAdmin' )	NULL	DEFAULT NULL");
 			} else
 				setTableExists("Players",
 					"`id`				INT    (11)		NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
-					"`playerName`		VARCHAR(16)		NULL		DEFAULT NULL	, " +
+					"`player_name`		VARCHAR(16)		NULL		DEFAULT NULL	, " +
 					"`password`			VARCHAR(32)		NULL		DEFAULT NULL	, " +
-					"`money`			DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'	, " +
-					"`itemsSold`		INT    (11)		NOT NULL	DEFAULT '0'		, " +
-					"`itemsBought`		INT    (11)		NOT NULL	DEFAULT '0'		, " +
-					"`earnt`			DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'	, " +
-					"`spent`			DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'	, " +
+					"`money`			DECIMAL(11,2)	NOT NULL	DEFAULT 0.00	, " +
+					"`items_sold`		INT    (11)		NOT NULL	DEFAULT 0		, " +
+					"`items_bought`		INT    (11)		NOT NULL	DEFAULT 0		, " +
+					"`earnt`			DECIMAL(11,2)	NOT NULL	DEFAULT 0.00	, " +
+					"`spent`			DECIMAL(11,2)	NOT NULL	DEFAULT 0.00	, " +
 					"`Permissions`		SET( '', 'canBuy', 'canSell', 'isAdmin' ) NULL DEFAULT NULL ," +
-					"`Locked`			TINYINT(1)		NOT NULL	DEFAULT '0'		");
+					"`Locked`			TINYINT(1)		NOT NULL	DEFAULT 0		");
 		// RecentSigns
 		else if (tableName.equals("RecentSigns"))
 			if (alter) {
 				executeRawSQL("ALTER TABLE `"+dbPrefix+"RecentSigns` CHANGE		`world`			`world`		VARCHAR(32)			CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"RecentSigns` CHANGE		`offset`		`offset`	INT    (11)			NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"RecentSigns` CHANGE		`x`				`x`			INT    (11)			NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"RecentSigns` CHANGE		`y`				`y`			INT    (11)			NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"RecentSigns` CHANGE		`z`				`z`			INT    (11)			NOT NULL	DEFAULT '0'");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"RecentSigns` CHANGE		`offset`		`offset`	INT    (11)			NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"RecentSigns` CHANGE		`x`				`x`			INT    (11)			NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"RecentSigns` CHANGE		`y`				`y`			INT    (11)			NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"RecentSigns` CHANGE		`z`				`z`			INT    (11)			NOT NULL	DEFAULT 0");
 			} else
 				setTableExists("RecentSigns",
 					"`id`				INT    (11)		NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
 					"`world`			VARCHAR(32)		NULL		DEFAULT NULL	, " +
-					"`offset`			INT    (11)		NOT NULL	DEFAULT '0'		, " +
-					"`x`				INT    (11)		NOT NULL	DEFAULT '0'		, " +
-					"`y`				INT    (11)		NOT NULL	DEFAULT '0'		, " +
-					"`z`				INT    (11)		NOT NULL	DEFAULT '0'		");
+					"`offset`			INT    (11)		NOT NULL	DEFAULT 0		, " +
+					"`x`				INT    (11)		NOT NULL	DEFAULT 0		, " +
+					"`y`				INT    (11)		NOT NULL	DEFAULT 0		, " +
+					"`z`				INT    (11)		NOT NULL	DEFAULT 0		");
 //		// SellPrice
 //		else if (tableName.equals("SellPrice"))
 //			if (alter) {
-//				executeRawSQL("ALTER TABLE `"+dbPrefix+"SellPrice`	CHANGE		`name`			`itemId`	INT    (11)			NOT NULL	DEFAULT '0'");
-//				executeRawSQL("ALTER TABLE `"+dbPrefix+"SellPrice`	CHANGE		`damage`		`itemDamage` INT   (11)			NOT NULL	DEFAULT '0'");
+//				executeRawSQL("ALTER TABLE `"+dbPrefix+"SellPrice`	CHANGE		`name`			`itemId`	INT    (11)			NOT NULL	DEFAULT 0");
+//				executeRawSQL("ALTER TABLE `"+dbPrefix+"SellPrice`	CHANGE		`damage`		`itemDamage` INT   (11)			NOT NULL	DEFAULT 0");
 //				executeRawSQL("ALTER TABLE `"+dbPrefix+"SellPrice`	CHANGE		`time`			`time`		DATETIME			NOT NULL	DEFAULT '0000-00-00 00:00:00'");
-//				executeRawSQL("ALTER TABLE `"+dbPrefix+"SellPrice`	CHANGE		`quantity`		`qty`		INT    (11)			NOT NULL	DEFAULT '0'");
-//				executeRawSQL("ALTER TABLE `"+dbPrefix+"SellPrice`	CHANGE		`price`			`price`		DECIMAL(11,2)		NOT NULL	DEFAULT '0.00'");
+//				executeRawSQL("ALTER TABLE `"+dbPrefix+"SellPrice`	CHANGE		`quantity`		`qty`		INT    (11)			NOT NULL	DEFAULT 0");
+//				executeRawSQL("ALTER TABLE `"+dbPrefix+"SellPrice`	CHANGE		`price`			`price`		DECIMAL(11,2)		NOT NULL	DEFAULT 0.00");
 //				executeRawSQL("ALTER TABLE `"+dbPrefix+"SellPrice`	CHANGE		`seller`		`seller`	VARCHAR(16)			CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
 //				executeRawSQL("ALTER TABLE `"+dbPrefix+"SellPrice`	CHANGE		`buyer`			`buyer`		VARCHAR(16)			CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
 //			} else
@@ -196,18 +197,18 @@ public class MySQLTables {
 		else if (tableName.equals("ShoutSigns"))
 			if (alter) {
 				executeRawSQL("ALTER TABLE `"+dbPrefix+"ShoutSigns`	CHANGE		`world`		`world`		VARCHAR(32)		CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"ShoutSigns`	CHANGE		`radius`	`radius`	INT(11)			NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"ShoutSigns`	CHANGE		`x`			`x`			INT(11)			NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"ShoutSigns`	CHANGE		`y`			`y`			INT(11)			NOT NULL	DEFAULT '0'");
-				executeRawSQL("ALTER TABLE `"+dbPrefix+"ShoutSigns`	CHANGE		`z`			`z`			INT(11)			NOT NULL	DEFAULT '0'");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"ShoutSigns`	CHANGE		`radius`	`radius`	INT(11)			NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"ShoutSigns`	CHANGE		`x`			`x`			INT(11)			NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"ShoutSigns`	CHANGE		`y`			`y`			INT(11)			NOT NULL	DEFAULT 0");
+				executeRawSQL("ALTER TABLE `"+dbPrefix+"ShoutSigns`	CHANGE		`z`			`z`			INT(11)			NOT NULL	DEFAULT 0");
 			} else
 				setTableExists("ShoutSigns",
 					"`id`				INT(11)			NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
 					"`world`			VARCHAR(32)		NULL		DEFAULT NULL	, " +
-					"`radius`			INT(11)			NOT NULL	DEFAULT '0'		, " +
-					"`x`				INT(11)			NOT NULL	DEFAULT '0'		, " +
-					"`y`				INT(11)			NOT NULL	DEFAULT '0'		, " +
-					"`z`				INT(11)			NOT NULL	DEFAULT '0'		");
+					"`radius`			INT(11)			NOT NULL	DEFAULT 0		, " +
+					"`x`				INT(11)			NOT NULL	DEFAULT 0		, " +
+					"`y`				INT(11)			NOT NULL	DEFAULT 0		, " +
+					"`z`				INT(11)			NOT NULL	DEFAULT 0		");
 		// LogSales
 		else if (tableName.equals("LogSales"))
 			if (alter) {
@@ -217,15 +218,17 @@ public class MySQLTables {
 					"`id`				INT(11)			NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
 					"`logType`			ENUM('', 'new','sale','cancel')	NULL	DEFAULT NULL	, " +
 					"`saleType`			ENUM('', 'buynow','auction')	NULL	DEFAULT NULL	, " +
-					"`timestamp`		DATETIME		NOT NULL	DEFAULT '0000-00-00 00:00:00'	, " +
 					"`itemType`			ENUM('', 'tool','map','book')	NULL	DEFAULT NULL	, " +
-					"`itemId`			INT(11)			NOT NULL	DEFAULT 0		, " +
-					"`itemDamage`		INT(11)			NOT NULL	DEFAULT 0		, " +
-					"`enchantments`		VARCHAR(255)	NULL		DEFAULT NULL	, " +
-					"`itemTitle`		VARCHAR(32)		NULL		DEFAULT NULL	, " +
+					"`timestamp`		DATETIME		NOT NULL	DEFAULT '0000-00-00 00:00:00'	, " +
+					"`item_id`			INT(11)			NOT NULL	DEFAULT 0		, " +
+					"`item_damage`		INT(11)			NOT NULL	DEFAULT 0		, " +
+					"`item_qty`			INT(11)			NOT NULL	DEFAULT 0		, " +
+					"`item_meta`		VARCHAR(255)	NULL		DEFAULT NULL	, " +
+					"`item_title`		VARCHAR(255)	NULL		DEFAULT NULL	, " +
 					"`seller`			VARCHAR(16)		NULL		DEFAULT NULL	, " +
 					"`buyer`			VARCHAR(16)		NULL		DEFAULT NULL	, " +
-					"`qty`				INT(11)			NOT NULL	DEFAULT 0		, " +
+					"`seller_id`		INT(11)			NOT NULL	DEFAULT 0		, " +
+					"`buyer_id`			INT(11)			NOT NULL	DEFAULT 0		, " +
 					"`price`			DECIMAL(11,2)	NOT NULL	DEFAULT 0.00	, " +
 					"`alert`			TINYINT(1)		NOT NULL	DEFAULT 0		");
 	}

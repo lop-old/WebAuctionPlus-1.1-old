@@ -2,9 +2,13 @@ package me.lorenzop.webauctionplus.mysql;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import me.lorenzop.webauctionplus.WebAuctionPlus;
+
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 
 public class MySQLUpdate {
 
@@ -17,6 +21,9 @@ public class MySQLUpdate {
 		// update db fields  (< 1.1.14)
 		if(WebAuctionPlus.compareVersions(fromVersion, "1.1.14").equals("<"))
 			UpdateFields1_1_14();
+		// update db fields (< 1.1.15)
+		if(WebAuctionPlus.compareVersions(fromVersion,  "1.1.15").equals("<"))
+			UpdateFields1_1_15();
 	}
 
 
@@ -35,6 +42,210 @@ public class MySQLUpdate {
 			DataQueries.closeResources(st, null);
 		}
 		return true;
+	}
+
+
+	// update to uuid (mc 1.8)
+	private static void UpdateFields1_1_15() {
+		final Connection conn  = WebAuctionPlus.dataQueries.getConnection();
+		final Connection conn2 = WebAuctionPlus.dataQueries.getConnection();
+		PreparedStatement st = null;
+		PreparedStatement stNew = null;
+		ResultSet rs = null;
+		try {
+			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updating db fields for 1.1.15");
+
+			{
+				final String[] queries = new String[]{
+					// auctions
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`	ADD		`seller_id`						INT    (11)		NOT NULL DEFAULT 0 AFTER `id`",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`	CHANGE	`itemId`		`item_id`		INT    (11)		NOT NULL DEFAULT 0",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`	CHANGE	`itemDamage`	`item_damage`	INT    (11)		NOT NULL DEFAULT 0",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`	CHANGE	`qty`			`item_qty`		INT    (11)		NOT NULL DEFAULT 0",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`	CHANGE	`enchantments`	`item_meta`		VARCHAR(255)	NULL     DEFAULT NULL",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`	CHANGE	`itemTitle`		`item_title`	VARCHAR(255)	NULL     DEFAULT NULL",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`	CHANGE	`allowBids`		`allow_bids`	TINYINT(1)		NOT NULL DEFAULT 0",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`	CHANGE	`currentBid`	`winner_bid`	DECIMAL(11,2)	NOT NULL DEFAULT 0.00",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`	ADD		`winner_id`						INT    (11)		NOT NULL DEFAULT 0 AFTER `winner_bid`",
+					// items
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items`		ADD		`player_id`						INT    (11)		NOT NULL DEFAULT 0 AFTER `id`",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items`		CHANGE	`itemId`		`item_id`		INT    (11)		NOT NULL DEFAULT 0",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items`		CHANGE	`itemDamage`	`item_damage`	INT    (11)		NOT NULL DEFAULT 0",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items`		CHANGE	`qty`			`item_qty`		INT    (11)		NOT NULL DEFAULT 0",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items`		CHANGE	`enchantments`	`item_meta`		VARCHAR(255)	NULL     DEFAULT NULL",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items`		CHANGE	`itemTitle`		`item_title`	VARCHAR(255)	NULL     DEFAULT NULL",
+					// log sales
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales`	CHANGE	`itemId`		`item_id`		INT    (11)		NOT NULL DEFAULT 0",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales`	CHANGE	`itemDamage`	`item_damage`	INT    (11)		NOT NULL DEFAULT 0",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales`	CHANGE	`qty`			`item_qty`		INT    (11)		NOT NULL DEFAULT 0",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales`	CHANGE	`enchantments`	`item_meta`		VARCHAR(255)	NULL     DEFAULT NULL",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales`	CHANGE	`itemTitle`		`item_title`	VARCHAR(255)	NULL     DEFAULT NULL",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales`	CHANGE	`seller`		`seller`		VARCHAR(16)		NULL     DEFAULT NULL",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales`	CHANGE	`buyer`			`buyer`			VARCHAR(16)		NULL     DEFAULT NULL",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales`	ADD		`seller_id`						INT    (11)		NOT NULL DEFAULT 0 AFTER `buyer`",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales`	ADD		`buyer_id`						INT    (11)		NOT NULL DEFAULT 0 AFTER `seller_id`",
+					// players
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players`		ADD		`uuid`							VARCHAR(36)		NULL     DEFAULT NULL AFTER `id`",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players`		CHANGE	`playerName`	`player_name`	VARCHAR(16)		NULL     DEFAULT NULL",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players`		CHANGE	`itemsSold`		`items_sold`	INT    (11)		NOT NULL DEFAULT 0",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players`		CHANGE	`itemsBought`	`items_bought`	INT    (11)		NOT NULL DEFAULT 0",
+				};
+				// execute queries
+				for(final String sql : queries) {
+					if(sql == null || sql.isEmpty()) continue;
+					if(!execQuery(conn, sql)) {
+						WebAuctionPlus.fail("Failed to update from 1.1.14 to 1.1.15! Check console log for details.");
+						throw new RuntimeException();
+					}
+				}
+			}
+
+			// convert auctions table
+			{
+				st = null;
+				stNew = null;
+				rs = null;
+				int affected = 0;
+				try {
+					st = conn.prepareStatement("SELECT `id`, `playerName` FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`");
+					rs = st.executeQuery();
+					while(rs.next()) {
+						final int id = rs.getInt("id");
+						final String name = rs.getString("playerName");
+						final int player_id = getPlayerIdByName(name);
+						try {
+							stNew = conn2.prepareStatement("UPDATE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` SET `seller_id` = ? WHERE `id` = ? LIMIT 1");
+							stNew.setInt(1, player_id);
+							stNew.setInt(2, id);
+							affected += stNew.executeUpdate();
+						} catch (SQLException e) {
+							e.printStackTrace();
+							WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Unable to update auction!");
+						} finally {
+							DataQueries.closeResources(stNew, null);
+						}
+					}
+				} finally {
+					DataQueries.closeResources(st, rs);
+				}
+				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updated "+Integer.toString(affected)+" auctions.");
+			}
+
+			// convert items table
+			{
+				st = null;
+				stNew = null;
+				rs = null;
+				int affected = 0;
+				try {
+					st = conn.prepareStatement("SELECT `id`, `playerName` FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items`");
+					rs = st.executeQuery();
+					while(rs.next()) {
+						final int id = rs.getInt("id");
+						final String name = rs.getString("playerName");
+						final int player_id = getPlayerIdByName(name);
+						try {
+							stNew = conn2.prepareStatement("UPDATE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` SET `player_id` = ? WHERE `id` = ? LIMIT 1");
+							stNew.setInt(1, player_id);
+							stNew.setInt(2, id);
+							affected += stNew.executeUpdate();
+						} catch (SQLException e) {
+							e.printStackTrace();
+							WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Unable to update stored item!");
+						} finally {
+							DataQueries.closeResources(stNew, null);
+						}
+					}
+				} finally {
+					DataQueries.closeResources(st, rs);
+				}
+				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updated "+Integer.toString(affected)+" stored items.");
+			}
+
+			// convert players table
+			{
+				st = null;
+				stNew = null;
+				rs = null;
+				int affected = 0;
+				try {
+					st = conn.prepareStatement("SELECT `id`, `player_name` FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players`");
+					rs = st.executeQuery();
+					while(rs.next()) {
+						final int id = rs.getInt("id");
+						final String name = rs.getString("player_name");
+						@SuppressWarnings("deprecation")
+						final OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+						if(player == null) {
+							WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Failed to get uuid for player "+name);
+							continue;
+						}
+						final String uuid = player.getUniqueId().toString();
+						try {
+							stNew = conn2.prepareStatement("UPDATE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players` SET `uuid` = ? WHERE `id` = ? LIMIT 1");
+							stNew.setString(1, uuid);
+							stNew.setInt(2, id);
+							affected += stNew.executeUpdate();
+						} catch (SQLException e) {
+							e.printStackTrace();
+							WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Unable to update player!");
+						} finally {
+							DataQueries.closeResources(stNew, null);
+						}
+					}
+				} finally {
+					DataQueries.closeResources(st, rs);
+				}
+				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updated "+Integer.toString(affected)+" players.");
+			}
+
+			// drop old unused fields
+			{
+				final String[] queries = new String[]{
+					// auctions
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`	DROP	`playerName`",
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`	DROP	`currentWinner`",
+					// items
+					"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items`		DROP	`playerName`",
+				};
+				// execute queries
+				for(final String sql : queries) {
+					if(sql == null || sql.isEmpty()) continue;
+					if(!execQuery(conn, sql)) {
+						WebAuctionPlus.fail("Failed to update from 1.1.14 to 1.1.15! Check console log for details.");
+						throw new RuntimeException();
+					}
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Unable to update to 1.1.15!");
+		} finally {
+			WebAuctionPlus.dataQueries.closeResources(conn);
+			WebAuctionPlus.dataQueries.closeResources(conn2);
+		}
+	}
+
+
+	private static int getPlayerIdByName(final String player) {
+		Connection conn = WebAuctionPlus.dataQueries.getConnection();
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("MySQLUpdate Query: getPlayerIdByName " + player);
+			st = conn.prepareStatement("SELECT `id` FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players` WHERE `player_name` = ? LIMIT 1");
+			st.setString(1, player);
+			rs = st.executeQuery();
+			if(rs.next())
+				return rs.getInt("id");
+		} catch(SQLException e) {
+			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to get player " + player);
+			e.printStackTrace();
+		} finally {
+			WebAuctionPlus.dataQueries.closeResources(conn, st, rs);
+		}
+		return 0;
 	}
 
 
