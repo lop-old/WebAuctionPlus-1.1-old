@@ -17,7 +17,6 @@ import me.lorenzop.webauctionplus.dao.waStats;
 import me.lorenzop.webauctionplus.listeners.WebAuctionBlockListener;
 import me.lorenzop.webauctionplus.listeners.WebAuctionCommands;
 import me.lorenzop.webauctionplus.listeners.WebAuctionPlayerListener;
-import me.lorenzop.webauctionplus.listeners.WebAuctionServerListener;
 import me.lorenzop.webauctionplus.listeners.failPlayerListener;
 import me.lorenzop.webauctionplus.mysql.DataQueries;
 import me.lorenzop.webauctionplus.mysql.MySQLTables;
@@ -26,7 +25,6 @@ import me.lorenzop.webauctionplus.tasks.AnnouncerTask;
 import me.lorenzop.webauctionplus.tasks.PlayerAlertTask;
 import me.lorenzop.webauctionplus.tasks.RecentSignTask;
 import me.lorenzop.webauctionplus.tasks.ShoutSignTask;
-import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -50,6 +48,8 @@ public class WebAuctionPlus extends JavaPlugin {
 
 	private static final String loggerPrefix  = "[WebAuction+] ";
 	public static final String chatPrefix = ChatColor.DARK_GREEN+"["+ChatColor.WHITE+"WebAuction+"+ChatColor.DARK_GREEN+"] ";
+
+	private static volatile Plugins3rdParty plugins3rd = null;
 
 	public static pxnMetrics metrics;
 	public static waStats stats;
@@ -95,8 +95,6 @@ public class WebAuctionPlus extends JavaPlugin {
 	public AnnouncerTask waAnnouncerTask = null;
 	public boolean announcerEnabled	= false;
 
-	public static Economy vaultEconomy = null;
-
 
 	public WebAuctionPlus() {
 	}
@@ -114,6 +112,10 @@ public class WebAuctionPlus extends JavaPlugin {
 		failMsg = null;
 		currentVersion = getDescription().getVersion();
 
+		// 3rd party plugins
+		if(plugins3rd == null)
+			plugins3rd = new Plugins3rdParty(getLog());
+
 		// Command listener
 		getCommand("wa").setExecutor(WebAuctionCommandsListener);
 
@@ -128,7 +130,6 @@ public class WebAuctionPlus extends JavaPlugin {
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(new WebAuctionPlayerListener(this), this);
 		pm.registerEvents(new WebAuctionBlockListener (this), this);
-		pm.registerEvents(new WebAuctionServerListener(),     this);
 		isOk = true;
 	}
 
@@ -269,11 +270,9 @@ public class WebAuctionPlus extends JavaPlugin {
 			announceGlobal     = config.getBoolean("Misc.AnnounceGlobally");
 			numberOfRecentLink = config.getInt    ("SignLink.NumberOfLatestAuctionsToTrack");
 			useSignLink        = config.getBoolean("SignLink.Enabled");
-			if(useSignLink) {
-				if(!Bukkit.getPluginManager().getPlugin("SignLink").isEnabled()) {
-					getLog().warning("SignLink is enabled but plugin is not loaded!");
-					useSignLink = false;
-				}
+			if(useSignLink && !plugins3rd.isLoaded_SignLink()) {
+				getLog().warning("SignLink is found but plugin is not loaded!");
+				useSignLink = false;
 			}
 
 			// scheduled tasks
@@ -679,7 +678,7 @@ public class WebAuctionPlus extends JavaPlugin {
 		return cmp<0 ? "<" : cmp>0 ? ">" : "=";
 	}
 	public static String normalisedVersion(String version) {
-		String delim = ".";
+		final String delim = ".";
 		int maxWidth = 5;
 		String[] split = Pattern.compile(delim, Pattern.LITERAL).split(version);
 		String output = "";
@@ -696,7 +695,7 @@ public class WebAuctionPlus extends JavaPlugin {
 			public void run() {
 				try {
 					newVersion = doUpdateCheck();
-					String cmp = compareVersions(currentVersion, newVersion);
+					final String cmp = compareVersions(currentVersion, newVersion);
 					if(cmp == "<") {
 						newVersionAvailable = true;
 						final logBoots log = getLog();
