@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import me.lorenzop.webauctionplus.WebAuctionPlus;
 
+
 public class MySQLUpdate {
 
 
@@ -42,7 +43,7 @@ public class MySQLUpdate {
 	private static void UpdateFields1_1_14() {
 		final Connection conn = WebAuctionPlus.dataQueries.getConnection();
 		try {
-			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updating db fields for 1.1.14");
+			WebAuctionPlus.getLog().warning("Updating db fields for 1.1.14");
 			final String[] queries = new String[]{
 				// enchantment/meta fields
 				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` CHANGE `enchantments` `enchantments` VARCHAR(255) NULL DEFAULT NULL",
@@ -67,7 +68,7 @@ public class MySQLUpdate {
 	}
 	// update potions
 	private static void UpdatePotions1_1_6() {
-		WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updating potions for Minecraft 1.3");
+		WebAuctionPlus.getLog().warning("Updating potions for Minecraft 1.3");
 		int affected = 0;
 		affected += UpdatePotion(8193, 16273); // regen 0:45
 		affected += UpdatePotion(8194, 16274); // speed 3:00
@@ -123,7 +124,7 @@ public class MySQLUpdate {
 		affected += UpdatePotion(32754, 32722); // speed splash 2 3:00
 		affected += UpdatePotion(32756, 32724); // poison splash 2 0:45
 		affected += UpdatePotion(32761, 32729); // strength splash 2 3:00
-		WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updated "+Integer.toString(affected)+" potions");
+		WebAuctionPlus.getLog().warning("Updated "+Integer.toString(affected)+" potions");
 	}
 	private static int UpdatePotion(int fromId, int toId) {
 		return
@@ -140,8 +141,8 @@ public class MySQLUpdate {
 			st.setInt(2, fromId);
 			affected = st.executeUpdate();
 		} catch (SQLException e) {
+			WebAuctionPlus.getLog().warning("Unable to update potions!");
 			e.printStackTrace();
-			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Unable to update potions!");
 		} finally {
 			WebAuctionPlus.dataQueries.closeResources(conn, st);
 		}

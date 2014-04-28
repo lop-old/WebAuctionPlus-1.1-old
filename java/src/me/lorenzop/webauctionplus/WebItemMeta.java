@@ -86,7 +86,7 @@ public class WebItemMeta {
 			if(part==null || part.isEmpty()) continue;
 			String[] split = part.split(":");
 			if(split.length != 2) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Invalid enchantment data: "+part);
+				WebAuctionPlus.getLog().warning("Invalid enchantment data: "+part);
 				continue;
 			}
 			// custom name
@@ -115,12 +115,12 @@ public class WebItemMeta {
 				level  = Integer.valueOf(split[1]);
 			} catch(Exception ignore) {}
 			if(enchId < 0 || level < 1) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Invalid enchantment data: "+part);
+				WebAuctionPlus.getLog().warning("Invalid enchantment data: "+part);
 				continue;
 			}
 			final Enchantment enchantment = getEnchById(enchId);
 			if(enchantment == null) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Invalid enchantment id: "+part);
+				WebAuctionPlus.getLog().warning("Invalid enchantment id: "+part);
 				continue;
 			}
 			// add enchantment to map
@@ -163,7 +163,7 @@ public class WebItemMeta {
 			enchants.put(ench, level);
 		}
 		if(removedUnsafe && player != null)
-			player.sendMessage(WebAuctionPlus.logPrefix+WebAuctionPlus.Lang.getString("removed_enchantments"));
+			player.sendMessage(WebAuctionPlus.chatPrefix+WebAuctionPlus.Lang.getString("removed_enchantments"));
 		return enchants;
 	}
 	// safely apply enchantments to a stack
@@ -195,7 +195,7 @@ public class WebItemMeta {
 				stack.addEnchantment(ench, level);
 		}
 		if(removedUnsafe && player != null)
-			player.sendMessage(WebAuctionPlus.logPrefix+WebAuctionPlus.Lang.getString("removed_enchantments"));
+			player.sendMessage(WebAuctionPlus.chatPrefix+WebAuctionPlus.Lang.getString("removed_enchantments"));
 	}
 
 
@@ -209,7 +209,7 @@ public class WebItemMeta {
 		// can enchant item
 		if(!isContainer) {
 			if(!ench.canEnchantItem(stack)) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Removed unsafe enchantment: "+stack.toString()+"  "+ench.toString());
+				WebAuctionPlus.getLog().warning("Removed unsafe enchantment: "+stack.toString()+"  "+ench.toString());
 				return FAIL_VALUE;
 			}
 		}
@@ -218,14 +218,14 @@ public class WebItemMeta {
 		} else {
 			// level too low
 			if(level < ench.getStartLevel()) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Raised unsafe enchantment: "+
-					Integer.toString(level)+"  "+stack.toString()+"  "+ench.toString()+"  to level: "+ench.getStartLevel() );
+				WebAuctionPlus.getLog().warning("Raised unsafe enchantment: "+Integer.toString(level)+"  "+
+						stack.toString()+"  "+ench.toString()+"  to level: "+ench.getStartLevel() );
 				level = ench.getStartLevel();
 			}
 			// level too high
 			if(level > ench.getMaxLevel()) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Lowered unsafe enchantment: "+
-					Integer.toString(level)+"  "+stack.toString()+"  "+ench.toString()+"  to level: "+ench.getMaxLevel() );
+				WebAuctionPlus.getLog().warning("Lowered unsafe enchantment: "+Integer.toString(level)+"  "+
+						stack.toString()+"  "+ench.toString()+"  to level: "+ench.getMaxLevel() );
 				level = ench.getMaxLevel();
 			}
 		}

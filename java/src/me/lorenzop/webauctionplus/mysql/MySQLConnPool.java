@@ -8,9 +8,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import me.lorenzop.webauctionplus.WebAuctionPlus;
+import me.lorenzop.webauctionplus.logBoots;
+
 
 public class MySQLConnPool {
 
@@ -26,8 +27,12 @@ public class MySQLConnPool {
 	private List<Boolean> inuse = new ArrayList<Boolean> (4);
 	private List<Connection> connections = new ArrayList<Connection> (4);
 
-	protected static Logger log = Logger.getLogger("Minecraft");
-	protected static String logPrefix = "";
+	protected final logBoots log;
+
+
+	protected MySQLConnPool() {
+		this.log = WebAuctionPlus.getLog();
+	}
 
 
 	// get a db connection from pool
@@ -52,10 +57,10 @@ public class MySQLConnPool {
 		}
 		// check max pool size
 		if(connections.size() >= ConnPoolSizeHard) {
-			log.severe(logPrefix+"DB connection pool is full! Hard limit reached!  Size:"+Integer.toString(connections.size()));
+			log.severe("DB connection pool is full! Hard limit reached!  Size:"+Integer.toString(connections.size()));
 			return null;
 		} else if(connections.size() >= ConnPoolSizeWarn) {
-			log.warning(logPrefix+"DB connection pool is full! Warning limit reached.  Size: "+Integer.toString(connections.size()));
+			log.warning("DB connection pool is full! Warning limit reached.  Size: "+Integer.toString(connections.size()));
 		}
 		// make a new connection
 		try {
@@ -65,19 +70,19 @@ public class MySQLConnPool {
 			inuse.add(true);
 			return conn;
 		} catch (ClassNotFoundException e) {
-			WebAuctionPlus.log.severe(WebAuctionPlus.logPrefix+"Unable to load database driver!");
+			log.severe("Unable to load database driver!");
 			e.printStackTrace();
 		} catch (InstantiationException e) {
-			WebAuctionPlus.log.severe(WebAuctionPlus.logPrefix+"Unable to create database driver!");
+			log.severe("Unable to create database driver!");
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			WebAuctionPlus.log.severe(WebAuctionPlus.logPrefix+"Unable to create database driver!");
+			log.severe("Unable to create database driver!");
 			e.printStackTrace();
 		} catch (SQLException e) {
-			WebAuctionPlus.log.severe(WebAuctionPlus.logPrefix+"SQL Error!");
+			log.severe("SQL Error!");
 			e.printStackTrace();
 		}
-		log.severe(logPrefix+"Exception getting MySQL Connection");
+		log.severe("Exception getting MySQL Connection");
 		return null;
 	}
 
@@ -154,7 +159,7 @@ public class MySQLConnPool {
 			st = conn.createStatement();
 			st.executeUpdate(sql);
 		} catch (SQLException e) {
-			log.warning(logPrefix+"Exception executing raw SQL: "+sql);
+			log.warning("Exception executing raw SQL: "+sql);
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -175,7 +180,7 @@ public class MySQLConnPool {
 			while (rs.next())
 				exists = true;
 		} catch (SQLException e) {
-			log.warning(logPrefix+"Unable to check if table exists: "+tableName);
+			log.warning("Unable to check if table exists: "+tableName);
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -185,7 +190,7 @@ public class MySQLConnPool {
 	}
 	protected boolean setTableExists(String tableName, String Sql) {
 		if (tableExists(tableName)) return false;
-		log.info(logPrefix+"Creating table "+tableName);
+		log.info("Creating table "+tableName);
 		executeRawSQL("CREATE TABLE `"+dbPrefix+tableName+"` ( "+Sql+" );");
 		return true;
 	}
@@ -205,7 +210,7 @@ public class MySQLConnPool {
 				break;
 			}
 		} catch (SQLException e) {
-			log.warning(logPrefix+"Unable to check if table column exists: "+dbPrefix+tableName+"::"+columnName);
+			log.warning("Unable to check if table column exists: "+dbPrefix+tableName+"::"+columnName);
 		} finally {
 			closeResources(conn, st, rs);
 		}
@@ -219,10 +224,6 @@ public class MySQLConnPool {
 	}
 
 
-	// access layer
-	public boolean isDebug() {
-		return WebAuctionPlus.isDebug();
-	}
 	public String dbPrefix() {
 		return dbPrefix;
 	}

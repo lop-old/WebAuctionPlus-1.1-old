@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 
+
 public class WebAuctionBlockListener implements Listener {
 
 	private final WebAuctionPlus plugin;
@@ -32,7 +33,7 @@ public class WebAuctionBlockListener implements Listener {
 					p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("no_permission"));
 				} else {
 					p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("sign_removed"));
-					WebAuctionPlus.log.info(WebAuctionPlus.logPrefix + WebAuctionPlus.Lang.getString("sign_removed"));
+					WebAuctionPlus.getLog().info(WebAuctionPlus.Lang.getString("sign_removed"));
 				}
 			}
 		}

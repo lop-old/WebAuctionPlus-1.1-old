@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import me.lorenzop.webauctionplus.WebAuctionPlus;
 import me.lorenzop.webauctionplus.mysql.DataQueries;
 
+
 public class waStats {
 
 	// long cycle stats
@@ -42,7 +43,7 @@ public class waStats {
 
 
 	private void doUpdate() {
-		if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Updating stats..");
+		WebAuctionPlus.getLog().debug("Updating stats..");
 		Connection conn = WebAuctionPlus.dataQueries.getConnection();
 
 		// total buy nows
@@ -51,13 +52,13 @@ public class waStats {
 			ResultSet rs = null;
 			this.totalBuyNowCount = 0;
 			try {
-				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Stats::count buy nows");
+				WebAuctionPlus.getLog().debug("WA Query: Stats::count buy nows");
 				st = conn.prepareStatement("SELECT COUNT(*) FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` WHERE `allowBids` = 0");
 				rs = st.executeQuery();
 				if(rs.next())
 					this.totalBuyNowCount = rs.getInt(1);
 			} catch (SQLException e) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to get total buy now count");
+				WebAuctionPlus.getLog().warning("Unable to get total buy now count");
 				e.printStackTrace();
 			} finally {
 				DataQueries.closeResources(st, rs);
@@ -70,13 +71,13 @@ public class waStats {
 			ResultSet rs = null;
 			this.totalAuctionCount = 0;
 			try {
-				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Stats::count auctions");
+				WebAuctionPlus.getLog().debug("WA Query: Stats::count auctions");
 				st = conn.prepareStatement("SELECT COUNT(*) FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` WHERE `allowBids` != 0");
 				rs = st.executeQuery();
 				if(rs.next())
 					this.totalAuctionCount = rs.getInt(1);
 			} catch (SQLException e) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to get total auction count");
+				WebAuctionPlus.getLog().warning("Unable to get total auction count");
 				e.printStackTrace();
 			} finally {
 				DataQueries.closeResources(st, rs);
@@ -89,13 +90,13 @@ public class waStats {
 			ResultSet rs = null;
 			this.maxAuctionId = -1;
 			try {
-				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Stats::getMaxAuctionID");
+				WebAuctionPlus.getLog().debug("WA Query: Stats::getMaxAuctionID");
 				st = conn.prepareStatement("SELECT MAX(`id`) AS `id` FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`");
 				rs = st.executeQuery();
 				if(rs.next())
 					this.maxAuctionId = rs.getInt("id");
 			} catch (SQLException e) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to query for max Auction ID");
+				WebAuctionPlus.getLog().warning("Unable to query for max Auction ID");
 				e.printStackTrace();
 			} finally {
 				DataQueries.closeResources(st, rs);
@@ -110,7 +111,7 @@ public class waStats {
 			this.newAuctionsCount = 0;
 			try {
 				final boolean isFirst = (this.newAuctionsCount_lastId < 1);
-				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Stats::getNewAuctionsCount"+(isFirst ? " -first-" : ""));
+				WebAuctionPlus.getLog().debug("WA Query: Stats::getNewAuctionsCount"+(isFirst ? " -first-" : ""));
 				if(isFirst) {
 					// first query
 					st = conn.prepareStatement("SELECT MAX(`id`) AS `id` FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions`");
@@ -131,7 +132,7 @@ public class waStats {
 					}
 				}
 			} catch (SQLException e) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to query for new auctions count");
+				WebAuctionPlus.getLog().warning("Unable to query for new auctions count");
 				e.printStackTrace();
 			} finally {
 				DataQueries.closeResources(st, rs);
@@ -145,7 +146,7 @@ public class waStats {
 			this.endAuctionsCount = 0;
 			try {
 				final boolean isFirst = (this.endAuctionsCount_lastId < 1);
-				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Stats::getNewSalesCount"+(isFirst ? " -first-" : ""));
+				WebAuctionPlus.getLog().debug("WA Query: Stats::getNewSalesCount"+(isFirst ? " -first-" : ""));
 				if(isFirst) {
 					// first query
 					st = conn.prepareStatement("SELECT MAX(`id`) AS `id` FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales`");
@@ -166,7 +167,7 @@ public class waStats {
 					}
 				}
 			} catch (SQLException e) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to query for new sales count");
+				WebAuctionPlus.getLog().warning("Unable to query for new sales count");
 				e.printStackTrace();
 			} finally {
 				DataQueries.closeResources(st, rs);

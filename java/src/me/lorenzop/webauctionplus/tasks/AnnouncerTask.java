@@ -7,6 +7,7 @@ import me.lorenzop.webauctionplus.WebAuctionPlus;
 
 import org.bukkit.Server;
 
+
 public class AnnouncerTask implements Runnable {
 
 	private int currentAnnouncement   = 0;
@@ -53,7 +54,7 @@ public class AnnouncerTask implements Runnable {
 
 	public void announce(int lineNumber){
 		if (announcementMessages.isEmpty() || lineNumber < 0) return;
-		WebAuctionPlus.log.info(WebAuctionPlus.logPrefix + "Announcement # " + Integer.toString(lineNumber));
+		WebAuctionPlus.getLog().info("Announcement # "+Integer.toString(lineNumber));
 		announce(announcementMessages.get(lineNumber));
 	}
 

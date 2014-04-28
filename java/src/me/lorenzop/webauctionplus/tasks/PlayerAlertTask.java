@@ -13,6 +13,7 @@ import me.lorenzop.webauctionplus.dao.AuctionPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+
 public class PlayerAlertTask implements Runnable {
 
 	private String playerJoined = null;
@@ -52,7 +53,7 @@ public class PlayerAlertTask implements Runnable {
 			boolean canBuy  = p.hasPermission("wa.canbuy");
 			boolean canSell = p.hasPermission("wa.cansell");
 			boolean isAdmin = p.hasPermission("wa.webadmin");
-			WebAuctionPlus.log.info(WebAuctionPlus.logPrefix + "Player found - " + playerJoined + " with perms:" +
+			WebAuctionPlus.getLog().info("Player found - "+playerJoined+" with perms:"+
 					(canBuy ?" canBuy" :"") +
 					(canSell?" canSell":"") +
 					(isAdmin?" isAdmin":"") );
@@ -67,7 +68,7 @@ public class PlayerAlertTask implements Runnable {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: SaleAlertTask::SaleAlerts " + playersMap.toString());
+			WebAuctionPlus.getLog().debug("WA Query: SaleAlertTask::SaleAlerts "+playersMap.toString());
 			st = conn.prepareStatement("SELECT `id`, `saleType`, `itemType`, `itemTitle`, `seller`,`buyer`,`qty`,`price` FROM `" +
 				WebAuctionPlus.dataQueries.dbPrefix()+"LogSales` WHERE ( " + whereSql + " ) AND `logType` = 'sale' AND `alert` != 0 LIMIT 4");
 			for(Map.Entry<Integer, String> entry : playersMap.entrySet()) {
@@ -93,10 +94,10 @@ public class PlayerAlertTask implements Runnable {
 			}
 			// mark seen
 			if(!markSeenSql.isEmpty()) {
-				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: SaleAlertTask::SaleAlerts " + playersMap.toString());
+				WebAuctionPlus.getLog().debug("WA Query: SaleAlertTask::SaleAlerts "+playersMap.toString());
 				st = conn.prepareStatement("UPDATE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales` SET `alert` = 0 WHERE " + markSeenSql);
 				if(st.executeUpdate() == 0)
-					WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Failed to mark sale alerts seen!");
+					WebAuctionPlus.getLog().warning("Failed to mark sale alerts seen!");
 			}
 			// alert joined player
 			if(playerJoined!=null && p!=null) {
@@ -105,7 +106,7 @@ public class PlayerAlertTask implements Runnable {
 					p.sendMessage(WebAuctionPlus.chatPrefix + "A new version is available! " + WebAuctionPlus.newVersion);
 			}
 		} catch (SQLException e) {
-			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to get sale alerts for players");
+			WebAuctionPlus.getLog().warning("Unable to get sale alerts for players");
 			e.printStackTrace();
 		} finally {
 			WebAuctionPlus.dataQueries.closeResources(conn, st, rs);

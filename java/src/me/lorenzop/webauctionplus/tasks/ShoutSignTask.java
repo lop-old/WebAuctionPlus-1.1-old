@@ -12,25 +12,28 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+
 public class ShoutSignTask implements Runnable {
 
 	private int lastAuction;
 
 	private final WebAuctionPlus plugin;
 
+
 	public ShoutSignTask(WebAuctionPlus plugin) {
 		this.plugin = plugin;
 		// Get current auction ID
 		lastAuction = WebAuctionPlus.stats.getMaxAuctionID();
-		if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Current Auction id = "+lastAuction);
+		WebAuctionPlus.getLog().debug("Current Auction id = "+lastAuction);
 	}
+
 
 	public void run() {
 		// check for new auctions
 		int latestAuctionID = WebAuctionPlus.stats.getMaxAuctionID();
 		if(lastAuction >= latestAuctionID) return;
 		lastAuction = latestAuctionID;
-		if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Current Auction id = "+lastAuction);
+		WebAuctionPlus.getLog().debug("Current Auction id = "+lastAuction);
 		if(plugin.getServer().getOnlinePlayers().length == 0) return;
 
 		Auction auction = WebAuctionPlus.dataQueries.getAuction(latestAuctionID);
@@ -49,7 +52,7 @@ public class ShoutSignTask implements Runnable {
 			msg += "has started!";
 		else
 			msg += "selling for "+WebAuctionPlus.FormatPrice(auction.getPrice())+" each.";
-		WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+msg);
+		WebAuctionPlus.getLog().info(msg);
 
 		// announce globally
 		if(WebAuctionPlus.announceGlobal()) {
@@ -71,7 +74,7 @@ public class ShoutSignTask implements Runnable {
 				for(Location signLoc : SignsToRemove) {
 					plugin.shoutSigns.remove(signLoc);
 					WebAuctionPlus.dataQueries.removeShoutSign(signLoc);
-					WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Removed invalid sign at location: "+signLoc);
+					WebAuctionPlus.getLog().info("Removed invalid sign at location: "+signLoc);
 				}
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -79,5 +82,6 @@ public class ShoutSignTask implements Runnable {
 
 		}
 	}
+
 
 }

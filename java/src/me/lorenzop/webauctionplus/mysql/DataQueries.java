@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.lorenzop.webauctionplus.WebAuctionPlus;
 import me.lorenzop.webauctionplus.WebItemMeta;
 import me.lorenzop.webauctionplus.dao.Auction;
 import me.lorenzop.webauctionplus.dao.AuctionPlayer;
@@ -18,12 +17,13 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
+
 public class DataQueries extends MySQLConnPool {
 
 
 	public DataQueries(String dbHost, int dbPort, String dbUser,
 			String dbPass, String dbName, String dbPrefix) {
-		DataQueries.logPrefix = WebAuctionPlus.logPrefix;
+		super();
 		this.dbHost = dbHost;
 		this.dbPort = dbPort;
 		this.dbUser = dbUser;
@@ -40,7 +40,7 @@ public class DataQueries extends MySQLConnPool {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(isDebug()) log.info("WA Query: getAuction "+Integer.toString(auctionId));
+			log.debug("WA Query: getAuction "+Integer.toString(auctionId));
 			st = conn.prepareStatement("SELECT `playerName`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle`, "+
 				"`price`, `allowBids`, `currentBid`, `currentWinner` FROM `WA_Auctions` WHERE `id` = ? LIMIT 1");
 //UNIX_TIMESTANP(`created`) AS `created`,
@@ -67,7 +67,7 @@ public class DataQueries extends MySQLConnPool {
 				auction.setCurrentWinner(rs.getString("currentWinner"));
 			}
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to get auction " + Integer.toString(auctionId));
+			log.warning("Unable to get auction "+Integer.toString(auctionId));
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -94,7 +94,7 @@ public class DataQueries extends MySQLConnPool {
 			st.setInt   (5, z);
 			st.executeUpdate();
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to create shout sign");
+			log.warning("Unable to create shout sign");
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -114,7 +114,7 @@ public class DataQueries extends MySQLConnPool {
 			st.setInt   (4, (int) location.getZ());
 			st.executeUpdate();
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to remove shout sign at location " + location);
+			log.warning("Unable to remove shout sign at location "+location);
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -126,7 +126,7 @@ public class DataQueries extends MySQLConnPool {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(isDebug()) log.info("WA Query: getShoutSignLocations");
+			log.debug("WA Query: getShoutSignLocations");
 			st = conn.prepareStatement("SELECT `world`,`radius`,`x`,`y`,`z` FROM `"+dbPrefix+"ShoutSigns`");
 			Location location;
 			rs = st.executeQuery();
@@ -136,7 +136,7 @@ public class DataQueries extends MySQLConnPool {
 				signLocations.put(location,    rs.getInt("radius"));
 			}
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to get shout sign locations");
+			log.warning("Unable to get shout sign locations");
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -151,7 +151,7 @@ public class DataQueries extends MySQLConnPool {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(isDebug()) log.info("WA Query: createRecentSign " +
+			log.debug("WA Query: createRecentSign " +
 				world.getName() + " " + Integer.toString(offset) + " " +
 				Integer.toString(x) + "," + Integer.toString(y) + "," + Integer.toString(z) );
 			st = conn.prepareStatement("INSERT INTO `"+dbPrefix+"RecentSigns` " +
@@ -163,7 +163,7 @@ public class DataQueries extends MySQLConnPool {
 			st.setInt   (5, z);
 			st.executeUpdate();
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to create recent sign");
+			log.warning("Unable to create recent sign");
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -174,7 +174,7 @@ public class DataQueries extends MySQLConnPool {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(isDebug()) log.info("WA Query: removeRecentSign " + location.toString());
+			log.debug("WA Query: removeRecentSign "+location.toString());
 			st = conn.prepareStatement("DELETE FROM `"+dbPrefix+"RecentSigns` WHERE "+
 				"`world` = ? AND `x` = ? AND `y` = ? AND `z` = ?");
 			st.setString(1, location.getWorld().getName());
@@ -183,7 +183,7 @@ public class DataQueries extends MySQLConnPool {
 			st.setInt   (4, (int) location.getZ());
 			st.executeUpdate();
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to remove recent sign at location " + location.toString());
+			log.warning("Unable to remove recent sign at location "+location.toString());
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -195,7 +195,7 @@ public class DataQueries extends MySQLConnPool {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(isDebug()) log.info("WA Query: getRecentSignLocations");
+			log.debug("WA Query: getRecentSignLocations");
 			st = conn.prepareStatement("SELECT `world`,`offset`,`x`,`y`,`z` FROM `"+dbPrefix+"RecentSigns`");
 			Location location;
 			rs = st.executeQuery();
@@ -205,7 +205,7 @@ public class DataQueries extends MySQLConnPool {
 				signLocations.put(location,    rs.getInt("offset"));
 			}
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to get shout sign locations");
+			log.warning("Unable to get shout sign locations");
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -220,7 +220,7 @@ public class DataQueries extends MySQLConnPool {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(isDebug()) log.info("WA Query: getPlayer " + player);
+			log.debug("WA Query: getPlayer "+player);
 			st = conn.prepareStatement("SELECT `id`,`playerName`,`money`,`Permissions` " +
 				"FROM `"+dbPrefix+"Players` WHERE `playerName` = ? LIMIT 1");
 			st.setString(1, player);
@@ -233,7 +233,7 @@ public class DataQueries extends MySQLConnPool {
 				waPlayer.setPerms(     rs.getString("Permissions"));
 			}
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to get player " + player);
+			log.warning("Unable to get player "+player);
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -247,7 +247,7 @@ public class DataQueries extends MySQLConnPool {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(isDebug()) log.info("WA Query: createPlayer " + waPlayer.getPlayerName() +
+			log.debug("WA Query: createPlayer " + waPlayer.getPlayerName() +
 				" with perms: " + waPlayer.getPermsString());
 			st = conn.prepareStatement("INSERT INTO `"+dbPrefix+"Players` " +
 				"(`playerName`, `password`, `Permissions`) VALUES (?, ?, ?)");
@@ -256,7 +256,7 @@ public class DataQueries extends MySQLConnPool {
 			st.setString(3, waPlayer.getPermsString());
 			st.executeUpdate();
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to update player permissions in DB");
+			log.warning("Unable to update player permissions in DB");
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -269,13 +269,13 @@ public class DataQueries extends MySQLConnPool {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(isDebug()) log.info("WA Query: updatePlayerPassword " + player);
+			log.debug("WA Query: updatePlayerPassword "+player);
 			st = conn.prepareStatement("UPDATE `"+dbPrefix+"Players` SET `password` = ? WHERE `playerName` = ? LIMIT 1");
 			st.setString(1, newPass);
 			st.setString(2, player);
 			st.executeUpdate();
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to update password for player: " + player);
+			log.warning("Unable to update password for player: "+player);
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -292,7 +292,7 @@ public class DataQueries extends MySQLConnPool {
 		try {
 			// update player permissions for website
 			waPlayer.setPerms(canBuy, canSell, isAdmin);
-			if(isDebug()) log.info("WA Query: updatePlayerPermissions " + waPlayer.getPlayerName() +
+			log.debug("WA Query: updatePlayerPermissions " + waPlayer.getPlayerName() +
 				" with perms: " + waPlayer.getPermsString());
 			st = conn.prepareStatement("UPDATE `"+dbPrefix+"Players` SET " +
 				"`Permissions` = ? WHERE `playerName` = ? LIMIT 1");
@@ -300,7 +300,7 @@ public class DataQueries extends MySQLConnPool {
 			st.setString(2, waPlayer.getPlayerName());
 			st.executeUpdate();
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to update player permissions in DB");
+			log.warning("Unable to update player permissions in DB");
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -313,13 +313,13 @@ public class DataQueries extends MySQLConnPool {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(isDebug()) log.info("WA Query: updatePlayerMoney " + player);
+			log.debug("WA Query: updatePlayerMoney "+player);
 			st = conn.prepareStatement("UPDATE `"+dbPrefix+"Players` SET `money` = ? WHERE `playerName` = ?");
 			st.setDouble(1, money);
 			st.setString(2, player);
 			st.executeUpdate();
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to update player money in DB");
+			log.warning("Unable to update player money in DB");
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);

@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.HashMap;
 
 import me.lorenzop.webauctionplus.WebAuctionPlus;
+import me.lorenzop.webauctionplus.logBoots;
+
 
 public class MySQLTables {
 
@@ -37,13 +39,16 @@ public class MySQLTables {
 		// update existing tables from original web auction
 		if(!tableExists("ItemEnchantments") && tableExists("EnchantLinks")) {
 			sqlTables("ItemEnchantments");
+			final logBoots log = WebAuctionPlus.getLog();
 			// convert database tables to Plus
-			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "**************************************");
-			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "*** Converting database to Plus... ***");
-			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "**************************************");
+			log.warning("**************************************");
+			log.warning("*** Converting database to Plus... ***");
+			log.warning("**************************************");
 			ConvertDatabase1_0();
-			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Finished converting database to Plus!");
-			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "*** You can delete these tables from the database: EnchantLinks, Enchantments, Mail ***");
+			log.warning("**************************************");
+			log.warning("*** Finished converting database to Plus! ***");
+			log.warning("*** You can delete these tables from the database: EnchantLinks, Enchantments, Mail ***");
+			log.warning("**************************************");
 		} else
 			sqlTables("ItemEnchantments");
 
@@ -66,7 +71,7 @@ public class MySQLTables {
 	}
 	private void sqlTables(boolean alter, String tableName) {
 		if(alter)
-			if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: sqlTables " + (alter?"Alter":"Create") + " " + tableName);
+			WebAuctionPlus.getLog().debug("WA Query: sqlTables " + (alter?"Alter":"Create") + " " + tableName);
 		// auctions
 		if (tableName.equals("Auctions"))
 			if (alter) {
@@ -186,7 +191,7 @@ public class MySQLTables {
 		// Settings
 		else if (tableName.equals("Settings"))
 			if (alter)
-				WebAuctionPlus.log.severe("Shouldn't run this!");
+				WebAuctionPlus.getLog().severe("Shouldn't run this!");
 			else
 				setTableExists("Settings",
 					"`id`				INT(11)			NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
@@ -211,7 +216,7 @@ public class MySQLTables {
 		// LogSales
 		else if (tableName.equals("LogSales"))
 			if (alter) {
-				WebAuctionPlus.log.severe("Shouldn't run this!");
+				WebAuctionPlus.getLog().severe("Shouldn't run this!");
 			} else
 				setTableExists("LogSales",
 					"`id`				INT(11)			NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
@@ -249,24 +254,24 @@ public class MySQLTables {
 
 		// check if already updated
 		try {
-			if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Count Database Settings");
+			WebAuctionPlus.getLog().debug("WA Query: Count Database Settings");
 			st = conn.prepareStatement("SELECT COUNT(*) AS `count` FROM `"+dbPrefix+"Settings`");
 			rs = st.executeQuery();
 			if (!rs.next()) {
-				WebAuctionPlus.log.severe(WebAuctionPlus.logPrefix + "Could not get total settings!");
+				WebAuctionPlus.getLog().severe("Could not get total settings!");
 				return;
 			}
 			if (rs.getInt(1) != 0) {
-				WebAuctionPlus.log.severe(WebAuctionPlus.logPrefix + "ERROR!! ALREADY CONVERTED DATABASE!!");
+				WebAuctionPlus.getLog().severe("ERROR!! ALREADY CONVERTED DATABASE!!");
 				return;
 			}
 			// add a setting
-			if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Insert Version Setting");
+			WebAuctionPlus.getLog().debug("WA Query: Insert Version Setting");
 			st = conn.prepareStatement("INSERT INTO `"+dbPrefix+"Settings` (`name`,`value`) VALUES ('Version',?)");
 			st.setString(1, plugin.getDescription().getVersion().toString());
 			st.executeUpdate();
 		} catch (SQLException e) {
-			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to update Players table!");
+			WebAuctionPlus.getLog().warning("Unable to update Players table!");
 			e.printStackTrace();
 		} finally {
 			closeResources(st, rs);
@@ -282,16 +287,16 @@ public class MySQLTables {
 			rs    = null;
 			rs2   = null;
 			try {
-				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Convert Database Players");
+				WebAuctionPlus.getLog().debug("WA Query: Convert Database Players");
 				// get total players
 				st = conn.prepareStatement("SELECT COUNT(*) AS `count` FROM `"+dbPrefix+"Players`");
 				rs = st.executeQuery();
 				if (!rs.next()) {
-					WebAuctionPlus.log.severe(WebAuctionPlus.logPrefix + "Could not get total players!");
+					WebAuctionPlus.getLog().severe("Could not get total players!");
 					return;
 				}
 				totalPlayers = rs.getInt(1);
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Found " + Integer.toString(totalPlayers) + " player accounts");
+				WebAuctionPlus.getLog().warning("Found "+Integer.toString(totalPlayers)+" player accounts");
 				// get old players permissions
 				st = conn.prepareStatement("SELECT `id`,`canBuy`,`canSell`,`isAdmin` FROM `"+dbPrefix+"Players`");
 				rs = st.executeQuery();
@@ -308,9 +313,9 @@ public class MySQLTables {
 					countPlayers++;
 					if(totalPlayers > 500) WebAuctionPlus.PrintProgress(countPlayers, totalPlayers);
 				}
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Converted " + Integer.toString(countPlayers) + " player accounts");
+				WebAuctionPlus.getLog().warning("Converted "+Integer.toString(countPlayers)+" player accounts");
 			} catch (SQLException e) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to update Players table!");
+				WebAuctionPlus.getLog().warning("Unable to update Players table!");
 				e.printStackTrace();
 			} finally {
 				closeResources(st, rs);
@@ -326,16 +331,16 @@ public class MySQLTables {
 			rs    = null;
 			rs2   = null;
 			try {
-				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Convert Database Mail");
+				WebAuctionPlus.getLog().debug("WA Query: Convert Database Mail");
 				// get total mail
 				st = conn.prepareStatement("SELECT COUNT(*) AS `count` FROM `"+dbPrefix+"Mail`");
 				rs = st.executeQuery();
 				if (!rs.next()) {
-					WebAuctionPlus.log.severe(WebAuctionPlus.logPrefix + "Could not get total mail!");
+					WebAuctionPlus.getLog().severe("Could not get total mail!");
 					return;
 				}
 				totalMail = rs.getInt(1);
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Found " + Integer.toString(totalMail) + " mail stacks");
+				WebAuctionPlus.getLog().warning("Found "+Integer.toString(totalMail)+" mail stacks");
 				// get old mail items
 				st = conn.prepareStatement("SELECT `name`,`damage`,`player`,`quantity` FROM `"+dbPrefix+"Mail`");
 				rs = st.executeQuery();
@@ -350,9 +355,9 @@ public class MySQLTables {
 					countMail++;
 					if(totalMail > 500) WebAuctionPlus.PrintProgress(countMail, totalMail);
 				}
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Converted " + Integer.toString(countMail) + " mail stacks");
+				WebAuctionPlus.getLog().warning("Converted "+Integer.toString(countMail)+" mail stacks");
 			} catch (SQLException e) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to update Mail table");
+				WebAuctionPlus.getLog().warning("Unable to update Mail table");
 				e.printStackTrace();
 			} finally {
 				closeResources(st, rs);
@@ -370,16 +375,16 @@ public class MySQLTables {
 			rs    = null;
 			rs2   = null;
 			try {
-				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Convert Database Enchantments");
+				WebAuctionPlus.getLog().debug("WA Query: Convert Database Enchantments");
 				// get total enchantments
 				st = conn.prepareStatement("SELECT COUNT(*) AS `count` FROM `"+dbPrefix+"EnchantLinks`");
 				rs = st.executeQuery();
 				if (!rs.next()) {
-					WebAuctionPlus.log.severe(WebAuctionPlus.logPrefix + "Could not get total enchantments!");
+					WebAuctionPlus.getLog().severe("Could not get total enchantments!");
 					return;
 				}
 				totalEnchantments = rs.getInt(1);
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Found " + Integer.toString(totalEnchantments) + " enchantments");
+				WebAuctionPlus.getLog().warning("Found "+Integer.toString(totalEnchantments)+" enchantments");
 				// get old enchantments table
 				st = conn.prepareStatement("SELECT `enchId`,`itemTableId`,`itemId` " +
 					"FROM `"+dbPrefix+"EnchantLinks` ORDER BY `itemId` ASC");
@@ -421,9 +426,9 @@ public class MySQLTables {
 					countEnchantments++;
 					if(totalEnchantments > 500) WebAuctionPlus.PrintProgress(countEnchantments, totalEnchantments);
 				}
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Converted " + Integer.toString(countEnchantments) + " enchantments");
+				WebAuctionPlus.getLog().warning("Converted "+Integer.toString(countEnchantments)+" enchantments");
 			} catch (SQLException e) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to update Enchantments table");
+				WebAuctionPlus.getLog().warning("Unable to update Enchantments table");
 				e.printStackTrace();
 			} finally {
 				closeResources(st, rs);
@@ -450,16 +455,16 @@ public class MySQLTables {
 			rs    = null;
 			rs2   = null;
 			try {
-				if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: Convert ItemEnchantments");
+				WebAuctionPlus.getLog().debug("WA Query: Convert ItemEnchantments");
 				// get total enchantments
 				st = conn.prepareStatement("SELECT COUNT(*) AS `count` FROM `"+dbPrefix+"ItemEnchantments`");
 				rs = st.executeQuery();
 				if (!rs.next()) {
-					WebAuctionPlus.log.severe(WebAuctionPlus.logPrefix + "Could not get total item enchantments!");
+					WebAuctionPlus.getLog().severe("Could not get total item enchantments!");
 					return;
 				}
 				totalItemEnchantments = rs.getInt(1);
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Found " + Integer.toString(totalItemEnchantments) + " item enchantments");
+				WebAuctionPlus.getLog().warning("Found "+Integer.toString(totalItemEnchantments)+" item enchantments");
 				// get old item enchantments
 				st = conn.prepareStatement("SELECT `ItemTable`, `ItemTableId`, `enchId`, `level`  FROM `"+dbPrefix+"ItemEnchantments` ORDER BY `enchId` ASC");
 				rs = st.executeQuery();
@@ -493,10 +498,10 @@ public class MySQLTables {
 					countEnchantments++;
 					if(totalItemEnchantments > 500) WebAuctionPlus.PrintProgress(countEnchantments, totalItemEnchantments);
 				}
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Converted " + Integer.toString(countEnchantments) + " enchantments for "+
+				WebAuctionPlus.getLog().warning("Converted "+Integer.toString(countEnchantments)+" enchantments for "+
 					Integer.toString(enchTempAuctions.size()+enchTempItems.size())+" items");
 			} catch (SQLException e) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to convert enchantments");
+				WebAuctionPlus.getLog().warning("Unable to convert enchantments");
 				e.printStackTrace();
 			} finally {
 				closeResources(st, rs);

@@ -9,7 +9,6 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,16 +42,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+
 public class WebAuctionPlus extends JavaPlugin {
 
 	private static volatile WebAuctionPlus instance = null;
 	private static volatile boolean isOk    = false;
-	private static volatile boolean isDebug = false;
-	private static volatile String failMsg = null;
 
-	public static final String logPrefix  = "[WebAuction+] ";
+	private static final String loggerPrefix  = "[WebAuction+] ";
 	public static final String chatPrefix = ChatColor.DARK_GREEN+"["+ChatColor.WHITE+"WebAuction+"+ChatColor.DARK_GREEN+"] ";
-	public static final Logger log = Logger.getLogger("Minecraft");
 
 	public static pxnMetrics metrics;
 	public static waStats stats;
@@ -163,7 +160,7 @@ public class WebAuctionPlus extends JavaPlugin {
 		} catch (Exception ignore) {}
 		settings = null;
 		Lang = null;
-		log.info(logPrefix + "Disabled, bye for now :-)");
+		getLog().info("Disabled, bye for now :-)");
 	}
 
 
@@ -176,22 +173,43 @@ public class WebAuctionPlus extends JavaPlugin {
 	}
 
 
-	private static WebAuctionPlus getPlugin() {
+	public static WebAuctionPlus getPlugin() {
 		return instance;
 	}
 	public static boolean isOk()    {return isOk;}
-	public static boolean isDebug() {return isDebug;}
+//	public static boolean isDebug() {return isDebug;}
 
 
+	/**
+	 * Logger bootstrap
+	 */
+	private static volatile logBoots bLog = null;
+	private static final Object logLock = new Object();
+	public static logBoots getLog() {
+		if(bLog == null) {
+			synchronized(logLock) {
+				if(bLog == null)
+					bLog = new logBoots(getPlugin(), loggerPrefix);
+			}
+		}
+		return bLog;
+	}
+
+
+	private static volatile String failMsg = null;
 	public static void fail(String msg) {
 		if(msg != null && !msg.isEmpty()) {
-			log.severe(logPrefix + msg);
-			if(failMsg == null) failMsg = "";
-			if(!failMsg.isEmpty()) failMsg += "|";
-			failMsg += msg;
+			getLog().severe(msg);
+			if(failMsg == null || failMsg.isEmpty())
+				failMsg = msg;
+			else
+				failMsg += "|"+msg;
 		}
-		getPlugin().onDisable();
-		failPlayerListener.start(getPlugin());
+		{
+			final JavaPlugin plugin = getPlugin();
+			plugin.onDisable();
+			failPlayerListener.start(plugin);
+		}
 	}
 	public static String getFailMsg() {
 		if(failMsg == null || failMsg.isEmpty())
@@ -230,7 +248,7 @@ public class WebAuctionPlus extends JavaPlugin {
 			MySQLUpdate.doUpdate(oldVersion);
 			// update version number
 			settings.setString("Version", currentVersion);
-			log.info(logPrefix+"Updated version from "+oldVersion+" to "+currentVersion);
+			getLog().info("Updated version from "+oldVersion+" to "+currentVersion);
 		}
 
 		// load language file
@@ -243,18 +261,20 @@ public class WebAuctionPlus extends JavaPlugin {
 		}
 
 		try {
-			isDebug = config.getBoolean("Development.Debug");
+			if(config.getBoolean("Development.Debug"))
+				getLog().setDebug();
 //			addComment("debug_mode", Arrays.asList("# This is where you enable debug mode"))
 			signDelay          = config.getInt    ("Misc.SignClickDelay");
 			timEnabled         = config.getBoolean("Misc.UnsafeEnchantments");
 			announceGlobal     = config.getBoolean("Misc.AnnounceGlobally");
 			numberOfRecentLink = config.getInt    ("SignLink.NumberOfLatestAuctionsToTrack");
 			useSignLink        = config.getBoolean("SignLink.Enabled");
-			if(useSignLink)
+			if(useSignLink) {
 				if(!Bukkit.getPluginManager().getPlugin("SignLink").isEnabled()) {
-					log.warning(logPrefix+"SignLink is enabled but plugin is not loaded!");
+					getLog().warning("SignLink is enabled but plugin is not loaded!");
 					useSignLink = false;
 				}
+			}
 
 			// scheduled tasks
 			BukkitScheduler scheduler = Bukkit.getScheduler();
@@ -271,7 +291,7 @@ public class WebAuctionPlus extends JavaPlugin {
 				waAnnouncerTask.addMessages(     config.getStringList("Announcements"));
 				scheduler.runTaskTimerAsynchronously(this, waAnnouncerTask,
 					(announcerMinutes/2), announcerMinutes);
-				log.info(logPrefix + "Enabled Task: Announcer (always multi-threaded)");
+				getLog().info("Enabled Task: Announcer (always multi-threaded)");
 			}
 
 			long saleAlertSeconds        = 20 * config.getLong("Tasks.SaleAlertSeconds");
@@ -291,7 +311,7 @@ public class WebAuctionPlus extends JavaPlugin {
 				if(saleAlertSeconds < 3*20) saleAlertSeconds = 3*20;
 				scheduler.runTaskTimerAsynchronously(this, new PlayerAlertTask(),
 					saleAlertSeconds, saleAlertSeconds);
-				log.info(logPrefix + "Enabled Task: Sale Alert (always multi-threaded)");
+				getLog().info("Enabled Task: Sale Alert (always multi-threaded)");
 			}
 			// shout sign task
 			if (shoutSignUpdateSeconds > 0) {
@@ -301,7 +321,7 @@ public class WebAuctionPlus extends JavaPlugin {
 				else
 					scheduler.scheduleSyncRepeatingTask (this, new ShoutSignTask(this),
 						shoutSignUpdateSeconds, shoutSignUpdateSeconds);
-				log.info(logPrefix + "Enabled Task: Shout Sign (using " + (UseMultithreads?"multiple threads":"single thread") + ")");
+				getLog().info("Enabled Task: Shout Sign (using " + (UseMultithreads?"multiple threads":"single thread") + ")");
 			}
 			// update recent signs
 			if(recentSignUpdateSeconds > 0 && useOriginalRecent) {
@@ -312,7 +332,7 @@ public class WebAuctionPlus extends JavaPlugin {
 				else
 					scheduler.scheduleSyncRepeatingTask (this, recentSignTask,
 						5*20, recentSignUpdateSeconds);
-				log.info(logPrefix + "Enabled Task: Recent Sign (using " + (UseMultithreads?"multiple threads":"single thread") + ")");
+				getLog().info("Enabled Task: Recent Sign (using " + (UseMultithreads?"multiple threads":"single thread") + ")");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -332,7 +352,7 @@ public class WebAuctionPlus extends JavaPlugin {
 			fail("Please set the database connection info in the config.");
 			return false;
 		}
-		log.info(logPrefix + "MySQL Initializing.");
+		getLog().info("MySQL Initializing.");
 		if(dataQueries != null) {
 			fail("Database connection already made?");
 			return false;
@@ -354,14 +374,14 @@ public class WebAuctionPlus extends JavaPlugin {
 			// create/update tables
 			MySQLTables dbTables = new MySQLTables(this);
 			if(!dbTables.isOk()) {
-				fail(logPrefix+"Error loading db updater class.");
+				fail("Error loading db updater class.");
 				return false;
 			}
 			dbTables = null;
 		//} catch (SQLException e) {
 		} catch (Exception e) {
+			fail("Unable to connect to MySQL database.");
 			e.printStackTrace();
-			fail(logPrefix+"Unable to connect to MySQL database.");
 			return false;
 		}
 		return true;
@@ -536,7 +556,7 @@ public class WebAuctionPlus extends JavaPlugin {
 		for (; i < width; i++) {
 			output += " ";
 		}
-		WebAuctionPlus.log.info(output + "]");
+		getLog().info(output+"]");
 	}
 	public static void PrintProgress(int count, int total, int width) {
 		try {
@@ -568,7 +588,7 @@ public class WebAuctionPlus extends JavaPlugin {
 				(playerX > x - (double)radius ) &&
 				(playerZ < z + (double)radius ) &&
 				(playerZ > z - (double)radius ) )
-					player.sendMessage(WebAuctionPlus.chatPrefix+msg);
+					player.sendMessage(chatPrefix+msg);
 		}
 	}
 
@@ -578,7 +598,7 @@ public class WebAuctionPlus extends JavaPlugin {
 		try {
 			metrics = new pxnMetrics(this);
 			if(metrics.isOptOut()) {
-				log.info(logPrefix+"Plugin metrics are disabled, you bum");
+				getLog().info("Plugin metrics are disabled, you bum");
 				return;
 			}
 //			log.info(logPrefix+"Starting metrics");
@@ -623,10 +643,8 @@ public class WebAuctionPlus extends JavaPlugin {
 			metrics.start();
 		} catch (IOException e) {
 			// Failed to submit the stats :-(
-			if(WebAuctionPlus.isDebug) {
-				log.severe(e.getMessage());
+			if(getLog().isDebug())
 				e.printStackTrace();
-			}
 		}
 	}
 
@@ -681,9 +699,10 @@ public class WebAuctionPlus extends JavaPlugin {
 					String cmp = compareVersions(currentVersion, newVersion);
 					if(cmp == "<") {
 						newVersionAvailable = true;
-						log.warning(logPrefix+"An update is available!");
-						log.warning(logPrefix+"You're running "+currentVersion+" new version available is "+newVersion);
-						log.warning(logPrefix+"http://dev.bukkit.org/server-mods/webauctionplus");
+						final logBoots log = getLog();
+						log.warning("An update is available!");
+						log.warning("You're running "+currentVersion+" new version available is "+newVersion);
+						log.warning("http://dev.bukkit.org/server-mods/webauctionplus");
 					}
 				} catch (Exception ignored) {}
 			}

@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.sl.API.TickMode;
 import com.bergerkiller.bukkit.sl.API.Variable;
 import com.bergerkiller.bukkit.sl.API.Variables;
 
+
 public class RecentSignTask implements Runnable {
 
 	Variable varTitle;
@@ -31,6 +32,7 @@ public class RecentSignTask implements Runnable {
 	Variable varType;
 
 	private final WebAuctionPlus plugin;
+
 
 	public RecentSignTask(WebAuctionPlus plugin) {
 		this.plugin = plugin;
@@ -73,7 +75,7 @@ public class RecentSignTask implements Runnable {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: RecentSignTask");
+			WebAuctionPlus.getLog().debug("WA Query: RecentSignTask");
 			st = conn.prepareStatement("SELECT `playerName`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle`, "+
 				"`price`, UNIX_TIMESTAMP(`created`) AS `created`, `allowBids`, `currentWinner` " +
 				"FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` ORDER BY `id` DESC LIMIT ?");
@@ -119,7 +121,7 @@ public class RecentSignTask implements Runnable {
 
 			}
 		} catch(SQLException e) {
-			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix + "Unable to update signs!");
+			WebAuctionPlus.getLog().warning("Unable to update signs!");
 			e.printStackTrace();
 		} finally {
 			WebAuctionPlus.dataQueries.closeResources(conn, st, rs);
@@ -173,7 +175,7 @@ public class RecentSignTask implements Runnable {
 				for(Location signLoc : SignsToRemove) {
 					plugin.recentSigns.remove(signLoc);
 					WebAuctionPlus.dataQueries.removeRecentSign(signLoc);
-					WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Removed invalid sign at location: "+signLoc);
+					WebAuctionPlus.getLog().info("Removed invalid sign at location: "+signLoc);
 				}
 		} catch(Exception e) {
 			e.printStackTrace();
