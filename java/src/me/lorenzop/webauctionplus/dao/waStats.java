@@ -53,10 +53,10 @@ public class waStats {
 			this.totalBuyNowCount = 0;
 			try {
 				WebAuctionPlus.getLog().debug("WA Query: Stats::count buy nows");
-				st = conn.prepareStatement("SELECT COUNT(*) FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` WHERE `allowBids` = 0");
+				st = conn.prepareStatement("SELECT COUNT(*) AS `count` FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` WHERE `allow_bids` = 0");
 				rs = st.executeQuery();
 				if(rs.next())
-					this.totalBuyNowCount = rs.getInt(1);
+					this.totalBuyNowCount = rs.getInt("count");
 			} catch (SQLException e) {
 				WebAuctionPlus.getLog().warning("Unable to get total buy now count");
 				e.printStackTrace();
@@ -72,10 +72,10 @@ public class waStats {
 			this.totalAuctionCount = 0;
 			try {
 				WebAuctionPlus.getLog().debug("WA Query: Stats::count auctions");
-				st = conn.prepareStatement("SELECT COUNT(*) FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` WHERE `allowBids` != 0");
+				st = conn.prepareStatement("SELECT COUNT(*) AS `count` FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` WHERE `allow_bids` != 0");
 				rs = st.executeQuery();
 				if(rs.next())
-					this.totalAuctionCount = rs.getInt(1);
+					this.totalAuctionCount = rs.getInt("count");
 			} catch (SQLException e) {
 				WebAuctionPlus.getLog().warning("Unable to get total auction count");
 				e.printStackTrace();
