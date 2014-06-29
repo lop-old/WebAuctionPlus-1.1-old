@@ -20,6 +20,7 @@ public class WebAuctionCommands implements CommandExecutor {
 		this.plugin = plugin;
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.NORMAL)
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		int params = args.length;
@@ -110,8 +111,8 @@ public class WebAuctionCommands implements CommandExecutor {
 					if (args[1].isEmpty() || args[2].isEmpty()) return false;
 					player = args[1];
 					if(!Bukkit.getOfflinePlayer(player).hasPlayedBefore()) {
-						sender.sendMessage(WebAuctionPlus.logPrefix+"Player not found!");
-						sender.sendMessage(WebAuctionPlus.logPrefix+"Note: if you really need to, you can add a player to the database, just md5 the password.");
+						sender.sendMessage(WebAuctionPlus.chatPrefix+"Player not found!");
+						sender.sendMessage(WebAuctionPlus.chatPrefix+"Note: if you really need to, you can add a player to the database, just md5 the password.");
 						return true;
 					}
 					pass = WebAuctionPlus.MD5(args[2]);

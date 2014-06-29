@@ -12,7 +12,6 @@ import java.util.concurrent.ExecutionException;
 
 import me.lorenzop.webauctionplus.WebAuctionPlus;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -87,9 +86,9 @@ public class RecentSignTask implements Runnable {
 				String strQtyPrice	= Integer.toString(qty)+"x "+strPrice;
 				String strSeller	= rs.getString("playerName");
 				if(strSeller==null || strSeller.isEmpty()) strSeller = "N/A       ";
-				String strType = "";
-				if(rs.getInt("allowBids") == 0)	strType = "Buy Now";
-				else							strType = "Auction";
+//				String strType = "";
+//				if(rs.getInt("allowBids") == 0)	strType = "Buy Now";
+//				else							strType = "Auction";
 
 				// recent signs
 				if(WebAuctionPlus.useOriginalRecent()) {
@@ -198,13 +197,13 @@ public class RecentSignTask implements Runnable {
 	}
 
 
-	// pad string with spaces for scrolling signlink signs
-	private String padString(String text, int size) {
-		if(text == null) return null;
-		if(text.length() > size) return text.substring(0, size-1);
-		if(text.length() < size) return text+StringUtils.repeat(" ", size-text.length());
-		return text;
-	}
+//	// pad string with spaces for scrolling signlink signs
+//	private String padString(String text, int size) {
+//		if(text == null) return null;
+//		if(text.length() > size) return text.substring(0, size-1);
+//		if(text.length() < size) return text+StringUtils.repeat(" ", size-text.length());
+//		return text;
+//	}
 
 
 }

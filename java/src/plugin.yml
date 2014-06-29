@@ -2,7 +2,7 @@ name: WebAuctionPlus
 main: me.lorenzop.webauctionplus.WebAuctionPlus
 version: 1.1.14
 author: lorenzop
-website: http://webauctionplus.com/
+website: http://dev.bukkit.org/server-mods/webauctionplus/
 depend: [Vault]
 //softdepend: [SignLink]
 commands:

@@ -224,6 +224,11 @@ public class MySQLConnPool {
 	}
 
 
+	public boolean isDebug() {
+		return WebAuctionPlus.getLog().isDebug();
+	}
+
+
 	public String dbPrefix() {
 		return dbPrefix;
 	}

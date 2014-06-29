@@ -38,6 +38,7 @@ public class AuctionPlayer {
 	}
 
 	// player object
+	@SuppressWarnings("deprecation")
 	public Player getPlayer() {
 		if(p == null) p = Bukkit.getPlayerExact(player);
 		return p;

@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 
@@ -214,16 +215,19 @@ public class DataQueries extends MySQLConnPool {
 	}
 
 
-	public AuctionPlayer getPlayer(String player) {
+	public AuctionPlayer getPlayer(final Player player) {
+		return getPlayer(player.getName());
+	}
+	public AuctionPlayer getPlayer(final String playerName) {
 		AuctionPlayer waPlayer = null;
 		Connection conn = getConnection();
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			log.debug("WA Query: getPlayer "+player);
+			log.debug("WA Query: getPlayer "+playerName);
 			st = conn.prepareStatement("SELECT `id`,`playerName`,`money`,`Permissions` " +
 				"FROM `"+dbPrefix+"Players` WHERE `playerName` = ? LIMIT 1");
-			st.setString(1, player);
+			st.setString(1, playerName);
 			rs = st.executeQuery();
 			if(rs.next()) {
 				waPlayer = new AuctionPlayer();
@@ -233,7 +237,7 @@ public class DataQueries extends MySQLConnPool {
 				waPlayer.setPerms(     rs.getString("Permissions"));
 			}
 		} catch(SQLException e) {
-			log.warning("Unable to get player "+player);
+			log.warning("Unable to get player "+playerName);
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -308,7 +312,8 @@ public class DataQueries extends MySQLConnPool {
 	}
 
 
-	public void updatePlayerMoney(String player, double money) {
+	public void updatePlayerMoney(final Player player, final double money) {
+		final String playerName = player.getName();
 		Connection conn = getConnection();
 		PreparedStatement st = null;
 		ResultSet rs = null;
@@ -316,10 +321,10 @@ public class DataQueries extends MySQLConnPool {
 			log.debug("WA Query: updatePlayerMoney "+player);
 			st = conn.prepareStatement("UPDATE `"+dbPrefix+"Players` SET `money` = ? WHERE `playerName` = ?");
 			st.setDouble(1, money);
-			st.setString(2, player);
+			st.setString(2, playerName);
 			st.executeUpdate();
 		} catch(SQLException e) {
-			log.warning("Unable to update player money in DB");
+			log.warning("Unable to update player money in DB: "+playerName);
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);

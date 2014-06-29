@@ -8,6 +8,8 @@ import me.lorenzop.webauctionplus.WebInventory;
 import me.lorenzop.webauctionplus.dao.AuctionPlayer;
 import me.lorenzop.webauctionplus.tasks.PlayerAlertTask;
 
+import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -75,6 +77,7 @@ public class WebAuctionPlayerListener implements Listener {
 	// player interact
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onPlayerInteract(PlayerInteractEvent event) {
+		final Economy econ = WebAuctionPlus.getPlugins().getEconomy();
 		// right click only
 		if( event.getAction() != Action.RIGHT_CLICK_BLOCK &&
 			event.getAction() != Action.RIGHT_CLICK_AIR) return;
@@ -88,16 +91,16 @@ public class WebAuctionPlayerListener implements Listener {
 		if(!lines[0].equals("[WebAuction+]")) return;
 		event.setCancelled(true);
 		// get player info
-		Player p = event.getPlayer();
-		String player = p.getName();
+		Player player = event.getPlayer();
+//		String player = p.getName();
 
 		// prevent click spamming signs
 		if(plugin.lastSignUse.containsKey(player))
 			if( plugin.lastSignUse.get(player)+(long)plugin.signDelay > WebAuctionPlus.getCurrentMilli() ) {
-				p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("please_wait"));
+				player.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("please_wait"));
 				return;
 			}
-		plugin.lastSignUse.put(player, WebAuctionPlus.getCurrentMilli());
+		plugin.lastSignUse.put(player.getName(), WebAuctionPlus.getCurrentMilli());
 
 		// Shout sign
 		if(lines[1].equals("Shout")) {
@@ -107,8 +110,8 @@ public class WebAuctionPlayerListener implements Listener {
 
 		// Deposit sign (money)
 		if(lines[1].equals("Deposit")) {
-			if(!p.hasPermission("wa.use.deposit.money")) {
-				p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("no_permission"));
+			if(!player.hasPermission("wa.use.deposit.money")) {
+				player.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("no_permission"));
 				return;
 			}
 			double amount = 0.0D;
@@ -118,38 +121,38 @@ public class WebAuctionPlayerListener implements Listener {
 				} catch(NumberFormatException ignore) {}
 			}
 			// player has enough money
-			if(!WebAuctionPlus.vaultEconomy.has(player, amount)) {
-				p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("not_enough_money_pocket"));
+			if(!econ.has(player, amount)) {
+				player.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("not_enough_money_pocket"));
 				return;
 			}
 			AuctionPlayer auctionPlayer = WebAuctionPlus.dataQueries.getPlayer(player);
 			if(auctionPlayer == null) {
-				p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("account_not_found"));
+				player.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("account_not_found"));
 				return;
 			}
 			double currentMoney = auctionPlayer.getMoney();
 			if(lines[2].equals("All"))
-				amount = WebAuctionPlus.vaultEconomy.getBalance(player);
+				amount = econ.getBalance(player);
 			currentMoney += amount;
 			currentMoney = WebAuctionPlus.RoundDouble(currentMoney, 2, BigDecimal.ROUND_HALF_UP);
-			p.sendMessage(WebAuctionPlus.chatPrefix + "Added " + amount +
+			player.sendMessage(WebAuctionPlus.chatPrefix + "Added " + amount +
 				" to auction account, new auction balance: " + currentMoney);
 			WebAuctionPlus.dataQueries.updatePlayerMoney(player, currentMoney);
-			WebAuctionPlus.vaultEconomy.withdrawPlayer(player, amount);
+			econ.withdrawPlayer(player, amount);
 			return;
 		}
 
 		// Withdraw sign (money)
 		if(lines[1].equals("Withdraw")) {
-			if(!p.hasPermission("wa.use.withdraw.money")) {
-				p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("no_permission"));
+			if(!player.hasPermission("wa.use.withdraw.money")) {
+				player.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("no_permission"));
 				return;
 			}
 			double amount = 0.0D;
 			try {
 				AuctionPlayer auctionPlayer = WebAuctionPlus.dataQueries.getPlayer(player);
 				if(auctionPlayer == null) {
-					p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("account_not_found"));
+					player.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("account_not_found"));
 					return;
 				}
 				// Match found!
@@ -162,15 +165,15 @@ public class WebAuctionPlayerListener implements Listener {
 					} catch(NumberFormatException ignore) {}
 				}
 				if(currentMoney < amount) {
-					p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("not_enough_money_account"));
+					player.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("not_enough_money_account"));
 					return;
 				}
 				currentMoney -= amount;
 				currentMoney = WebAuctionPlus.RoundDouble(currentMoney, 2, BigDecimal.ROUND_HALF_UP);
-				p.sendMessage(WebAuctionPlus.chatPrefix + "Removed " +
+				player.sendMessage(WebAuctionPlus.chatPrefix + "Removed " +
 					amount + " from auction account, new auction balance: " + currentMoney);
 				WebAuctionPlus.dataQueries.updatePlayerMoney(player, currentMoney);
-				WebAuctionPlus.vaultEconomy.depositPlayer(player, amount);
+				econ.depositPlayer(player, amount);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -179,17 +182,17 @@ public class WebAuctionPlayerListener implements Listener {
 
 		// Mailbox (items)
 		if(lines[1].equals("MailBox")) {
-			if(!p.hasPermission("wa.use.mailbox")) {
-				p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("no_permission"));
+			if(!player.hasPermission("wa.use.mailbox")) {
+				player.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("no_permission"));
 				return;
 			}
 			// disallow creative
-			if(p.getGameMode() != GameMode.SURVIVAL && !p.isOp()) {
-				p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("no_cheating"));
+			if(player.getGameMode() != GameMode.SURVIVAL && !player.isOp()) {
+				player.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("no_cheating"));
 				return;
 			}
 			// load virtual chest
-			WebInventory.onInventoryOpen(p);
+			WebInventory.onInventoryOpen(player);
 			return;
 		}
 

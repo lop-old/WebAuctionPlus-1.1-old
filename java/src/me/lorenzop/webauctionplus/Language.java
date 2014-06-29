@@ -2,6 +2,7 @@ package me.lorenzop.webauctionplus;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -58,7 +59,7 @@ public class Language {
 				WebAuctionPlus.getLog().warning("Language file not found in jar: "+lang+".yml");
 				if(!langFile.exists()) return;
 			} else {
-				YamlConfiguration defaultLangConfig = YamlConfiguration.loadConfiguration(defaultLangStream);
+				YamlConfiguration defaultLangConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultLangStream));
 				// copy defaults
 				langConfig.setDefaults(defaultLangConfig);
 			}

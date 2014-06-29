@@ -182,6 +182,14 @@ public class WebAuctionPlus extends JavaPlugin {
 
 
 	/**
+	 * 3rd party plugins
+	 */
+	public static Plugins3rdParty getPlugins() {
+		return plugins3rd;
+	}
+
+
+	/**
 	 * Logger bootstrap
 	 */
 	private static volatile logBoots bLog = null;

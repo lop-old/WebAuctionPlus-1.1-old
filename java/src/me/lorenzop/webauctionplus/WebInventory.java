@@ -85,6 +85,7 @@ public class WebInventory {
 	public static void ForceCloseAll() {
 		if(openInvs==null || openInvs.size()==0) return;
 		for(final String playerName : openInvs.keySet()) {
+			@SuppressWarnings("deprecation")
 			final Player player = Bukkit.getPlayerExact(playerName);
 			player.closeInventory();
 			WebInventory.onInventoryClose(player);

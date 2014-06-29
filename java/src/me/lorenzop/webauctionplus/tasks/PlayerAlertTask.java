@@ -27,6 +27,7 @@ public class PlayerAlertTask implements Runnable {
 	}
 
 
+	@SuppressWarnings("deprecation")
 	public synchronized void run() {
 		HashMap<Integer, String> playersMap = new HashMap<Integer, String>();
 		AuctionPlayer waPlayer = null;
