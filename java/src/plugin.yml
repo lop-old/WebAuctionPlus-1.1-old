@@ -4,7 +4,7 @@ version: 1.1.14
 author: lorenzop
 website: http://webauctionplus.com/
 depend: [Vault]
-softdepend: [SignLink]
+//softdepend: [SignLink]
 commands:
   wa:
     description: WebAuctionPlus

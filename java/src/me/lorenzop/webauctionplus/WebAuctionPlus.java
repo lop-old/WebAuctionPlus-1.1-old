@@ -78,8 +78,8 @@ public class WebAuctionPlus extends JavaPlugin {
 
 	// use recent signs
 	private static boolean useOriginalRecent = false;
-	// sign link
-	private static boolean useSignLink = false;
+//	// sign link
+//	private static boolean useSignLink = false;
 	// tim the enchanter
 	private static boolean timEnabled = false;
 	// globally announce new auctions (vs using shout signs)
@@ -268,12 +268,12 @@ public class WebAuctionPlus extends JavaPlugin {
 			signDelay          = config.getInt    ("Misc.SignClickDelay");
 			timEnabled         = config.getBoolean("Misc.UnsafeEnchantments");
 			announceGlobal     = config.getBoolean("Misc.AnnounceGlobally");
-			numberOfRecentLink = config.getInt    ("SignLink.NumberOfLatestAuctionsToTrack");
-			useSignLink        = config.getBoolean("SignLink.Enabled");
-			if(useSignLink && !plugins3rd.isLoaded_SignLink()) {
-				getLog().warning("SignLink is found but plugin is not loaded!");
-				useSignLink = false;
-			}
+//			numberOfRecentLink = config.getInt    ("SignLink.NumberOfLatestAuctionsToTrack");
+//			useSignLink        = config.getBoolean("SignLink.Enabled");
+//			if(useSignLink && !plugins3rd.isLoaded_SignLink()) {
+//				getLog().warning("SignLink is found but plugin is not loaded!");
+//				useSignLink = false;
+//			}
 
 			// scheduled tasks
 			BukkitScheduler scheduler = Bukkit.getScheduler();
@@ -404,8 +404,8 @@ public class WebAuctionPlus extends JavaPlugin {
 		config.addDefault("Tasks.ShoutSignUpdateSeconds",	20L);
 		config.addDefault("Tasks.RecentSignUpdateSeconds",	60L);
 		config.addDefault("Tasks.AnnouncerMinutes",			60L);
-		config.addDefault("SignLink.Enabled",				false);
-		config.addDefault("SignLink.NumberOfLatestAuctionsToTrack", 10);
+//		config.addDefault("SignLink.Enabled",				false);
+//		config.addDefault("SignLink.NumberOfLatestAuctionsToTrack", 10);
 		config.addDefault("Development.UseMultithreads",	false);
 		config.addDefault("Development.Debug",				false);
 		config.addDefault("Announcer.Enabled",				false);
@@ -421,7 +421,8 @@ public class WebAuctionPlus extends JavaPlugin {
 		return useOriginalRecent;
 	}
 	public static boolean useSignLink() {
-		return useSignLink;
+//		return useSignLink;
+		return false;
 	}
 	public static boolean timEnabled() {
 		return timEnabled;

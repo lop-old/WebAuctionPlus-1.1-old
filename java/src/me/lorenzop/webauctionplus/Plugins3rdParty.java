@@ -82,20 +82,20 @@ public class Plugins3rdParty {
 	}
 
 
-	/**
-	 * SignLink
-	 */
-	private Plugin signlink = null;
+//	/**
+//	 * SignLink
+//	 */
+//	private Plugin signlink = null;
 
 
-	private boolean setupSignLink() {
-		this.signlink = Bukkit.getPluginManager().getPlugin("SignLink");
-		if(this.signlink == null) return false;
-
-		return isLoaded_SignLink();
-	}
+//	private boolean setupSignLink() {
+//		this.signlink = Bukkit.getPluginManager().getPlugin("SignLink");
+//		if(this.signlink == null) return false;
+//		return isLoaded_SignLink();
+//	}
 	public boolean isLoaded_SignLink() {
-		return (this.signlink != null);
+//		return (this.signlink != null);
+		return false;
 	}
 
 

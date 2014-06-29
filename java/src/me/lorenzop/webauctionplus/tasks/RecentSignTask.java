@@ -19,57 +19,53 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 
-import com.bergerkiller.bukkit.sl.API.TickMode;
-import com.bergerkiller.bukkit.sl.API.Variable;
-import com.bergerkiller.bukkit.sl.API.Variables;
-
 
 public class RecentSignTask implements Runnable {
 
-	Variable varTitle;
-	Variable varQtyPrice;
-	Variable varSeller;
-	Variable varType;
+//	Variable varTitle;
+//	Variable varQtyPrice;
+//	Variable varSeller;
+//	Variable varType;
 
 	private final WebAuctionPlus plugin;
 
 
 	public RecentSignTask(WebAuctionPlus plugin) {
 		this.plugin = plugin;
-		// register signlink variables
-		// %waTitle  - items name
-		// %waPrice  - price each
-		// %waSeller - sellers name
-		// %waType   - Buy Now or Auction
-		if(WebAuctionPlus.useSignLink()) {
-			varTitle	= Variables.get("waTitle");
-			varTitle.setDefault				("N/A       ");
-			varTitle.getTicker().interval	= 10;
-			varTitle.getTicker().mode		= TickMode.LEFT;
-			varQtyPrice	= Variables.get("waPrice");
-			varQtyPrice.setDefault			("N/A       ");
-			varQtyPrice.getTicker().interval= 10;
-			varQtyPrice.getTicker().mode	= TickMode.LEFT;
-			varSeller	= Variables.get("waSeller");
-			varSeller.setDefault			("N/A       ");
-			varSeller.getTicker().interval	= 10;
-			varSeller.getTicker().mode		= TickMode.LEFT;
-			varType		= Variables.get("waType");
-			varType.setDefault				("N/A       ");
-			varType.getTicker().interval	= 10;
-			varType.getTicker().mode		= TickMode.LEFT;
-		}
+//		// register signlink variables
+//		// %waTitle  - items name
+//		// %waPrice  - price each
+//		// %waSeller - sellers name
+//		// %waType   - Buy Now or Auction
+//		if(WebAuctionPlus.useSignLink()) {
+//			varTitle	= Variables.get("waTitle");
+//			varTitle.setDefault				("N/A       ");
+//			varTitle.getTicker().interval	= 10;
+//			varTitle.getTicker().mode		= TickMode.LEFT;
+//			varQtyPrice	= Variables.get("waPrice");
+//			varQtyPrice.setDefault			("N/A       ");
+//			varQtyPrice.getTicker().interval= 10;
+//			varQtyPrice.getTicker().mode	= TickMode.LEFT;
+//			varSeller	= Variables.get("waSeller");
+//			varSeller.setDefault			("N/A       ");
+//			varSeller.getTicker().interval	= 10;
+//			varSeller.getTicker().mode		= TickMode.LEFT;
+//			varType		= Variables.get("waType");
+//			varType.setDefault				("N/A       ");
+//			varType.getTicker().interval	= 10;
+//			varType.getTicker().mode		= TickMode.LEFT;
+//		}
 	}
 
 
 	public void run() {
 		if(!WebAuctionPlus.useSignLink() && !WebAuctionPlus.useOriginalRecent()) return;
 		if(Bukkit.getServer().getOnlinePlayers().length == 0) return;
-		// signlink vars
-		String tickTitle	= "";
-		String tickQtyPrice	= "";
-		String tickSeller	= "";
-		String tickType		= "";
+//		// signlink vars
+//		String tickTitle	= "";
+//		String tickQtyPrice	= "";
+//		String tickSeller	= "";
+//		String tickType		= "";
 		// query auctions
 		Connection conn = WebAuctionPlus.dataQueries.getConnection();
 		PreparedStatement st = null;
@@ -106,18 +102,18 @@ public class RecentSignTask implements Runnable {
 					UpdateRecentSigns(offset, lines);
 				}
 
-				// sign link
-				if(WebAuctionPlus.useSignLink()) {
-					int size = strTitle.length();
-					if(strQtyPrice.length() > size)	size = strQtyPrice.length();
-					if(strSeller.length() > size)	size = strSeller.length();
-					if(strType.length() > size)		size = strType.length();
-					size += 10;
-					tickTitle		+= padString(strTitle,		size);
-					tickQtyPrice	+= padString(strQtyPrice,	size);
-					tickSeller		+= padString(strSeller,		size);
-					tickType		+= padString(strType,		size);
-				}
+//				// sign link
+//				if(WebAuctionPlus.useSignLink()) {
+//					int size = strTitle.length();
+//					if(strQtyPrice.length() > size)	size = strQtyPrice.length();
+//					if(strSeller.length() > size)	size = strSeller.length();
+//					if(strType.length() > size)		size = strType.length();
+//					size += 10;
+//					tickTitle		+= padString(strTitle,		size);
+//					tickQtyPrice	+= padString(strQtyPrice,	size);
+//					tickSeller		+= padString(strSeller,		size);
+//					tickType		+= padString(strType,		size);
+//				}
 
 			}
 		} catch(SQLException e) {
@@ -127,17 +123,17 @@ public class RecentSignTask implements Runnable {
 			WebAuctionPlus.dataQueries.closeResources(conn, st, rs);
 		}
 
-		// set signlink vars
-		if(WebAuctionPlus.useSignLink()) {
-			try {
-				varTitle.set	(tickTitle);
-				varQtyPrice.set	(tickQtyPrice);
-				varSeller.set	(tickSeller);
-				varType.set		(tickType);
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
+//		// set signlink vars
+//		if(WebAuctionPlus.useSignLink()) {
+//			try {
+//				varTitle.set	(tickTitle);
+//				varQtyPrice.set	(tickQtyPrice);
+//				varSeller.set	(tickSeller);
+//				varType.set		(tickType);
+//			} catch(Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
 
 	}
 
