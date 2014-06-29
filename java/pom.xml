@@ -54,7 +54,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0.2</version>
+        <version>3.1</version>
 <!--        <version>2.3.1</version>-->
         <configuration>
           <source>1.7</source>
@@ -77,6 +77,10 @@
       <id>bukkit-repo</id>
       <url>http://repo.bukkit.org/content/groups/public</url>
     </repository>
+    <repository>
+      <id>vault-repo</id>
+      <url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -98,8 +102,11 @@
       <artifactId>Vault</artifactId>
       <version>1.2.29</version>
       <type>jar</type>
+      <scope>compile</scope>
+<!--
       <scope>system</scope>
       <systemPath>${project.basedir}/resources/Vault-1.2.29.jar</systemPath>
+-->
     </dependency>
     <dependency>
       <groupId>com.bergerkiller.bukkit.sl.SignLink</groupId>
