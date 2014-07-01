@@ -43,7 +43,7 @@ public class DataQueries extends MySQLConnPool {
 		try {
 			log.debug("WA Query: getAuction "+Integer.toString(auctionId));
 			st = conn.prepareStatement("SELECT `playerName`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle`, "+
-				"`price`, `allowBids`, `currentBid`, `currentWinner` FROM `WA_Auctions` WHERE `id` = ? LIMIT 1");
+				"`price`, `allowBids`, `currentBid`, `currentWinner` FROM `"+dbPrefix+"Auctions` WHERE `id` = ? LIMIT 1");
 //UNIX_TIMESTANP(`created`) AS `created`,
 			st.setInt(1, auctionId);
 			rs = st.executeQuery();
