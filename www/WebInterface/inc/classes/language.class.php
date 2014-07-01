@@ -3,25 +3,28 @@
 class LanguageClass{
 
 
-public static function LoadLanguage(){global $config;
+public static function LoadLanguage() {
+	global $config;
 }
 
 
 // set defaults / type
-public static function setDefaults(){global $config;
-//  foreach($tempArray as $name => $message){
-//    if(empty($config['languages'][$name]))
-//      $config['languages'][$name] = $message;
-//  }
+public static function setDefaults() {
+	global $config;
+//	foreach($tempArray as $name => $message) {
+//		if(empty($config['languages'][$name]))
+//			$config['languages'][$name] = $message;
+//	}
 }
 
 
 // get message
-public static function getMessage($name){global $config;
-  if(isset($config['languages'][$config['language']][$name]))
-    return($config['languages'][$config['language']][$name]);
-  else
-    return(NULL);
+public static function getMessage($name) {
+	global $config;
+	if(isset($config['languages'][$config['language']][$name]))
+		return($config['languages'][$config['language']][$name]);
+	else
+		return(NULL);
 }
 
 

@@ -5,17 +5,17 @@
 function ConnectDB(){global $db,$config;
 
 
-  $host     = 'localhost';
-  $port     = 3306;
-  $username = 'minecraft';
-  $password = 'password123';
-  $database = 'minecraft';
-  $config['table prefix'] = 'WA_';
+$host     = 'localhost';
+$port     = 3306;
+$username = 'minecraft';
+$password = 'password123';
+$database = 'minecraft';
+$config['table prefix'] = 'WA_';
 
 
-  $db=@mysql_pconnect($host.($port==0?'':':'.((int)$port)),$username,$password);
-  if(!$db || !@mysql_select_db($database,$db)){echo '<p>MySQL Error: '.mysql_error().'</p>'; exit();}
-  mysql_query("SET names UTF8");
+$db=@mysql_pconnect($host.($port==0?'':':'.((int)$port)),$username,$password);
+if(!$db || !@mysql_select_db($database,$db)){echo '<p>MySQL Error: '.mysql_error().'</p>'; exit();}
+mysql_query("SET names UTF8");
 }
 
 

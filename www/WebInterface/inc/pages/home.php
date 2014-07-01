@@ -5,7 +5,7 @@
 
 include('auctions.php');
 function RenderPage_home(){
-return RenderPage_auctions();
+	return RenderPage_auctions();
 }
 
 

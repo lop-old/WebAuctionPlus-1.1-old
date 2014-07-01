@@ -6,31 +6,31 @@ global $config;
 
 // get,post,cookie (highest priority last)
 function getVar($name,$type='',$order=array('get','post')){$output='';
-  if(!is_array($order)) $order = @explode(',',(string)$order);
-  if(@count($order)==0 || $order=='')
-    if($order!='') $order = array($order);
-    else           $order = array('get','post');
-  # get vars
-  foreach($order as $v){
-    if(    $v=='get'    && isset($_GET   [$name])) $output=@$_GET   [$name];
-    elseif($v=='post'   && isset($_POST  [$name])) $output=@$_POST  [$name];
-    elseif($v=='cookie' && isset($_COOKIE[$name])) $output=@$_COOKIE[$name];
-  }
-  // convert type if set
-  if(    $type=='str'   || $type=='string' ) return( (string)  $output  );
-  elseif($type=='int'   || $type=='integer') return( (integer) $output  );
-  elseif($type=='float' || $type=='double' ) return( (float)   $output  );
-  elseif($type=='bool'  || $type=='boolean') return( toBoolean($output) );
-  return($output);
+	if(!is_array($order)) $order = @explode(',',(string)$order);
+	if(@count($order)==0 || $order=='')
+		if($order!='') $order = array($order);
+		else           $order = array('get','post');
+	# get vars
+	foreach($order as $v){
+		if(    $v=='get'    && isset($_GET   [$name])) $output=@$_GET   [$name];
+		elseif($v=='post'   && isset($_POST  [$name])) $output=@$_POST  [$name];
+		elseif($v=='cookie' && isset($_COOKIE[$name])) $output=@$_COOKIE[$name];
+	}
+	// convert type if set
+	if(    $type=='str'   || $type=='string' ) return( (string)  $output  );
+	elseif($type=='int'   || $type=='integer') return( (integer) $output  );
+	elseif($type=='float' || $type=='double' ) return( (float)   $output  );
+	elseif($type=='bool'  || $type=='boolean') return( toBoolean($output) );
+	return($output);
 }
 function toBoolean($value){
-  if(gettype($value) == 'boolean') return($value);
-  $tempValue = strtolower((string)$value);
-  if($tempValue==='t' || $tempValue==='true' ) return(TRUE);
-  if($tempValue==='y' || $tempValue==='yes'  ) return(TRUE);
-  if($tempValue==='f' || $tempValue==='false') return(FALSE);
-  if($tempValue==='n' || $tempValue==='no'   ) return(FALSE);
-  return( (boolean)$value );
+	if(gettype($value) == 'boolean') return($value);
+	$tempValue = strtolower((string)$value);
+	if($tempValue==='t' || $tempValue==='true' ) return(TRUE);
+	if($tempValue==='y' || $tempValue==='yes'  ) return(TRUE);
+	if($tempValue==='f' || $tempValue==='false') return(FALSE);
+	if($tempValue==='n' || $tempValue==='no'   ) return(FALSE);
+	return( (boolean)$value );
 }
 
 define('LOGIN_FORM_USERNAME', 'WA_Login_Username');
@@ -46,27 +46,27 @@ if($page=='mcskin'){require('inc/mcskin.php'); exit();}
 
 // set defaults
 $config=array(
-  'settings'     => array(),
-  'languages'    => array(),
-  'language'     => '',
-  'html'         => NULL,
-  'user'         => NULL,
-  'page'         => &$page,
-  'action'       => &$action,
-  'paths' => array(
-    'local'      => array(),
-    'http'       => array()
-  ),
-  'demo'         => FALSE,
-  'title'        => '',
-  'tags'         => array(),
-  'theme'        => '',
-  'table prefix' => 'WA_',
-  'iConomy' => array(
-    'use'        => 'auto',
-    'table'      => 'iConomy'
-  ),
-  'session name' => 'WebAuctionPlus User'
+	'settings'     => array(),
+	'languages'    => array(),
+	'language'     => '',
+	'html'         => NULL,
+	'user'         => NULL,
+	'page'         => &$page,
+	'action'       => &$action,
+	'paths' => array(
+		'local'      => array(),
+		'http'       => array()
+	),
+	'demo'         => FALSE,
+	'title'        => '',
+	'tags'         => array(),
+	'theme'        => '',
+	'table prefix' => 'WA_',
+	'iConomy' => array(
+		'use'        => 'auto',
+		'table'      => 'iConomy'
+	),
+	'session name' => 'WebAuctionPlus User'
 );
 $settings = &$config['settings'];
 $languages= &$config['languages'];
@@ -103,7 +103,7 @@ $config['site title'] = 'WebAuctionPlus';
 if(!isset($config['iConomy']['use']))   $config['iConomy']['use']   = 'auto';
 if(!isset($config['iConomy']['table'])) $config['iConomy']['table'] = 'iConomy';
 if(!@date_default_timezone_get())
-  @date_default_timezone_set('America/New_York');
+	@date_default_timezone_set('America/New_York');
 
 
 
@@ -115,10 +115,10 @@ $page=SanFilename($page);
 // php session
 $func = 'session_status';
 if(function_exists($func))
-  if($func() == PHP_SESSION_DISABLED){
-    echo '<p>PHP Sessions are disabled. This is a requirement, please enable this.</p>';
-    exit();
-  }
+	if($func() == PHP_SESSION_DISABLED){
+		echo '<p>PHP Sessions are disabled. This is a requirement, please enable this.</p>';
+		exit();
+	}
 session_init();
 
 // load settings
@@ -142,10 +142,10 @@ $config['theme']    = SettingsClass::getString('Website Theme');
 
 // check website version
 if(SettingsClass::getString('Version') != CURRENT_VERSION){
-  echo '<center><h2>Please update the WebAuctionPlus website to match the plugin version you\'re running.</h2>'.
-       '<b>Plugin is running: '.SettingsClass::getString('Version').'</b><br />'.
-       '<b>Website is running: '.CURRENT_VERSION.'</b></center>';
-  exit();
+	echo '<center><h2>Please update the WebAuctionPlus website to match the plugin version you\'re running.</h2>'.
+			'<b>Plugin is running: '.SettingsClass::getString('Version').'</b><br />'.
+			'<b>Website is running: '.CURRENT_VERSION.'</b></center>';
+	exit();
 }
 
 // jquery ui path
@@ -155,8 +155,8 @@ $wpaths['static jquery'] = $wpaths['static'].'jquery/'.SanFilename(SettingsClass
 // load item packs
 require($lpaths['item packs'].'default/item.defines.php');
 foreach(explode(',',SettingsClass::getString('Item Packs')) as $v){
-  $t = trim($v); if(empty($v)) continue;
-  require($lpaths['item packs'].SanFilename($v).'/item.defines.php');
+	$t = trim($v); if(empty($v)) continue;
+	require($lpaths['item packs'].SanFilename($v).'/item.defines.php');
 }
 
 // load template engine
@@ -172,8 +172,8 @@ if($config['user'] === NULL) {echo '<p>Failed to load user manager!</p>'; exit()
 // render page content
 $page_outputs['body'] = include($lpaths['pages'].SanFilename($page).'.php');
 if($page_outputs['body'] == TRUE){
-  $a = 'RenderPage_'.$page;
-  $page_outputs['body'] = $a();
+	$a = 'RenderPage_'.$page;
+	$page_outputs['body'] = $a();
 }
 if    ($page_outputs['body'] === TRUE ) $page_outputs['body']='';
 elseif($page_outputs['body'] === FALSE) $page_outputs['body']='Unable to load page, render returned FALSE';

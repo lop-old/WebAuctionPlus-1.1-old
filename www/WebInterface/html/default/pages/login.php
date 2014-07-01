@@ -12,23 +12,23 @@ $outputs['body']='
 <input type="hidden" name="page"     value="login" />
 <input type="hidden" name="lastpage" value="{lastpage}" />
 <table border="0" cellspacing="0" cellpadding="0" align="center" id="login-table">
-  <tr>
-    <td align="right"><label for="'.LOGIN_FORM_USERNAME.'">Username:&nbsp;</label></td>
-    <td><input type="text"  name="'.LOGIN_FORM_USERNAME.'" value="{username}" class="input" size="30" tabindex="1" id="'.LOGIN_FORM_USERNAME.'" /></td>
-  </tr>
-  <tr><td style="height: 10px;"></td></tr>
-  <tr>
-    <td align="right"><label    for="'.LOGIN_FORM_PASSWORD.'">Password:&nbsp;</label></td>
-    <td><input type="password" name="'.LOGIN_FORM_PASSWORD.'" value="{password}" class="input" size="30" tabindex="2" id="'.LOGIN_FORM_PASSWORD.'" /></td>
-  </tr>
-  <tr><td style="height: 0px;"></td></tr>
-  <tr><td colspan="2" align="center"><input type="submit" name="Submit" value="Submit" class="button" tabindex="3" /></td>
-  </tr>
+	<tr>
+		<td align="right"><label for="'.LOGIN_FORM_USERNAME.'">Username:&nbsp;</label></td>
+		<td><input type="text"  name="'.LOGIN_FORM_USERNAME.'" value="{username}" class="input" size="30" tabindex="1" id="'.LOGIN_FORM_USERNAME.'" /></td>
+	</tr>
+	<tr><td style="height: 10px;"></td></tr>
+	<tr>
+		<td align="right"><label    for="'.LOGIN_FORM_PASSWORD.'">Password:&nbsp;</label></td>
+		<td><input type="password" name="'.LOGIN_FORM_PASSWORD.'" value="{password}" class="input" size="30" tabindex="2" id="'.LOGIN_FORM_PASSWORD.'" /></td>
+	</tr>
+	<tr><td style="height: 0px;"></td></tr>
+	<tr><td colspan="2" align="center"><input type="submit" name="Submit" value="Submit" class="button" tabindex="3" /></td>
+	</tr>
 </table>
 </form>
 <script type="text/javascript">
 function formfocus() {
-  document.getElementById(\''.LOGIN_FORM_USERNAME.'\').focus();
+	document.getElementById(\''.LOGIN_FORM_USERNAME.'\').focus();
 }
 window.onload = formfocus;
 </script>

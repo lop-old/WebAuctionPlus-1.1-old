@@ -8,9 +8,9 @@ $output.=
 '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-  <title>{sitepage title}</title>
-  <link rel="icon" type="image/x-icon" href="{path=static}favicon.ico" />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>{sitepage title}</title>
+	<link rel="icon" type="image/x-icon" href="{path=static}favicon.ico" />
 ';
 // css
 $output.='
@@ -31,9 +31,9 @@ $output.='
 <body>
 ';
 
-switch($html->getPageFrame()){
+switch($html->getPageFrame()) {
 case 'default':
-  $output.='
+$output.='
 <div id="holder">
 <div id="profile-box">
 
@@ -41,9 +41,9 @@ case 'default':
 
 <table border="0" cellspacing="0" cellpadding="0" style="padding-bottom: 2px; text-align:  left; font-size:   20px; font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;">
 <tr>
-  <td rowspan="4"><img src="./?page=mcskin&user='.$user->getName().'&view=body" alt="" width="60" height="120" id="mcface" /></td>
-  <td height="30">Name:</td><td>'.$user->getName().
-      ($user->hasPerms('isAdmin')?'&nbsp;<a style="font-size: small; font-weight: bold; color: #000000;">[ADMIN]</a>':'').'</td>
+	<td rowspan="4"><img src="./?page=mcskin&user='.$user->getName().'&view=body" alt="" width="60" height="120" id="mcface" /></td>
+	<td height="30">Name:</td><td>'.$user->getName().
+		($user->hasPerms('isAdmin')?'&nbsp;<a style="font-size: small; font-weight: bold; color: #000000;">[ADMIN]</a>':'').'</td>
 </tr>
 <tr><td height="30">Money:&nbsp;&nbsp;</td><td>'.str_replace(' ','&nbsp;',FormatPrice($user->getMoney())).'</td></tr>
 <tr><td colspan="2" align="center" style="font-size: smaller;">'.@date('jS M Y H:i:s').'</td></tr>
@@ -57,14 +57,14 @@ case 'default':
 <input type="hidden" name="lastpage" value="./" />
 <table border="0" cellspacing="0" cellpadding="0" style="margin-top: -10px;width: 585px;">
 <tr>
-  <td align="right"><label for="'.LOGIN_FORM_USERNAME.'">Username:&nbsp;</label></td>
-  <td width="290"><input type="text"  name="'.LOGIN_FORM_USERNAME.'" value="" class="input" size="30" tabindex="1" id="'.LOGIN_FORM_USERNAME.'" /></td>
-  <td rowspan="3"><input type="submit" name="Submit" value="Submit" class="button" tabindex="3" style="margin-left: 10px;" /></td>
+	<td align="right"><label for="'.LOGIN_FORM_USERNAME.'">Username:&nbsp;</label></td>
+	<td width="290"><input type="text"  name="'.LOGIN_FORM_USERNAME.'" value="" class="input" size="30" tabindex="1" id="'.LOGIN_FORM_USERNAME.'" /></td>
+	<td rowspan="3"><input type="submit" name="Submit" value="Submit" class="button" tabindex="3" style="margin-left: 10px;" /></td>
 </tr>
 <tr><td style="height: 5px;"></td></tr>
 <tr>
-  <td align="right"><label    for="'.LOGIN_FORM_PASSWORD.'">Password:&nbsp;</label></td>
-  <td><input type="password" name="'.LOGIN_FORM_PASSWORD.'" value="" class="input" size="30" tabindex="2" id="'.LOGIN_FORM_PASSWORD.'" /></td>
+	<td align="right"><label    for="'.LOGIN_FORM_PASSWORD.'">Password:&nbsp;</label></td>
+	<td><input type="password" name="'.LOGIN_FORM_PASSWORD.'" value="" class="input" size="30" tabindex="2" id="'.LOGIN_FORM_PASSWORD.'" /></td>
 </tr>
 <tr><td style="height: 5px;"></td></tr>
 <tr><td colspan="3" align="center" style="font-size: small;">If you don\'t have an account, you can create one using the command:<br />/wa password &lt;somepassword&gt;</td></tr>
@@ -72,7 +72,7 @@ case 'default':
 </form>
 <script type="text/javascript">
 function formfocus() {
-  document.getElementById(\''.LOGIN_FORM_USERNAME.'\').focus();
+	document.getElementById(\''.LOGIN_FORM_USERNAME.'\').focus();
 }
 window.onload = formfocus;
 </script>
@@ -100,15 +100,15 @@ window.onload = formfocus;
 
 </div>
 <div id="title-box">
-  <div id="title-box2">
-    <h1 style="margin-bottom: 10px; text-align: center; font-family: Arial;">WebAuction<sup>Plus</sup></h1>
-    <h2>{page title}</h2>
-  </div>
+	<div id="title-box2">
+		<h1 style="margin-bottom: 10px; text-align: center; font-family: Arial;">WebAuction<sup>Plus</sup></h1>
+		<h2>{page title}</h2>
+	</div>
 </div>
 ';
-  break;
+break;
 case 'basic':
-  $output.='
+$output.='
 <table border="0" cellspacing="0" cellpadding="0" align="center" style="width: 100%; height: 100%;">
 <tr><td style="height: 1px;"><h1 style="margin-bottom: 30px; text-align: center; font-family: Arial; font-size: 45px;">WebAuction<sup>Plus</sup></h1></td></tr>
 <tr><td>
