@@ -25,7 +25,7 @@ public class WebItemMeta {
 
 	// encode enchantments for database storage
 	public static String encodeEnchants(final ItemStack stack, final Player player) {
-		if(stack  == null) throw new NullPointerException();
+		if(stack == null) throw new NullPointerException();
 		final Map<Enchantment, Integer> enchants = getItemEnchants(stack, player);
 		final boolean hasEnchants = !enchants.isEmpty();
 		final StringBuilder str = new StringBuilder();

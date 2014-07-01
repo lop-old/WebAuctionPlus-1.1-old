@@ -13,7 +13,7 @@ public class pxnMetrics extends Metrics {
 	public pxnMetrics(Plugin plugin) throws IOException {
 		super(plugin);
 		if(!isOptOut())
-            Bukkit.getLogger().log(Level.INFO, "[Metrics] Starting metrics..");
+			Bukkit.getLogger().log(Level.INFO, "[Metrics] Starting metrics..");
 	}
 
 
