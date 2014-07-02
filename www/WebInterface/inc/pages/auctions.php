@@ -117,8 +117,8 @@ function RenderPage_auctions_ajax() {
 ';
 			// sanitize
 			$data = str_replace(
-			array('/' , '"' , "\r", "\n"),
-			array('\/', '\"', ''  , '\n'),
+			array('/' , '"' , "\r", "\n", "\t"),
+			array('\/', '\"', ''  , '\n', ' ' ),
 			$data);
 			$rowClass = 'gradeU';
 //TODO:
