@@ -107,7 +107,7 @@ public static function RenderTags(&$html, $tags=array()) {global $config;
 	// {if x} {else} {endif}
 	$html = preg_replace_callback('/\{if (.*?)\{endif\}/s',array('RenderHTML','ifCallback'),$html);
 	// paths
-	foreach($config['paths'] as $paths) {
+	foreach(\array_reverse($config['paths']) as $paths) {
 		foreach($paths as $pathName=>$path) {
 			$path = str_replace('{theme}'             , $config['theme'], $path);
 			$html = str_replace('{path='.$pathName.'}', $path           , $html);

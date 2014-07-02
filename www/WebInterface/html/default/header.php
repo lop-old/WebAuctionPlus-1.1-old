@@ -14,8 +14,8 @@ $output.=
 ';
 // css
 $output.='
-<link rel="stylesheet" type="text/css" href="{path=theme}main.css" />
-<link rel="stylesheet" type="text/css" href="{path=theme}table_jui.css" />
+<link rel="stylesheet" type="text/css" href="{path=html}main.css" />
+<link rel="stylesheet" type="text/css" href="{path=html}table_jui.css" />
 <link rel="stylesheet" type="text/css" href="{path=static jquery}jquery-ui-1.8.19.custom.css" />
 <style type="text/css">
 {css}
