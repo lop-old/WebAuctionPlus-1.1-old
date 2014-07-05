@@ -74,15 +74,18 @@ function RenderPage_auctions_ajax() {
 				if(!$auction) break;
 				$Item = $auction->getItem();
 				if(!$Item) continue;
-				if($count != 0) $outputRows .= "\t},\n\t{\n";
-				$count++;
+				if($count++ != 0) $outputRows .= "\t},\n\t{\n";
+				$created = str_replace('  ', '<br />', ($auction->getCreated() > 0 ? @date(DATETIME_FORMAT, $auction->getCreated()) : '- -'));
+				$expires = str_replace('  ', '<br />', ($auction->getExpires() > 0 ? fromSeconds($auction->getExpires() - time()) : '- -'));
 				$data = array(
 //					'auction id'  => (int)$auction->getTableRowId(),
 					'item'        => $Item->getDisplay(),
 					'seller'      => '<img src="./?page=mcskin&user='.$auction->getSeller().'" width="32" height="32" alt="" /><br />'.$auction->getSeller(),
+					'created'     => $created,
+					'expires'     => $expires,
 					'price each'  => FormatPrice($auction->getPrice()),
 					'price total' => FormatPrice($auction->getPriceTotal()),
-					'market percent' => '--',
+//					'market percent' => '- -',
 					'qty'         => (int)$Item->getItemQty(),
 //TODO:
 //allowBids
@@ -117,9 +120,10 @@ function RenderPage_auctions_ajax() {
 ';
 			// sanitize
 			$data = str_replace(
-			array('/' , '"' , "\r", "\n", "\t"),
-			array('\/', '\"', ''  , '\n', ' ' ),
-			$data);
+				array('/' , '"' , "\r", "\n", "\t"),
+				array('\/', '\"', ''  , '\n', ' ' ),
+				$data
+			);
 			$rowClass = 'gradeU';
 //TODO:
 //gradeA

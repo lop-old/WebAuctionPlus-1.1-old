@@ -8,17 +8,19 @@ protected $playerName    = '';
 protected $Item          = FALSE;
 protected $price         = 0.0;
 protected $created       = -1;
+protected $expires       = -1;
 protected $allowBids     = FALSE;
 protected $currentBid    = 0.0;
 protected $currentWinner = '';
 
 
-function __construct($tableRowId=0, $playerName='', $Item=FALSE, $price=0.0, $created=0, $allowBids=FALSE, $currentBid=0.0, $currentWinner='') {
+function __construct($tableRowId=0, $playerName='', $Item=FALSE, $price=0.0, $created=0, $expires=0, $allowBids=FALSE, $currentBid=0.0, $currentWinner='') {
 	$this->tableRowId = ($tableRowId<1  ? -1 : (int)  $tableRowId);
 	$this->playerName = (string)$playerName;
 	$this->Item       = $Item;
 	$this->price      = ($price<0.0     ? 0.0: (float)$price);
 	$this->created    = ($created<0     ? -1 : (int)  $created);
+	$this->expires    = ($expires<0     ? -1 : (int)  $expires);
 	$this->allowBids  = (boolean)$allowBids;
 	$this->currentBid = ($currentBid<0.0? 0.0: (float)$currentBid);
 	$this->currentWinner = (string)$currentWinner;
@@ -53,9 +55,9 @@ public function getPriceTotal() {
 public function getCreated() {
 	return($this->created);
 }
-// get date expire
-public function getExpire() {
-	return('expires date<br />goes here');
+// get date expires
+public function getExpires() {
+	return($this->expires);
 }
 
 

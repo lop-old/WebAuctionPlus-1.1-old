@@ -39,9 +39,9 @@ function RenderPage_myitems() {
 		$tags = array(
 			'item display'       => $Item->getDisplay(),
 			'item row id'        => $Item->getTableRowId(),
+			'market price each'  => '- -',
+			'market price total' => '- -',
 			'item qty'           => $Item->getItemQty(),
-			'market price each'  => '--',
-			'market price total' => '--',
 //number_format((double)$auction['price'],2)
 //number_format((double)($auction['price'] * $Item->qty),2)
 //	$marketPrice=getMarketPrice($id, 0);

@@ -42,7 +42,9 @@ $(document).ready(function() {
 			{ "sType": "currency", "aTargets": [ "column_price_each", "column_price_total" ] },
 			{ "sType": "numeric",  "aTargets": [ "column_qty" ] },
 			// not searchable
-			{ "bSearchable": false, "aTargets": [ "column_market", "column_qty" ] },
+			{ "bSearchable": false, "aTargets": [ "column_market", "column_qty", "column_buy", "column_cancel" ] },
+			// not sortable
+			{ "bSortable": false, "aTargets": [ "column_buy", "column_cancel" ] },
 			// modify sorting
 			{ "asSorting": [ "desc", "asc" ], "aTargets": [ "column_created", "column_expires", "column_qty" ] },
 		],
@@ -69,18 +71,19 @@ $outputs['body top']='
 <table border="0" cellpadding="0" cellspacing="0" class="display" id="mainTable">
 	<thead>
 		<tr style="text-align: center; vertical-align: bottom;">
-			<th>Item</th>
-			<th>Seller</th>
-<!--		<th>Expires</th>-->
-			<th>Price (Each)</th>
-			<th>Price (Total)</th>
-			<th>Percent of<br />Market Price</th>
-			<th>Qty</th>
+			<th class="column_item">Item</th>
+			<th class="column_seller">Seller</th>
+			<th class="column_created">Created</th>
+			<th class="column_expires">Expires</th>
+			<th class="column_price_each">Price<br />(Each)</th>
+			<th class="column_price_total">Price<br />(Total)</th>
+'./*<!--		<th class="column_market">Percent of<br />Market Price</th>-->*/'
+			<th class="column_qty">Qty</th>
 {if permission[canBuy]}
-			<th>Buy</th>
+			<th class="column_buy"></th>
 {endif}
 {if permission[isAdmin]}
-			<th>Cancel</th>
+			<th class="column_cancel"></th>
 {endif}
 		</tr>
 	</thead>
@@ -92,10 +95,11 @@ $outputs['body row']='
 		<tr class="{rowclass}" style="height: 120px;">
 			<td style="padding-bottom: 10px; text-align: center;">{item}</td>
 			<td style="text-align: center;"><img src="./?page=mcskin&user={seller name}" width="32" height="32" alt="" /><br />{seller name}</td>
-<!--		<td style="text-align: center;">{expire}</td>-->
+			<td style="text-align: center;">{created}</td>
+			<td style="text-align: center;">{expires}</td>
 			<td style="text-align: center;">{price each}</td>
 			<td style="text-align: center;">{price total}</td>
-			<td style="text-align: center;">{market price percent}</td>
+'./*<!--		<td style="text-align: center;">{market price percent}</td>-->*/'
 			<td style="text-align: center;"><b>{qty}</b></td>
 {if permission[canBuy]}
 			<td style="text-align: center;">

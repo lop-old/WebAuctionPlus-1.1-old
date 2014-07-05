@@ -57,16 +57,18 @@ function RenderPage_myauctions() {
 		if(!$auction) break;
 		$Item = $auction->getItem();
 		if(!$Item) continue;
+		$created = str_replace('  ', '<br />', ($auction->getCreated() > 0 ? @date(DATETIME_FORMAT, $auction->getCreated()) : '- -'));
+		$expires = str_replace('  ', '<br />', ($auction->getExpires() > 0 ? fromSeconds($auction->getExpires() - time()) : '- -'));
 		$tags = array(
 			'auction id'  => (int)$auction->getTableRowId(),
 			'seller name' => $auction->getSeller(),
 			'item'        => $Item->getDisplay(),
+			'created'     => $created,
+			'expires'     => $expires,
+			'price each'  => FormatPrice($auction->getPrice()),
+			'price total' => FormatPrice($auction->getPriceTotal()),
 			'qty'         => (int)$Item->getItemQty(),
-			'price each'	=> FormatPrice($auction->getPrice()),
-			'price total'	=> FormatPrice($auction->getPriceTotal()),
-			'created'     => $auction->getCreated(),
-			'expire'      => $auction->getExpire(),
-			'market price percent' => '--',
+			'market price percent' => '- -',
 			'rowclass'    => 'gradeU',
 //TODO:
 //allowBids

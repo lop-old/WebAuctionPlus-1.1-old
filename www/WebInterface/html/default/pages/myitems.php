@@ -37,7 +37,9 @@ $(document).ready(function() {
 			{ "sType": "currency", "aTargets": [ "column_price_each", "column_price_total" ] },
 			{ "sType": "numeric",  "aTargets": [ "column_qty" ] },
 			// not searchable
-			{ "bSearchable": false, "aTargets": [ "column_market", "column_qty" ] },
+			{ "bSearchable": false, "aTargets": [ "column_market", "column_qty", "column_sell" ] },
+			// not sortable
+			{ "bSortable": false, "aTargets": [ "column_sell" ] },
 			// modify sorting
 			{ "asSorting": [ "desc", "asc" ], "aTargets": [ "column_created", "column_expires", "column_qty" ] },
 		],
@@ -64,12 +66,12 @@ $outputs['body top']='
 <table border="0" cellpadding="0" cellspacing="0" class="display" id="mainTable">
 	<thead>
 		<tr style="text-align: center; vertical-align: bottom;">
-			<th>Item</th>
-			<th>Qty</th>
-			<th>Market Price (Each)</th>
-			<th>Market Price (Total)</th>
+			<th class="column_item">Item</th>
+			<th class="column_price_each">Market Price<br />(Each)</th>
+			<th class="column_price_total">Market Price<br />(Total)</th>
+			<th class="column_qty">Qty</th>
 {if permission[canSell]}
-			<th>Sell Item</th>
+			<th class="column_sell"></th>
 {endif}
 		</tr>
 	</thead>
@@ -80,9 +82,9 @@ $outputs['body top']='
 $outputs['body row']='
 		<tr class="{rowclass}" style="height: 120px;">
 			<td style="padding-bottom: 10px; text-align: center;">{item display}</td>
-			<td style="text-align: center;"><b>{item qty}</b></td>
 			<td style="text-align: center;">{market price each}</td>
 			<td style="text-align: center;">{market price total}</td>
+			<td style="text-align: center;"><b>{item qty}</b></td>
 {if permission[canSell]}
 			<td style="text-align: center;"><a href="./?page=sell&amp;id={item row id}&amp;lastpage=page-myitems" class="button">Sell it</a></td>
 {endif}

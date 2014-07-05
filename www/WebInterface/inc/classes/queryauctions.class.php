@@ -29,10 +29,22 @@ public static function QuerySingle($id) {
 	return($class->getNext());
 }
 // query
-protected function doQuery($WHERE='') {global $config;
-	$query = "SELECT ".(getVar('ajax','bool')?"SQL_CALC_FOUND_ROWS ":'').
-		"`id`, `playerName`, `itemId`, `itemDamage`, `qty`, `enchantments`, ".
-		"`price`, UNIX_TIMESTAMP(`created`) AS `created`, `allowBids`, `currentBid`, `currentWinner` ".
+protected function doQuery($WHERE='') {
+	global $config;
+	$query = "SELECT ".
+		(getVar('ajax','bool')==TRUE ? "SQL_CALC_FOUND_ROWS " : '').
+		"`id`, ".
+		"`playerName`, ".
+		"`itemId`, ".
+		"`itemDamage`, ".
+		"`qty`, ".
+		"`enchantments`, ".
+		"`price`, ".
+		"UNIX_TIMESTAMP(`created`) AS `created`, ".
+		"UNIX_TIMESTAMP(`expires`) AS `expires`, ".
+		"`allowBids`, ".
+		"`currentBid`, ".
+		"`currentWinner` ".
 		"FROM `".$config['table prefix']."Auctions` ";
 	// where
 	if(is_array($WHERE)) {
@@ -49,24 +61,34 @@ protected function doQuery($WHERE='') {global $config;
 	// build where string
 	if(count($query_where) == 0) $query_where = '';
 	else $query_where = 'WHERE '.implode(' AND ', $query_where);
+	// column indexes/names
+	$columns = explode(',', getVar('sColumns', 'str'));
+	// field mappings
+	$fields = array(
+		'item'        => '`itemTitle`',
+		'seller'      => '`playerName`',
+		'created'     => '`created`',
+		'expires'     => '`expires`',
+		'price_each'  => '`price`',
+		'price_total' => '(`price` * `qty`)',
+//		'market'      => '1',
+		'qty'         => '`qty`',
+	);
 	// ajax sorting
+	$directions = array('ASC', 'DESC');
 	$query_order = '';
 	if(isset($_GET['iSortCol_0'])) {
-		$order_cols = array(
-			0 => "`itemTitle`",
-			1 => "`playerName`",
-			2 => "`price`",
-			3 => "(`price` * `qty`)",
-			4 => "1", // market
-			5 => "`qty`",
-		);
 		$iSortingCols = getVar('iSortingCols', 'int');
 		for($i = 0; $i < $iSortingCols; $i++) {
 			$iSortCol = getVar('iSortCol_'.$i, 'int');
+			$direction = strtoupper(getVar('sSortDir_'.$i, 'str'));
+			if(!in_array($direction, $directions)) continue;
 			if(!getVar('bSortable_'.$iSortCol, 'bool')) continue;
-			if(!isset($order_cols[$iSortCol])) continue;
-			if(!empty($query_order)) $query_order .= ', ';
-			$query_order .= $order_cols[$iSortCol].' '.mysql_san(getVar('sSortDir_'.$i, 'str'));
+			if(!isset($columns[$iSortCol])) continue;
+			$sort_name = $columns[$iSortCol];
+			if(!empty($query_order))
+				$query_order .= ', ';
+			$query_order .= $fields[$sort_name].' '.$direction;
 		}
 	}
 	if(empty($query_order)) $query_order = "`id` ASC";
@@ -119,6 +141,7 @@ public function getNext() {
 		),
 		$row['price'],
 		$row['created'],
+		$row['expires'],
 		$row['allowBids']!=0,
 		$row['currentBid'],
 		$row['currentWinner']
