@@ -25,13 +25,38 @@ $(document).ready(function() {
 		},
 		"bJQueryUI"         : true,
 		"bStateSave"        : true,
+		"aoColumnDefs": [
+			// column data names
+			{ "sName": "item",        "aTargets": [ "column_item"        ] },
+			{ "sName": "seller",      "aTargets": [ "column_seller"      ] },
+			{ "sName": "created",     "aTargets": [ "column_created"     ] },
+			{ "sName": "expires",     "aTargets": [ "column_expires"     ] },
+			{ "sName": "price_each",  "aTargets": [ "column_price_each"  ] },
+			{ "sName": "price_total", "aTargets": [ "column_price_total" ] },
+'./*			{ "sName": "market",      "aTargets": [ "column_market"      ] },*/'
+			{ "sName": "qty",         "aTargets": [ "column_qty"         ] },
+			{ "sName": "buy",         "aTargets": [ "column_buy"         ] },
+			{ "sName": "cancel",      "aTargets": [ "column_cancel"      ] },
+			// field type
+			{ "sType": "html", "aTargets": [ "column_item" ] },
+			{ "sType": "currency", "aTargets": [ "column_price_each", "column_price_total" ] },
+			{ "sType": "numeric",  "aTargets": [ "column_qty" ] },
+			// not searchable
+			{ "bSearchable": false, "aTargets": [ "column_market", "column_qty" ] },
+			// modify sorting
+			{ "asSorting": [ "desc", "asc" ], "aTargets": [ "column_created", "column_expires", "column_qty" ] },
+		],
+		// default sorting
+		"aaSorting"         : [[ 2, "desc" ]],
+		// items per page
 		"iDisplayLength"    : 5,
-		"aLengthMenu"       : [[5, 10, 30, 100, -1], [5, 10, 30, 100, "All"]],
+		// pagination
 		"sPaginationType"   : "full_numbers",
-		"sPagePrevEnabled"  : true,
-		"sPageNextEnabled"  : true,
+			"aLengthMenu"       : [[5, 10, 30, 100, -1], [5, 10, 30, 100, "All"]],
+			"sPagePrevEnabled"  : true,
+			"sPageNextEnabled"  : true,
+		"bServerSide"       : true,
 			"bProcessing"       : true,
-			"bServerSide"       : true,
 			"sAjaxSource"       : "./?page={page}&ajax=true",
 	});
 } );
