@@ -6,10 +6,22 @@ $outputs=array();
 $outputs['header']='
 <script type="text/javascript" language="javascript" charset="utf-8">
 $(document).ready(function() {
-	oTable = $(\'#mainTable\').dataTable({
+	$(\'#mainTable\').dataTable({
 		"oLanguage": {
+			"sSearch"         : "Search:",
+			"sProcessing"     : "Processing...",
+			"sLengthMenu"     : "Show _MENU_ auctions per page",
+			"sInfo"           : "Showing auctions _START_ to _END_ of _TOTAL_",
+			"sInfoEmpty"      : "No matching auctions found",
+			"sInfoFiltered"   : "(filtered from _MAX_ total auctions)",
 			"sEmptyTable"     : "&nbsp;<br />No auctions to display<br />&nbsp;",
 			"sZeroRecords"    : "&nbsp;<br />No auctions to display<br />&nbsp;",
+			"oPaginate": {
+				"sFirst"    : "&lt;&lt;",
+				"sNext"     : "&gt;",
+				"sPrevious" : "&lt;",
+				"sLast"     : "&gt;&gt;",
+			},
 		},
 		"bJQueryUI"         : true,
 		"bStateSave"        : true,
