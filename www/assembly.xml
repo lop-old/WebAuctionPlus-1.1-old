@@ -4,7 +4,6 @@
 	<baseDirectory>/</baseDirectory>
 	<formats>
 		<format>zip</format>
-<!--		<format>tar.gz</format> -->
 	</formats>
 	<includeBaseDirectory>true</includeBaseDirectory>
 	<fileSets>
@@ -14,15 +13,18 @@
 			<lineEnding>crlf</lineEnding>
 			<useDefaultExcludes>true</useDefaultExcludes>
 			<excludes>
-				<exclude>**/*.log</exclude>
 				<exclude>**/pom.xml</exclude>
 				<exclude>**/assembly.xml</exclude>
+				<exclude>**/*.log</exclude>
+				<exclude>**/.htaccess</exclude>
+				<exclude>**/.project</exclude>
+				<exclude>**/config.php</exclude>
 				<exclude>WebInterface/</exclude>
 			</excludes>
 		</fileSet>
 		<fileSet>
-			<directory>../../ProSiteManager/www/psm/</directory>
-			<outputDirectory>psm/</outputDirectory>
+			<directory>${psm-repo-path}/www/psm/</directory>
+			<outputDirectory>psm</outputDirectory>
 			<lineEnding>crlf</lineEnding>
 		</fileSet>
 	</fileSets>
