@@ -35,7 +35,7 @@
 				<configuration>
 					<appendAssemblyId>false</appendAssemblyId>
 					<descriptors>
-						<descriptor>assembly.xml</descriptor>
+						<descriptor>package.xml</descriptor>
 					</descriptors>
 				</configuration>
 				<executions>
