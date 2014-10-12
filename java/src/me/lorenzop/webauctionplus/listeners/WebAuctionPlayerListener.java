@@ -47,7 +47,13 @@ public class WebAuctionPlayerListener implements Listener {
 	// player quit
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerQuit(PlayerQuitEvent event) {
-		WebInventory.onInventoryClose(event.getPlayer());
+                final Player p = (Player) event.getPlayer();
+                Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        WebInventory.onInventoryClose(p);  
+                    }
+                });
 		plugin.lastSignUse.remove(event.getPlayer().getName());
 	}
 
@@ -55,7 +61,13 @@ public class WebAuctionPlayerListener implements Listener {
 	// close inventory
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onInventoryClose(InventoryCloseEvent event){
-		WebInventory.onInventoryClose( (Player) event.getPlayer() );
+                final Player p = (Player) event.getPlayer();
+                Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        WebInventory.onInventoryClose(p);  
+                    }
+                });	
 //		if(WebAuctionPlus.dataQueries.debugSQL) WebAuctionPlus.log.info(WebAuctionPlus.dataQueries."CLOSED!");
 //		Bukkit.getServer().broadcastMessage("Close Inventory");
 	}
@@ -88,7 +100,7 @@ public class WebAuctionPlayerListener implements Listener {
 		if(!lines[0].equals("[WebAuction+]")) return;
 		event.setCancelled(true);
 		// get player info
-		Player p = event.getPlayer();
+		final Player p = event.getPlayer();
 		String player = p.getName();
 
 		// prevent click spamming signs
@@ -189,7 +201,12 @@ public class WebAuctionPlayerListener implements Listener {
 				return;
 			}
 			// load virtual chest
-			WebInventory.onInventoryOpen(p);
+                        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable() {
+                            @Override
+                            public void run() {
+                                WebInventory.onInventoryOpen(p);  
+                            }
+                        });			
 			return;
 		}
 
