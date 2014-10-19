@@ -1,6 +1,6 @@
 name: WebAuctionPlus
 main: me.lorenzop.webauctionplus.WebAuctionPlus
-version: 1.1.14
+version: 1.1.15
 author: lorenzop
 website: http://webauctionplus.com/
 depend: [Vault]
