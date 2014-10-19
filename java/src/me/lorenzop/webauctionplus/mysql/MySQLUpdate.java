@@ -17,6 +17,9 @@ public class MySQLUpdate {
 		// update db fields  (< 1.1.14)
 		if(WebAuctionPlus.compareVersions(fromVersion, "1.1.14").equals("<"))
 			UpdateFields1_1_14();
+                // update db fields  (< 1.1.15)
+		if(WebAuctionPlus.compareVersions(fromVersion, "1.1.15").equals("<"))
+			UpdateUUID1_1_15();
 	}
 
 
@@ -37,7 +40,28 @@ public class MySQLUpdate {
 		return true;
 	}
 
-
+	// UUID update
+	private static void UpdateUUID1_1_15() {
+		final Connection conn = WebAuctionPlus.dataQueries.getConnection();
+		try {
+			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updating db fields for 1.1.15");
+			final String[] queries = new String[]{
+				// enchantment/meta fields
+				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players` ADD `uuid` VARCHAR(50) NULL DEFAULT NULL AFTER `playerName`, ADD UNIQUE (`uuid`)"
+			};
+			// execute queries
+			for(final String sql : queries) {
+				if(sql == null || sql.isEmpty()) continue;
+				if(!execQuery(conn, sql)) {
+					WebAuctionPlus.fail("Failed to update from 1.1.9! Check console log for details.");
+					throw new RuntimeException();
+				}
+			}
+		} finally {
+			WebAuctionPlus.dataQueries.closeResources(conn);
+		}
+	}
+        
 	// update broken fields
 	private static void UpdateFields1_1_14() {
 		final Connection conn = WebAuctionPlus.dataQueries.getConnection();
