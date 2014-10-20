@@ -260,10 +260,10 @@ public static function getMaxStack($itemId=0, $itemDamage=0){
 
 
 // update qty / create item
-public static function AddCreateItem($playerName, $Item){global $config;
+public static function AddCreateItem($playerId, $Item){global $config;
   // find existing stack
   $query = "SELECT `id` FROM `".$config['table prefix']."Items` WHERE ".
-           "`playerName`='".mysql_san($playerName)."' AND ".
+           "`playerId`='".mysql_san($playerId)."' AND ".
            "`itemId` = ".    ((int)$Item->getItemId())." AND ".
            "`itemDamage` = ".((int)$Item->getItemDamage())." AND ".
            "`enchantments` = '".mysql_san($Item->getEnchantmentsCompressed())."' ".
@@ -277,15 +277,15 @@ public static function AddCreateItem($playerName, $Item){global $config;
     $query = "UPDATE `".$config['table prefix']."Items` SET ".
              "`qty`=`qty`+".((int)$Item->getItemQty()).", ".
              "`itemTitle` = '".mysql_san($Item->getItemTitle())."' ".
-             "WHERE `id` = ".((int)$tableRowId)." AND `playerName`='".mysql_san($playerName)."' LIMIT 1";
+             "WHERE `id` = ".((int)$tableRowId)." AND `playerId`='".mysql_san($playerId)."' LIMIT 1";
     $result = RunQuery($query, __file__, __line__);
     if(!$result){echo '<p style="color: red;">Error updating item stack!</p>'; exit();}
     return($tableRowId);
   }
   // create new stack
   $query = "INSERT INTO `".$config['table prefix']."Items` (".
-           "`playerName`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle`) VALUES (".
-           "'".mysql_san($playerName)."', ".
+           "`playerId`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle`) VALUES (".
+           "'".mysql_san($playerId)."', ".
            ((int)$Item->getItemId()).", ".
            ((int)$Item->getItemDamage()).", ".
            ((int)$Item->getItemQty()).", ".

@@ -4,6 +4,7 @@ class UserClass{
 
 
 protected $UserId      = 0;
+protected $UUID        = 0;
 protected $Name        = '';
 protected $Money       = 0.0;
 protected $ItemsSold   = 0;
@@ -39,7 +40,7 @@ private function doValidate($username, $password=FALSE){global $config;
   if(empty($this->Name)) return(FALSE);
   if($password!==FALSE && empty($password)) return(FALSE);
   // validate player
-  $query = "SELECT `id`,`playerName`,`money`,`itemsSold`,`itemsBought`,`earnt`,`spent`,`Permissions`,`Locked` ".
+  $query = "SELECT `id`,`playerName`, `UUID`,`money`,`itemsSold`,`itemsBought`,`earnt`,`spent`,`Permissions`,`Locked` ".
            "FROM `".$config['table prefix']."Players` ".
            "WHERE LOWER(`playerName`)='".mysql_san(strtolower($this->Name))."' ".
            ($password===FALSE?"":"AND `password`='".mysql_san($password)."' ").
@@ -55,6 +56,7 @@ private function doValidate($username, $password=FALSE){global $config;
     if( strtolower($row['playerName']) != strtolower($this->Name) ) return(FALSE);
     $this->UserId      = ((int)    $row['id']         );
     $this->Name        =           $row['playerName'];
+    $this->UUID        =           $row['UUID'];
     $this->Money       = ((double) $row['money']      );
     $this->ItemsSold   = ((int)    $row['itemsSold']  );
     $this->ItemsBought = ((int)    $row['itemsBought']);
@@ -92,7 +94,7 @@ private function doValidate($username, $password=FALSE){global $config;
     $result = mysql_query("SELECT ".mysql_san($config['CC']['prefix'])."_balance.balance AS balance FROM cc3_balance JOIN ".mysql_san($config['CC']['prefix'])."_account ON ".
                           " ".mysql_san($config['CC']['prefix'])."_account.id = ".mysql_san($config['CC']['prefix'])."_balance.username_id ".
                           "JOIN ".mysql_san($config['CC']['prefix'])."_currency ON ".mysql_san($config['CC']['prefix'])."_currency.id = ".mysql_san($config['CC']['prefix'])."_balance.currency_id ".
-                          "WHERE LOWER(".mysql_san($config['CC']['prefix'])."_account.name) = '".mysql_san(strtolower($this->Name))."' AND ".
+                          "WHERE ".mysql_san($config['CC']['prefix'])."_account.uuid = '".mysql_san($this->UUID)."' AND ".
                           " LOWER(".mysql_san($config['CC']['prefix'])."_currency.name) = '".mysql_san($config['CC']['currency'])."' AND LOWER(".mysql_san($config['CC']['prefix'])."_balance.worldName) = '".mysql_san($config['CC']['group'])."';");
     if($result){
       $row = mysql_fetch_assoc($result);
@@ -121,10 +123,14 @@ public function doLogout(){global $config;
 
 
 // user id
-public function getUserId(){
+public function getId(){
   return($this->UserId);
 }
 
+// user id
+public function getUUID(){
+  return($this->UUID);
+}
 
 // player name
 public function getName(){
@@ -194,21 +200,29 @@ public function getMoney(){
 
 
 //TODO: this code doesn't check for failures
-public static function MakePayment($fromPlayer, $toPlayer, $amount, $desc=''){
+public static function MakePayment($fromPlayer, $fromPlayerUUID, $toPlayer, $toPlayerUUID, $amount, $desc=''){
   if(empty($fromPlayer) || empty($toPlayer) || $amount<=0){echo 'Invalid payment amount!'; exit();}
-  self::PaymentQuery($toPlayer,     $amount);
-  self::PaymentQuery($fromPlayer, 0-$amount);
+  self::PaymentQuery($toPlayer, $toPlayerUUID,     $amount);
+  self::PaymentQuery($fromPlayer, $fromPlayerUUID, 0-$amount);
   // TODO: log transaction
 }
-public static function PaymentQuery($playerName, $amount){global $config;
+public static function PaymentQuery($playerName, $playerUUID, $amount){global $config;
   if($config['iConomy']['use'] === TRUE){
     $query = "UPDATE `".mysql_san($config['iConomy']['table'])."` SET ".
              "`balance` = `balance` + ".((float)$amount)." ".
              "WHERE LOWER(`username`)='".mysql_san(strtolower($playerName))."' LIMIT 1";
-  }else{
+  } else if($config['CC']['use'] === TRUE){
+    $query = "UPDATE `".mysql_san($config['CC']['prefix'])."_balance` JOIN ".mysql_san($config['CC']['prefix'])."_account ON ".
+             " ".mysql_san($config['CC']['prefix'])."_account.id = ".mysql_san($config['CC']['prefix'])."_balance.username_id ".
+             "JOIN ".mysql_san($config['CC']['prefix'])."_currency ON ".mysql_san($config['CC']['prefix'])."_currency.id = ".mysql_san($config['CC']['prefix'])."_balance.currency_id SET".
+             "`".mysql_san($config['CC']['prefix'])."_balance.balance` = `".mysql_san($config['CC']['prefix'])."_balance.balance` + ".((float)$amount)." ".
+             "WHERE ".mysql_san($config['CC']['prefix'])."_account.uuid = '".mysql_san($this->UUID)."' AND ".
+             " LOWER(".mysql_san($config['CC']['prefix'])."_currency.name) = '".mysql_san(stringtolower($config['CC']['currency']))."' AND LOWER(".mysql_san($config['CC']['prefix'])."_balance.worldName) = '".mysql_san(stringtolower($config['CC']['group']))."' LIMIT 1;";
+  }
+  else {
     $query = "UPDATE `".$config['table prefix']."Players` SET ".
              "`money` = `money` + ".((float)$amount)." ".
-             "WHERE LOWER(`playerName`)='".mysql_san(strtolower($playerName))."' LIMIT 1";
+             "WHERE `uuid`='".mysql_san($playerUUID)."' LIMIT 1";
   }
   $result = RunQuery($query, __file__, __line__);
   global $db;

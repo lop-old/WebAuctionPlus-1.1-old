@@ -5,18 +5,18 @@ protected $result = FALSE;
 
 
 // query inventory item stacks
-public static function QueryInventory($playerName){
-  if(empty($playerName)) {$this->result = FALSE; return(FALSE);}
+public static function QueryInventory($playerId){
+  if(empty($playerId)) {$this->result = FALSE; return(FALSE);}
   $class = new QueryItems();
-  $class->doQuery("LOWER(`playerName`) = '".mysql_san(strtolower($playerName))."'");
+  $class->doQuery("`playerId` = '".mysql_san($playerId)."'");
   if(!$class->result) return(FALSE);
   return($class);
 }
 // query single item stack
-public static function QuerySingle($playerName, $id){
-  if(empty($playerName)) {$this->result = FALSE; return(FALSE);}
+public static function QuerySingle($playerId, $id){
+  if(empty($playerId)) {$this->result = FALSE; return(FALSE);}
   $class = new QueryItems();
-  $class->doQuery("LOWER(`playerName`) = '".mysql_san(strtolower($playerName))."' AND `id` = ".((int)$id));
+  $class->doQuery("`playerId` = '".mysql_san($playerId)."' AND `id` = ".((int)$id));
   if(!$class->result) return(FALSE);
   return($class->getNext());
 }

@@ -24,13 +24,13 @@ public static function Sell($id, $qty, $price, $desc){global $config, $user;
   $maxSellPrice = SettingsClass::getDouble('Max Sell Price');
   if($maxSellPrice>0.0 && $price>$maxSellPrice){$config['error'] = 'Over max sell price of $ '.$maxSellPrice.' !'; return(FALSE);}
   // query item
-  $Item = QueryItems::QuerySingle($user->getName(), $id);
+  $Item = QueryItems::QuerySingle($user->getId(), $id);
   if(!$Item){$config['error'] = 'Item not found!'; return(FALSE);}
   if($qty > $Item->getItemQty()){$qty = $Item->getItemQty(); $config['error'] = 'You don\'t have that many!'; return(FALSE);}
   // create auction
   $query = "INSERT INTO `".$config['table prefix']."Auctions` (".
-           "`playerName`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle`, `price`, `created` )VALUES( ".
-           "'".mysql_san($user->getName())."', ".
+           "`playerId`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle`, `price`, `created` )VALUES( ".
+           "'".mysql_san($user->getId())."', ".
            ((int)$Item->getItemId()).", ".
            ((int)$Item->getItemDamage()).", ".
            ((int)$qty).", ".
@@ -48,7 +48,7 @@ public static function Sell($id, $qty, $price, $desc){global $config, $user;
   LogSales::addLog(
     LogSales::LOG_NEW,
     LogSales::SALE_BUYNOW,
-    $user->getName(),
+    $user->getId(),
     NULL,
     $Item,
     $price,
@@ -77,7 +77,7 @@ public static function BuyAuction($auctionId, $qty){global $config, $user;
 //    header("Location: ../myauctions.php");
 //  }
   // buying validation
-  if($auction->getSeller()==$user->getName()){$config['error'] = 'Can\'t buy from yourself!'; return(FALSE);}
+  if($auction->getSellerId()==$user->getId()){$config['error'] = 'Can\'t buy from yourself!'; return(FALSE);}
   if($qty > $auction->getItem()->getItemQty()) {$qty = $auction->getItem()->getItemQty(); $config['error'] = 'Not that many for sale!'; return(FALSE);}
   $maxSellPrice = SettingsClass::getDouble('Max Sell Price');
   $sellPrice = $auction->getPrice();
@@ -87,7 +87,9 @@ public static function BuyAuction($auctionId, $qty){global $config, $user;
   // make payment from buyer to seller
   UserClass::MakePayment(
     $user->getName(),
+    $user->getUUID(),
     $auction->getSeller(),
+    $auction->getSellerUUID(),
     $priceQty,
     'Bought auction '.((int)$auction->getTableRowId()).' '.$Item->getItemTitle().' x'.((int)$Item->getItemQty())
   );
@@ -102,8 +104,8 @@ public static function BuyAuction($auctionId, $qty){global $config, $user;
   LogSales::addLog(
     LogSales::LOG_SALE,
     LogSales::SALE_BUYNOW,
-    $auction->getSeller(),
-    $user->getName(),
+    $auction->getSellerId(),
+    $user->getId(),
     $Item,
     $sellPrice,
     FALSE,
@@ -122,18 +124,18 @@ public static function CancelAuction($auctionId){global $config, $user;
   $auction = QueryAuctions::QuerySingle($auctionId);
   if(!$auction) {$config['error'] = 'Auction not found!'; return(FALSE);}
   // isAdmin or owns auction
-  if( !$user->hasPerms('isAdmin') && $auction->getSeller() != $user->getName() ) {
+  if( !$user->hasPerms('isAdmin') && $auction->getSellerId() != $user->getId() ) {
     $config['error'] = 'You don\'t own that auction!'; return(FALSE);}
   // remove auction
   self::RemoveAuction($auctionId, -1);
   // add item to inventory
-  $tableRowId = ItemFuncs::AddCreateItem($auction->getSeller(), $auction->getItem());
+  $tableRowId = ItemFuncs::AddCreateItem($auction->getId(), $auction->getItem());
   // add sale log
   $Item = $auction->getItem();
   LogSales::addLog(
     LogSales::LOG_CANCEL,
     LogSales::SALE_BUYNOW,
-    $user->getName(),
+    $user->getId(),
     NULL,
     $Item,
     0.0,

@@ -15,7 +15,7 @@ public static function QueryCurrent(){
 public static function QueryMy(){global $user;
   if(!$user->isOk()) {$this->result = FALSE; return(FALSE);}
   $class = new QueryAuctions();
-  $class->doQuery( "`playerName` = '".mysql_san($user->getName())."'" );
+  $class->doQuery( "`playerId` = '".mysql_san($user->getId())."'" );
   if(!$class->result) return(FALSE);
   return($class);
 }
@@ -30,9 +30,9 @@ public static function QuerySingle($id){
 // query
 protected function doQuery($WHERE=''){global $config;
   $query = "SELECT ".(getVar('ajax','bool')?"SQL_CALC_FOUND_ROWS ":'').
-           "`id`, `playerName`, `itemId`, `itemDamage`, `qty`, `enchantments`, ".
+           "".$config['table prefix']."Auctions.id, `playerId`, `playerName`, `uuid`, `itemId`, `itemDamage`, `qty`, `enchantments`, ".
            "`price`, UNIX_TIMESTAMP(`created`) AS `created`, `allowBids`, `currentBid`, `currentWinner` ".
-           "FROM `".$config['table prefix']."Auctions` ";
+           "FROM `".$config['table prefix']."Auctions` JOIN `".$config['table prefix']."Players` ON ".$config['table prefix']."Auctions.playerId = ".$config['table prefix']."Players.id ";
   // where
   if(is_array($WHERE)){
     $query_where = $WHERE;
@@ -109,6 +109,8 @@ public function getNext(){
   return(new AuctionDAO(
     $row['id'],
     $row['playerName'],
+    $row['uuid'],
+    $row['playerId'],
     new ItemDAO(
       -1,
       $row['itemId'],

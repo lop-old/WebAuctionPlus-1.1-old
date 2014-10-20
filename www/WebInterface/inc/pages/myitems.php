@@ -29,7 +29,7 @@ function RenderPage_myitems(){global $config,$html;
   }
   $outputs['body top'] = str_replace('{messages}', $msg, $outputs['body top']);
   // list items
-  $Items = QueryItems::QueryInventory($config['user']->getName());
+  $Items = QueryItems::QueryInventory($config['user']->getId());
   if($Items == FALSE) {echo 'Unable to query items!'; exit();}
   $outputRows = '';
   while(TRUE) {

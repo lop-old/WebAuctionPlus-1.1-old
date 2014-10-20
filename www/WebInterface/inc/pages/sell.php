@@ -149,7 +149,7 @@ function RenderPage_sell(){global $config,$html,$user,$settings; $output='';
   $qty       = getVar('qty');
   $priceEach = getVar('price', 'double');
   // query item
-  $Item = QueryItems::QuerySingle($user->getName(), $id);
+  $Item = QueryItems::QuerySingle($user->getId(), $id);
   if(!$Item) return('<h2 style="text-align: center;">The item you\'re trying to sell couldn\'t be found!</h2>');
 //echo '<pre>';print_r($Item);exit();
   if(empty($qty)) $qty = $Item->getItemQty();
