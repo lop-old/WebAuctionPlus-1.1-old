@@ -81,10 +81,10 @@
   <dependencies>
     <dependency>
       <groupId>org.bukkit</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>1.7.2-R0.2</version>
-      <type>jar</type>
-      <scope>compile</scope>
+      <artifactId>craftbukkit</artifactId>
+      <version>1.8.0 Spigot</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/resources/spigot-1.8.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.avaje</groupId>

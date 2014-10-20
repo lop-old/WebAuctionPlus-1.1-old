@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -36,7 +37,7 @@ public class WebAuctionPlayerListener implements Listener {
 	// player join
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		String player = event.getPlayer().getName();
+		OfflinePlayer player = event.getPlayer();
 		if (player == null) return;
 		// login code runs multi-threaded with a delay
 		// run after 2 seconds
@@ -130,24 +131,24 @@ public class WebAuctionPlayerListener implements Listener {
 				} catch(NumberFormatException ignore) {}
 			}
 			// player has enough money
-			if(!WebAuctionPlus.vaultEconomy.has(player, amount)) {
+			if(!WebAuctionPlus.vaultEconomy.has(p, amount)) {
 				p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("not_enough_money_pocket"));
 				return;
 			}
-			AuctionPlayer auctionPlayer = WebAuctionPlus.dataQueries.getPlayer(player);
+			AuctionPlayer auctionPlayer = WebAuctionPlus.dataQueries.getPlayer(p.getUniqueId());
 			if(auctionPlayer == null) {
 				p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("account_not_found"));
 				return;
 			}
 			double currentMoney = auctionPlayer.getMoney();
 			if(lines[2].equals("All"))
-				amount = WebAuctionPlus.vaultEconomy.getBalance(player);
+				amount = WebAuctionPlus.vaultEconomy.getBalance(p);
 			currentMoney += amount;
 			currentMoney = WebAuctionPlus.RoundDouble(currentMoney, 2, BigDecimal.ROUND_HALF_UP);
 			p.sendMessage(WebAuctionPlus.chatPrefix + "Added " + amount +
 				" to auction account, new auction balance: " + currentMoney);
-			WebAuctionPlus.dataQueries.updatePlayerMoney(player, currentMoney);
-			WebAuctionPlus.vaultEconomy.withdrawPlayer(player, amount);
+			WebAuctionPlus.dataQueries.updatePlayerMoney(p.getUniqueId(), currentMoney);
+			WebAuctionPlus.vaultEconomy.withdrawPlayer(p, amount);
 			return;
 		}
 
@@ -159,7 +160,7 @@ public class WebAuctionPlayerListener implements Listener {
 			}
 			double amount = 0.0D;
 			try {
-				AuctionPlayer auctionPlayer = WebAuctionPlus.dataQueries.getPlayer(player);
+				AuctionPlayer auctionPlayer = WebAuctionPlus.dataQueries.getPlayer(p.getUniqueId());
 				if(auctionPlayer == null) {
 					p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("account_not_found"));
 					return;
@@ -181,8 +182,8 @@ public class WebAuctionPlayerListener implements Listener {
 				currentMoney = WebAuctionPlus.RoundDouble(currentMoney, 2, BigDecimal.ROUND_HALF_UP);
 				p.sendMessage(WebAuctionPlus.chatPrefix + "Removed " +
 					amount + " from auction account, new auction balance: " + currentMoney);
-				WebAuctionPlus.dataQueries.updatePlayerMoney(player, currentMoney);
-				WebAuctionPlus.vaultEconomy.depositPlayer(player, amount);
+				WebAuctionPlus.dataQueries.updatePlayerMoney(p.getUniqueId(), currentMoney);
+				WebAuctionPlus.vaultEconomy.depositPlayer(p, amount);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -11,23 +11,24 @@ import me.lorenzop.webauctionplus.WebAuctionPlus;
 import me.lorenzop.webauctionplus.dao.AuctionPlayer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class PlayerAlertTask implements Runnable {
 
-	private String playerJoined = null;
+	private OfflinePlayer playerJoined = null;
 
 
 	public PlayerAlertTask() {
 		this.playerJoined = null;
 	}
-	public PlayerAlertTask(String playerJoined) {
+	public PlayerAlertTask(OfflinePlayer playerJoined) {
 		this.playerJoined = playerJoined;
 	}
 
 
 	public synchronized void run() {
-		HashMap<Integer, String> playersMap = new HashMap<Integer, String>();
+		HashMap<Integer, AuctionPlayer> playersMap = new HashMap<Integer, AuctionPlayer>();
 		AuctionPlayer waPlayer = null;
 		Player p = null;
 		String whereSql = "";
@@ -39,15 +40,18 @@ public class PlayerAlertTask implements Runnable {
 			if (playersList.length == 0) return;
 			// build query
 			for (Player player : playersList) {
-				i++; if(i != 1) whereSql += " OR ";
-				whereSql += "`seller` = ?";
-				playersMap.put(i, player.getName());
+                                waPlayer = WebAuctionPlus.dataQueries.getPlayer(player.getUniqueId());
+                                if(waPlayer != null) {
+                                    i++; if(i != 1) whereSql += " OR ";
+                                    whereSql += "`sellerid` = ?";
+                                    playersMap.put(i, waPlayer);
+                                }
 			}
 		// only running for a single joined player
 		} else {
-			waPlayer = WebAuctionPlus.dataQueries.getPlayer(playerJoined);
-			p = Bukkit.getPlayerExact(playerJoined);
-			if (waPlayer==null || p==null) return;
+			waPlayer = WebAuctionPlus.dataQueries.getPlayer(playerJoined.getUniqueId());
+			p = Bukkit.getPlayer(playerJoined.getUniqueId());
+			if (waPlayer == null || p==null) return;
 			// update permissions
 			boolean canBuy  = p.hasPermission("wa.canbuy");
 			boolean canSell = p.hasPermission("wa.cansell");
@@ -58,8 +62,8 @@ public class PlayerAlertTask implements Runnable {
 					(isAdmin?" isAdmin":"") );
 			WebAuctionPlus.dataQueries.updatePlayerPermissions(waPlayer, canBuy, canSell, isAdmin);
 			// build query
-			whereSql += "seller = ?";
-			playersMap.put(1, playerJoined);
+			whereSql += "sellerid = ?";
+			playersMap.put(1, waPlayer);
 		}
 		if(playersMap.size() == 0) return;
 		// run the querys
@@ -68,22 +72,22 @@ public class PlayerAlertTask implements Runnable {
 		ResultSet rs = null;
 		try {
 			if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: SaleAlertTask::SaleAlerts " + playersMap.toString());
-			st = conn.prepareStatement("SELECT `id`, `saleType`, `itemType`, `itemTitle`, `seller`,`buyer`,`qty`,`price` FROM `" +
-				WebAuctionPlus.dataQueries.dbPrefix()+"LogSales` WHERE ( " + whereSql + " ) AND `logType` = 'sale' AND `alert` != 0 LIMIT 4");
-			for(Map.Entry<Integer, String> entry : playersMap.entrySet()) {
-				st.setString(entry.getKey(), entry.getValue());
+			st = conn.prepareStatement("SELECT "+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales.id, `playerName`, `saleType`, `itemType`, `itemTitle`, `sellerid`, `qty`,`price` FROM " +
+				WebAuctionPlus.dataQueries.dbPrefix()+"LogSales JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"Players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales.buyerid = "+WebAuctionPlus.dataQueries.dbPrefix()+"Players.id  WHERE ( " + whereSql + " ) AND `logType` = 'sale' AND `alert` != 0 LIMIT 4");
+			for(Map.Entry<Integer, AuctionPlayer> entry : playersMap.entrySet()) {
+				st.setInt(entry.getKey(), entry.getValue().getPlayerId());
 			}
 			rs = st.executeQuery();
 			String markSeenSql = "";
 			while (rs.next()) {
 				if(playerJoined == null)
-					p = Bukkit.getPlayerExact(rs.getString("seller"));
+					p = Bukkit.getPlayer(WebAuctionPlus.dataQueries.getPlayer(rs.getInt("sellerid")).getPlayerUUID());
 				if(p != null) {
 // TODO: language here
 					p.sendMessage(WebAuctionPlus.chatPrefix+"You sold " +
 						rs.getInt   ("qty")+"x "+
 						rs.getString("itemTitle")+" to "+
-						rs.getString("buyer")+" for "+
+						rs.getString("playerName")+" for "+
 						WebAuctionPlus.FormatPrice(rs.getDouble("price"))+
 						(rs.getInt("qty")>1 ? " each, "+WebAuctionPlus.FormatPrice(rs.getDouble("price")*rs.getDouble("qty"))+" total." : "") );
 					// mark seen sql

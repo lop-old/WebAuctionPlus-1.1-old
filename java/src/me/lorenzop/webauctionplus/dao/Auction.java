@@ -8,6 +8,7 @@ public class Auction {
 	private ItemStack stack		= null;
 	private String itemTitle	= null;
 	private String player		= null;
+        private int playerId            = 0;
 	private double price		= 0D;
 //	private long created		= 0;
 	private Boolean allowBids	= false;
@@ -49,6 +50,14 @@ public class Auction {
 	}
 	public void setPlayerName(String player) {
 		this.player = player;
+	}
+        
+        // player Id
+	public int getPlayerId() {
+		return playerId;
+	}
+	public void setPlayerId(int playerId) {
+		this.playerId = playerId;
 	}
 
 	// price

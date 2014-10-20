@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import me.lorenzop.webauctionplus.WebAuctionPlus;
 import me.lorenzop.webauctionplus.WebItemMeta;
@@ -41,8 +42,8 @@ public class DataQueries extends MySQLConnPool {
 		ResultSet rs = null;
 		try {
 			if(isDebug()) log.info("WA Query: getAuction "+Integer.toString(auctionId));
-			st = conn.prepareStatement("SELECT `playerName`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle`, "+
-				"`price`, `allowBids`, `currentBid`, `currentWinner` FROM `"+dbPrefix+"Auctions` WHERE `id` = ? LIMIT 1");
+			st = conn.prepareStatement("SELECT `playerName`, `playerId`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle`, "+
+				"`price`, `allowBids`, `currentBid`, `currentWinner` FROM `"+dbPrefix+"Auctions` JOIN `"+dbPrefix+"Players` ON `"+dbPrefix+"Players.id` = `"+dbPrefix+"Auctions.playerId` WHERE `"+dbPrefix+"Auctions.id` = ? LIMIT 1");
 //UNIX_TIMESTANP(`created`) AS `created`,
 			st.setInt(1, auctionId);
 			rs = st.executeQuery();
@@ -60,6 +61,7 @@ public class DataQueries extends MySQLConnPool {
 				auction.setItemStack(stack);
 				auction.setItemTitle(rs.getString("itemTitle"));
 				auction.setPlayerName(rs.getString("playerName"));
+                                auction.setPlayerName(rs.getString("playerId"));
 				auction.setPrice(rs.getDouble("price"));
 //				auction.setCreated(rs.getInt("created"));
 				auction.setAllowBids(rs.getBoolean("allowBids"));
@@ -214,26 +216,55 @@ public class DataQueries extends MySQLConnPool {
 	}
 
 
-	public AuctionPlayer getPlayer(String player) {
+	public AuctionPlayer getPlayer(UUID uuid) {
 		AuctionPlayer waPlayer = null;
 		Connection conn = getConnection();
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(isDebug()) log.info("WA Query: getPlayer " + player);
-			st = conn.prepareStatement("SELECT `id`,`playerName`,`money`,`Permissions` " +
-				"FROM `"+dbPrefix+"Players` WHERE `playerName` = ? LIMIT 1");
-			st.setString(1, player);
+			if(isDebug()) log.info("WA Query: getPlayer " + uuid.toString());
+			st = conn.prepareStatement("SELECT `id`,`playerName`,`uuid`,`money`,`Permissions` " +
+				"FROM `"+dbPrefix+"Players` WHERE `uuid` = ? LIMIT 1");
+			st.setString(1, uuid.toString());
 			rs = st.executeQuery();
 			if(rs.next()) {
 				waPlayer = new AuctionPlayer();
 				waPlayer.setPlayerId(  rs.getInt   ("id"));
 				waPlayer.setPlayerName(rs.getString("playerName"));
+                                waPlayer.setPlayerUUID(UUID.fromString(rs.getString("uuid")));
 				waPlayer.setMoney(     rs.getDouble("money"));
 				waPlayer.setPerms(     rs.getString("Permissions"));
 			}
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to get player " + player);
+			log.warning(logPrefix + "Unable to get player with UUID: " + uuid.toString());
+			e.printStackTrace();
+		} finally {
+			closeResources(conn, st, rs);
+		}
+		return waPlayer;
+	}
+        
+	public AuctionPlayer getPlayer(int id) {
+		AuctionPlayer waPlayer = null;
+		Connection conn = getConnection();
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			if(isDebug()) log.info("WA Query: getPlayer " + id);
+			st = conn.prepareStatement("SELECT `id`,`playerName`,`uuid`,`money`,`Permissions` " +
+				"FROM `"+dbPrefix+"Players` WHERE `id` = ? LIMIT 1");
+			st.setInt(1, id);
+			rs = st.executeQuery();
+			if(rs.next()) {
+				waPlayer = new AuctionPlayer();
+				waPlayer.setPlayerId(  rs.getInt   ("id"));
+				waPlayer.setPlayerName(rs.getString("playerName"));
+                                waPlayer.setPlayerUUID(UUID.fromString(rs.getString("uuid")));
+				waPlayer.setMoney(     rs.getDouble("money"));
+				waPlayer.setPerms(     rs.getString("Permissions"));
+			}
+		} catch(SQLException e) {
+			log.warning(logPrefix + "Unable to get player with interlan ID: " + id);
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -250,10 +281,11 @@ public class DataQueries extends MySQLConnPool {
 			if(isDebug()) log.info("WA Query: createPlayer " + waPlayer.getPlayerName() +
 				" with perms: " + waPlayer.getPermsString());
 			st = conn.prepareStatement("INSERT INTO `"+dbPrefix+"Players` " +
-				"(`playerName`, `password`, `Permissions`) VALUES (?, ?, ?)");
+				"(`playerName`,`uuid`, `password`, `Permissions`) VALUES (?, ?, ?, ?)");
 			st.setString(1, waPlayer.getPlayerName());
-			st.setString(2, pass);
-			st.setString(3, waPlayer.getPermsString());
+                        st.setString(2, waPlayer.getPlayerUUID().toString());
+			st.setString(3, pass);
+			st.setString(4, waPlayer.getPermsString());
 			st.executeUpdate();
 		} catch(SQLException e) {
 			log.warning(logPrefix + "Unable to update player permissions in DB");
@@ -264,18 +296,18 @@ public class DataQueries extends MySQLConnPool {
 	}
 
 
-	public void updatePlayerPassword(String player, String newPass) {
+	public void updatePlayerPassword(UUID uuid, String newPass) {
 		Connection conn = getConnection();
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(isDebug()) log.info("WA Query: updatePlayerPassword " + player);
-			st = conn.prepareStatement("UPDATE `"+dbPrefix+"Players` SET `password` = ? WHERE `playerName` = ? LIMIT 1");
+			if(isDebug()) log.info("WA Query: updatePlayerPassword " + uuid.toString());
+			st = conn.prepareStatement("UPDATE `"+dbPrefix+"Players` SET `password` = ? WHERE `uuid` = ? LIMIT 1");
 			st.setString(1, newPass);
-			st.setString(2, player);
+			st.setString(2, uuid.toString());
 			st.executeUpdate();
 		} catch(SQLException e) {
-			log.warning(logPrefix + "Unable to update password for player: " + player);
+			log.warning(logPrefix + "Unable to update password for player: " + uuid.toString());
 			e.printStackTrace();
 		} finally {
 			closeResources(conn, st, rs);
@@ -295,9 +327,9 @@ public class DataQueries extends MySQLConnPool {
 			if(isDebug()) log.info("WA Query: updatePlayerPermissions " + waPlayer.getPlayerName() +
 				" with perms: " + waPlayer.getPermsString());
 			st = conn.prepareStatement("UPDATE `"+dbPrefix+"Players` SET " +
-				"`Permissions` = ? WHERE `playerName` = ? LIMIT 1");
+				"`Permissions` = ? WHERE `uuid` = ? LIMIT 1");
 			st.setString(1, waPlayer.getPermsString());
-			st.setString(2, waPlayer.getPlayerName());
+			st.setString(2, waPlayer.getPlayerUUID().toString());
 			st.executeUpdate();
 		} catch(SQLException e) {
 			log.warning(logPrefix + "Unable to update player permissions in DB");
@@ -308,15 +340,15 @@ public class DataQueries extends MySQLConnPool {
 	}
 
 
-	public void updatePlayerMoney(String player, double money) {
+	public void updatePlayerMoney(UUID uuid, double money) {
 		Connection conn = getConnection();
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			if(isDebug()) log.info("WA Query: updatePlayerMoney " + player);
-			st = conn.prepareStatement("UPDATE `"+dbPrefix+"Players` SET `money` = ? WHERE `playerName` = ?");
+			if(isDebug()) log.info("WA Query: updatePlayerMoney " + uuid.toString());
+			st = conn.prepareStatement("UPDATE `"+dbPrefix+"Players` SET `money` = ? WHERE `uuid` = ?");
 			st.setDouble(1, money);
-			st.setString(2, player);
+			st.setString(2, uuid.toString());
 			st.executeUpdate();
 		} catch(SQLException e) {
 			log.warning(logPrefix + "Unable to update player money in DB");

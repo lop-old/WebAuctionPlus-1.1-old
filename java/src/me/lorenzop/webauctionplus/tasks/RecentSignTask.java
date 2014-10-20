@@ -76,7 +76,7 @@ public class RecentSignTask implements Runnable {
 			if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: RecentSignTask");
 			st = conn.prepareStatement("SELECT `playerName`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle`, "+
 				"`price`, UNIX_TIMESTAMP(`created`) AS `created`, `allowBids`, `currentWinner` " +
-				"FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` ORDER BY `id` DESC LIMIT ?");
+				"FROM "+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"Players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions.PlayerId = "+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions.Id  ORDER BY "+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions.id DESC LIMIT ?");
 			st.setInt(1, plugin.numberOfRecentLink);
 			rs = st.executeQuery();
 			int offset = 0;

@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import me.lorenzop.webauctionplus.dao.AuctionPlayer;
 
 import me.lorenzop.webauctionplus.mysql.DataQueries;
 
@@ -21,23 +23,25 @@ public class WebInventory {
 	protected static final Map<String, WebInventory> openInvs = new HashMap<String, WebInventory>();
 
 	protected final Player player;
-	protected final String playerName;
 	protected final Inventory chest;
+        protected final AuctionPlayer Aplayer;
 	protected final Map<Integer, Integer> tableRowIds = new HashMap<Integer, Integer>();
 //	protected List<Integer> slotChanged = new ArrayList<Integer>();
 
 
-	public WebInventory(final Player player) {
+	public WebInventory(final Player player, final AuctionPlayer Aplayer) {
 		if(player == null) throw new NullPointerException();
-		this.player = player;
-		this.playerName = player.getName();
-		int numSlots = WebAuctionPlus.MinMax( WebAuctionPlus.settings.getInteger("Inventory Rows"), 1, 6) * 9;
-		String invTitle = WebAuctionPlus.Lang.getString("mailbox_title");
-		if(invTitle == null || invTitle.isEmpty())
-			invTitle = "WebAuction+ MailBox";
-		this.chest = Bukkit.createInventory(null, numSlots, invTitle);
-		loadInventory();
-		player.openInventory(chest);
+                if(Aplayer == null) throw new NullPointerException();
+                this.player = player;
+                this.Aplayer = Aplayer;
+                int numSlots = WebAuctionPlus.MinMax( WebAuctionPlus.settings.getInteger("Inventory Rows"), 1, 6) * 9;
+                String invTitle = WebAuctionPlus.Lang.getString("mailbox_title");
+                if(invTitle == null || invTitle.isEmpty()) {
+                    invTitle = "WebAuction+ MailBox";
+                }
+                this.chest = Bukkit.createInventory(null, numSlots, invTitle);
+                loadInventory();
+                player.openInventory(chest);
 	}
 
 
@@ -45,22 +49,29 @@ public class WebInventory {
 	public static void onInventoryOpen(final Player player){
 		if(player == null) throw new NullPointerException();
 		final String playerName = player.getName();
+                final UUID playerUUID = player.getUniqueId();
+                final AuctionPlayer Aplayer_tmp = WebAuctionPlus.dataQueries.getPlayer(playerUUID);
 		synchronized(openInvs){
-			// lock inventory
-			setLocked(playerName, true);
-			if(openInvs.containsKey(playerName)) {
-				// chest already open
-				player.sendMessage(WebAuctionPlus.chatPrefix+"MailBox already opened!");
-				WebAuctionPlus.log.warning("Inventory already open for "+playerName+"!");
-				return;
-//				inventory = openInvs.get(player);
-//				p.openInventory(inventory.chest);
-			} else {
-				// create new virtual chest
-				WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Inventory opened for: "+playerName);
-				final WebInventory inventory = new WebInventory(player);
-				openInvs.put(playerName, inventory);
-			}
+			// lock inventory                   
+                        if(Aplayer_tmp != null) {
+                            setLocked(playerUUID, true);
+                            if(openInvs.containsKey(playerName)) {
+                                    // chest already open
+                                    player.sendMessage(WebAuctionPlus.chatPrefix+"MailBox already opened!");
+                                    WebAuctionPlus.log.warning("Inventory already open for "+playerName+"!");
+                                    return;
+//                                  inventory = openInvs.get(player);
+//                                  p.openInventory(inventory.chest);
+                            } else {
+                                    // create new virtual chest
+                                    player.sendMessage(WebAuctionPlus.chatPrefix+"Opening Inventory.....");
+                                    WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Inventory opened for: "+playerName);
+                                    final WebInventory inventory = new WebInventory(player, Aplayer_tmp);
+                                    openInvs.put(playerName, inventory);
+                            }
+                         } else {
+                            player.sendMessage(WebAuctionPlus.chatPrefix+"You have to create an WebAuction account before you can use this sing.");
+                        }
 		}
 //		player.sendMessage(WebAuctionPlus.chatPrefix+WebAuctionPlus.Lang.getString("mailbox_opened"));
 	}
@@ -68,6 +79,7 @@ public class WebInventory {
 	public static void onInventoryClose(final Player player){
 		if(player == null) throw new NullPointerException();
 		final String playerName = player.getName();
+                final UUID playerUUID = player.getUniqueId();
 		if(playerName == null || playerName.isEmpty()) throw new NullPointerException();
 		synchronized(openInvs){
 			if(!openInvs.containsKey(playerName)) return;
@@ -77,7 +89,7 @@ public class WebInventory {
 			// remove inventory chest
 			openInvs.remove(playerName);
 			// unlock inventory
-			setLocked(playerName, false);
+			setLocked(playerUUID, false);
 		}
 		WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"MailBox inventory closed and saved");
 		player.sendMessage(WebAuctionPlus.chatPrefix+WebAuctionPlus.Lang.getString("mailbox_closed"));
@@ -131,19 +143,19 @@ public class WebInventory {
 //		return locked;
 //	}
 	// set inventory lock
-	public static void setLocked(final String playerName, final boolean locked) {
-		if(playerName == null || playerName.isEmpty()) throw new NullPointerException();
+	public static void setLocked(final UUID playerUUID, final boolean locked) {
+		if(playerUUID == null) throw new NullPointerException();
 		Connection conn = WebAuctionPlus.dataQueries.getConnection();
 		PreparedStatement st = null;
 		try {
 			if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: setLocked "+(locked?"engaged":"released"));
 			st = conn.prepareStatement("UPDATE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players` "+
-				"SET `Locked` = ? WHERE `playerName` = ? LIMIT 1");
+				"SET `Locked` = ? WHERE `uuid` = ? LIMIT 1");
 			if(locked)
 				st.setInt(1, 1);
 			else
 				st.setInt(1, 0);
-			st.setString(2, playerName);
+			st.setString(2, playerUUID.toString());
 			st.executeUpdate();
 		} catch(SQLException e) {
 			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Unable to set inventory lock");
@@ -165,8 +177,8 @@ public class WebInventory {
 		try {
 			if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: isLocked");
 			st = conn.prepareStatement("SELECT `id`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle` "+
-				"FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` WHERE `playerName` = ? ORDER BY `id` ASC LIMIT ?");
-			st.setString(1, playerName);
+				"FROM `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` WHERE `playerId` = ? ORDER BY `id` ASC LIMIT ?");
+			st.setInt(1, Aplayer.getPlayerId());
 			st.setInt   (2, chest.getSize());
 			rs = st.executeQuery();
 			ItemStack[] stacks = new ItemStack[chest.getSize()];
@@ -213,8 +225,8 @@ public class WebInventory {
 				try {
 					if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: getSplitItemStack  qty:"+Integer.toString(tmpQty)+"  max:"+Integer.toString(maxSize));
 					st = conn.prepareStatement("INSERT INTO `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` ( "+
-						"`playerName`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle` )VALUES( ?, ?, ?, ?, ?, ? )");
-					st.setString(1, playerName);
+						"`playerId`, `itemId`, `itemDamage`, `qty`, `enchantments`, `itemTitle` )VALUES( ?, ?, ?, ?, ?, ? )");
+					st.setInt(1, Aplayer.getPlayerId());
 					st.setInt   (2, itemId);
 					st.setShort (3, itemDamage);
 					st.setInt   (4, maxSize);
@@ -307,8 +319,8 @@ public class WebInventory {
 					try {
 						if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: saveInventory::insert slot "+Integer.toString(i));
 						st = conn.prepareStatement("INSERT INTO `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` ( "+
-							"`playerName`, `itemId`, `itemDamage`, `qty`, `enchantments` )VALUES( ?, ?, ?, ?, ? )");
-						st.setString(1, playerName);
+							"`playerId`, `itemId`, `itemDamage`, `qty`, `enchantments` )VALUES( ?, ?, ?, ?, ? )");
+						st.setInt   (1, Aplayer.getPlayerId());
 						st.setInt   (2, itemId);
 						st.setShort (3, itemDamage);
 						st.setInt   (4, itemQty);
@@ -331,7 +343,7 @@ public class WebInventory {
 //		slotChanged.clear();
 		chest.clear();
 		tableRowIds.clear();
-		WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Updated player inventory for: "+playerName+" ["+
+		WebAuctionPlus.log.info(WebAuctionPlus.logPrefix+"Updated player inventory for: "+Aplayer.getPlayerName()+" ["+
 			" Inserted:"+Integer.toString(countInserted)+
 			" Updated:"+Integer.toString(countUpdated)+
 			" Deleted:"+Integer.toString(countDeleted)+

@@ -46,8 +46,24 @@ public class MySQLUpdate {
 		try {
 			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updating db fields for 1.1.15");
 			final String[] queries = new String[]{
-				// enchantment/meta fields
-				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players` ADD `uuid` VARCHAR(50) NULL DEFAULT NULL AFTER `playerName`, ADD UNIQUE (`uuid`)"
+				// Add UUID support
+				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"players` ADD `uuid` VARCHAR(50) NULL DEFAULT NULL AFTER `playerName`, ADD UNIQUE (`uuid`)",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"auctions` ADD `playerId` INT(11) NOT NULL DEFAULT '1' AFTER `playerName`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"auctions` ADD CONSTRAINT `fk_player_id1` FOREIGN KEY (`playerId`) REFERENCES `wa_players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
+                                "UPDATE "+WebAuctionPlus.dataQueries.dbPrefix()+"auctions JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"auctions.playerName = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Playername SET "+WebAuctionPlus.dataQueries.dbPrefix()+"auctions.playerId = wa_players.Id",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"auctions` DROP `playerName`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"items` ADD `playerId` INT(11) NOT NULL DEFAULT '1' AFTER `playerName`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"items` ADD CONSTRAINT `fk_player_id2` FOREIGN KEY (`playerId`) REFERENCES `"+WebAuctionPlus.dataQueries.dbPrefix()+"players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
+                                "UPDATE "+WebAuctionPlus.dataQueries.dbPrefix()+"items JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"items.playerName = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Playername SET "+WebAuctionPlus.dataQueries.dbPrefix()+"items.playerId = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Id",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"items` DROP `playerName`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"logsales` ADD `sellerId` INT(11) NOT NULL DEFAULT '1' AFTER `seller`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"logsales` ADD `buyerId` INT(11) DEFAULT NULL AFTER `buyer`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"logsales` ADD CONSTRAINT `fk_seller_id1` FOREIGN KEY (`sellerId`) REFERENCES `"+WebAuctionPlus.dataQueries.dbPrefix()+"players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"logsales` ADD CONSTRAINT `fk_buyer_id1` FOREIGN KEY (`buyerId`) REFERENCES `"+WebAuctionPlus.dataQueries.dbPrefix()+"players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
+                                "UPDATE "+WebAuctionPlus.dataQueries.dbPrefix()+"logsales JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"logsales.seller = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Playername SET "+WebAuctionPlus.dataQueries.dbPrefix()+"logsales.sellerId = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Id",
+                                "UPDATE "+WebAuctionPlus.dataQueries.dbPrefix()+"logsales JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"logsales.buyer = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Playername SET "+WebAuctionPlus.dataQueries.dbPrefix()+"logsales.buyerId = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Id",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"logsales` DROP `seller`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"logsales` DROP `buyer`"
 			};
 			// execute queries
 			for(final String sql : queries) {

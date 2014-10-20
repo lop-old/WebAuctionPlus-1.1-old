@@ -4,6 +4,7 @@ import me.lorenzop.webauctionplus.WebAuctionPlus;
 import me.lorenzop.webauctionplus.dao.AuctionPlayer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,8 +23,8 @@ public class WebAuctionCommands implements CommandExecutor {
 	@EventHandler(priority = EventPriority.NORMAL)
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		int params = args.length;
-		String player = "";
-		if(sender instanceof Player) player = ((Player) sender).getName();
+		OfflinePlayer player = null;
+		if(sender instanceof Player) player = ((Player) sender);
 		// 0 args
 		if(params == 0) {
 			return false;
@@ -104,8 +105,8 @@ public class WebAuctionCommands implements CommandExecutor {
 				} else {
 					if (params != 3) return false;
 					if (args[1].isEmpty() || args[2].isEmpty()) return false;
-					player = args[1];
-					if(!Bukkit.getOfflinePlayer(player).hasPlayedBefore()) {
+					player = Bukkit.getOfflinePlayer(args[1]);
+					if(!player.hasPlayedBefore()) {
 						sender.sendMessage(WebAuctionPlus.logPrefix+"Player not found!");
 						sender.sendMessage(WebAuctionPlus.logPrefix+"Note: if you really need to, you can add a player to the database, just md5 the password.");
 						return true;
@@ -113,8 +114,8 @@ public class WebAuctionCommands implements CommandExecutor {
 					pass = WebAuctionPlus.MD5(args[2]);
 					args[2] = "";
 				}
-				if(player.isEmpty()) return false;
-				AuctionPlayer waPlayer = WebAuctionPlus.dataQueries.getPlayer(player);
+				//if(player.isEmpty()) return false;
+				AuctionPlayer waPlayer = WebAuctionPlus.dataQueries.getPlayer(player.getUniqueId());
 				// create that person in database
 				if(waPlayer == null) {
 					// permission to create an account
@@ -124,7 +125,7 @@ public class WebAuctionCommands implements CommandExecutor {
 							return true;
 						}
 					}
-					waPlayer = new AuctionPlayer(player);
+					waPlayer = new AuctionPlayer(player.getUniqueId());
 					waPlayer.setPerms(
 						sender.hasPermission("wa.canbuy")   && isPlayer,
 						sender.hasPermission("wa.cansell")  && isPlayer,
@@ -144,7 +145,7 @@ public class WebAuctionCommands implements CommandExecutor {
 							return true;
 						}
 					}
-					WebAuctionPlus.dataQueries.updatePlayerPassword(player, pass);
+					WebAuctionPlus.dataQueries.updatePlayerPassword(player.getUniqueId(), pass);
 					if(sender instanceof Player)
 						sender.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("password_changed"));
 					WebAuctionPlus.log.info(WebAuctionPlus.logPrefix + WebAuctionPlus.Lang.getString("password_changed") + " " + player);

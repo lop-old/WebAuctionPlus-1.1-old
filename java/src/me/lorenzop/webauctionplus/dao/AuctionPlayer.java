@@ -1,5 +1,6 @@
 package me.lorenzop.webauctionplus.dao;
 
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -7,6 +8,7 @@ public class AuctionPlayer {
 
 	private int playerId	= 0;
 	private String player	= null;
+        private UUID   uuid     = null;
 	private Player p        = null;
 	private double money	= 0D;
 	private boolean canBuy	= false;
@@ -15,8 +17,9 @@ public class AuctionPlayer {
 
 	public AuctionPlayer() {
 	}
-	public AuctionPlayer(String player) {
-		this.player = player;
+	public AuctionPlayer(UUID uuid) {
+		this.uuid = uuid;
+                this.player = Bukkit.getOfflinePlayer(uuid).getName();
 	}
 
 
@@ -35,6 +38,15 @@ public class AuctionPlayer {
 
 	public void setPlayerName(String player) {
 		this.player = player;
+	}
+        
+        // player uuid
+	public UUID getPlayerUUID() {
+		return uuid;
+	}
+        
+	public void setPlayerUUID(UUID uuid) {
+		this.uuid = uuid;
 	}
 
 	// player object
