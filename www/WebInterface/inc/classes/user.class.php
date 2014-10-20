@@ -70,14 +70,33 @@ private function doValidate($username, $password=FALSE){global $config;
     exit();
   }
   // use iconomy table
-  if(toBoolean($config['iConomy']['use']) || $config['iConomy']['use']==='auto'){
+  if(toBoolean($config['iConomy']['use'])){
     global $db;
     $result = mysql_query("SELECT `balance` FROM `".mysql_san($config['iConomy']['table'])."` WHERE ".
                           "LOWER(`username`)='".mysql_san(strtolower($this->Name))."' LIMIT 1", $db);
     if($result){
       $row = mysql_fetch_assoc($result);
       $this->Money = ((double)$row['balance']);
-      $config['iConomy']['use'] = TRUE;
+    }else{
+      // table not found
+      if(mysql_errno($db) == 1146){
+        $config['iConomy']['use'] = FALSE;
+      }else echo mysql_error($db);
+    }
+    unset($result, $row);
+  }
+    // use Craftconomy table
+  if(toBoolean($config['CC']['use'])){
+    global $db;
+    //$result = mysql_query("SELECT `balance` FROM `".mysql_san($config['CC']['table'])."` WHERE "."LOWER(`username`)='".mysql_san(strtolower($this->Name))."' LIMIT 1", $db);
+    $result = mysql_query("SELECT ".mysql_san($config['CC']['prefix'])."_balance.balance AS balance FROM cc3_balance JOIN ".mysql_san($config['CC']['prefix'])."_account ON ".
+                          " ".mysql_san($config['CC']['prefix'])."_account.id = ".mysql_san($config['CC']['prefix'])."_balance.username_id ".
+                          "JOIN ".mysql_san($config['CC']['prefix'])."_currency ON ".mysql_san($config['CC']['prefix'])."_currency.id = ".mysql_san($config['CC']['prefix'])."_balance.currency_id ".
+                          "WHERE LOWER(".mysql_san($config['CC']['prefix'])."_account.name) = '".mysql_san(strtolower($this->Name))."' AND ".
+                          " LOWER(".mysql_san($config['CC']['prefix'])."_currency.name) = '".mysql_san($config['CC']['currency'])."' AND LOWER(".mysql_san($config['CC']['prefix'])."_balance.worldName) = '".mysql_san($config['CC']['group'])."';");
+    if($result){
+      $row = mysql_fetch_assoc($result);
+      $this->Money = ((double)$row['balance']);
     }else{
       // table not found
       if(mysql_errno($db) == 1146){

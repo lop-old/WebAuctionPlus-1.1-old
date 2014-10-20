@@ -1,7 +1,7 @@
 <?php
 error_reporting(E_ALL | E_STRICT);
 define('DEFINE_INDEX_FILE',TRUE);
-define('CURRENT_VERSION', '1.1.14');
+define('CURRENT_VERSION', '1.1.15');
 global $config;
 
 // get,post,cookie (highest priority last)

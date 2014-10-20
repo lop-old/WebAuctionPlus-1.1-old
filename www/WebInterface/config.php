@@ -20,8 +20,13 @@ function ConnectDB(){global $db,$config;
 
 
 // iConomy config
-$config['iConomy']['use']   = 'auto';    // ( true / false / 'auto' )  you you have iConomy data in another table in the same database?
+$config['iConomy']['use']   = 'false';    // ( true / false )  Do you want to use the iConomy table to get the money from (iConomy tables and WebAuction tables need to be in the same Database)
 $config['iConomy']['table'] = 'iConomy'; // 'iConomy' is the default table name when using MySQL with iConomy
 
+// CraftConomy config
+$config['CC']['use']   = 'false';    // ( true / false )  Do you want to use the CraftConomy table to get the money from (CraftConomy tables and WebAuction tables need to be in the same Database)
+$config['CC']['prefix'] = 'cc3'; // the thable prefix ot the CrafConomy tables
+$config['CC']['group'] = 'default'; // the name of the money group we should use
+$config['CC']['currency'] = 'Dollar'; // the name of the currency we should use
 
 ?>
