@@ -129,7 +129,7 @@ public static function CancelAuction($auctionId){global $config, $user;
   // remove auction
   self::RemoveAuction($auctionId, -1);
   // add item to inventory
-  $tableRowId = ItemFuncs::AddCreateItem($auction->getId(), $auction->getItem());
+  $tableRowId = ItemFuncs::AddCreateItem($auction->getSellerId(), $auction->getItem());
   // add sale log
   $Item = $auction->getItem();
   LogSales::addLog(

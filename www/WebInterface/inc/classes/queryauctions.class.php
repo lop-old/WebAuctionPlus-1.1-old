@@ -20,10 +20,10 @@ public static function QueryMy(){global $user;
   return($class);
 }
 // query single auction
-public static function QuerySingle($id){
+public static function QuerySingle($id){global $config;
   if($id < 1) {$this->result = FALSE; return(FALSE);}
   $class = new QueryAuctions();
-  $class->doQuery( "`id` = ".((int)$id) );
+  $class->doQuery( "".$config['table prefix']."Auctions.id = ".((int)$id) );
   if(!$class->result) return(FALSE);
   return($class->getNext());
 }
@@ -68,7 +68,7 @@ protected function doQuery($WHERE=''){global $config;
       $query_order .= $order_cols[$iSortCol].' '.mysql_san(getVar('sSortDir_'.$i, 'str'));
     }
   }
-  if(empty($query_order)) $query_order = "`id` ASC";
+  if(empty($query_order)) $query_order = "".$config['table prefix']."Auctions.id ASC";
   $query_order = ' ORDER BY '.$query_order;
   // pagination
   $query_limit = '';
