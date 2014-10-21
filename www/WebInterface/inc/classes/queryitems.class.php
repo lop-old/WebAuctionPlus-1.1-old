@@ -27,11 +27,16 @@ protected function doQuery($WHERE){global $config;
   $query="SELECT `id`, `itemId`, `itemDamage`, `qty`, `enchantments` ".
          "FROM `".$config['table prefix']."Items` ".
          "WHERE ".$WHERE." ORDER BY `id` ASC";
-  $this->result = RunQuery($query, __file__, __line__);
-  
+  $this->result = RunQuery($query, __file__, __line__);  
+}
+
+
+// get next item
+public function getNext(){global $config;
+  if(!$this->result) return(FALSE);
+  $row = mysql_fetch_assoc($this->result);
+  if(!$row) return(FALSE);
   if($this->result){ 
-    $row = mysql_fetch_assoc($this->result);
-  
     $query = "SELECT AVG(price) AS MarketPrice FROM `".$config['table prefix']."LogSales` WHERE ".
                "`itemId` = ".    ((int) $row['itemId'])." AND ".
                "`itemDamage` = ".((int) $row['itemDamage'])." AND ".
@@ -40,15 +45,6 @@ protected function doQuery($WHERE){global $config;
                "ORDER BY `id` DESC LIMIT 10";
     $this->result_price = RunQuery($query, __file__, __line__);
   }
-  
-}
-
-
-// get next item
-public function getNext(){
-  if(!$this->result) return(FALSE);
-  $row = mysql_fetch_assoc($this->result);
-  if(!$row) return(FALSE);
   if($this->result_price){
       $row_price = mysql_fetch_assoc($this->result_price);
       if($row_price){
@@ -64,9 +60,9 @@ public function getNext(){
     $row['id'],
     $row['itemId'],
     $row['itemDamage'],
-    $marketPrice,
-    $marketPrice_total,
     $row['qty'],
+    FormatPrice($marketPrice),
+    FormatPrice($marketPrice_total),
     $row['enchantments']
   ));
 }

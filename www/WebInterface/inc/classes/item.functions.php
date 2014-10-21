@@ -214,7 +214,11 @@ public static function getDamagedChargedStr($itemId=0, $itemDamage=0){
 private static function getPercentDamaged($itemDamage, $maxDamage){
   $a = (float)$itemDamage;
   $b = (float)$maxDamage;
-  $damaged = ($a / $b) * 100.0;
+  if($b != 0) {
+      $damaged = ($a / $b) * 100.0;
+  } else {
+      $damaged = 0;
+  }
   if($damaged > 0 && (string)round($damaged,1) == '0') return( (string)round($damaged, 2) );
   else                                                 return( (string)round($damaged, 1) );
 }
