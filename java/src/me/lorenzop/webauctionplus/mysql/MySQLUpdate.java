@@ -5,10 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import me.lorenzop.webauctionplus.WebAuctionPlus;
+import me.lorenzop.webauctionplus.tasks.PlayerConvertTask;
+import org.bukkit.Bukkit;
 
 public class MySQLUpdate {
-
-
+    
 	// update database
 	public static void doUpdate(String fromVersion) {
 		// update potions  (< 1.1.6)
@@ -20,6 +21,7 @@ public class MySQLUpdate {
                 // update db fields  (< 1.1.15)
 		if(WebAuctionPlus.compareVersions(fromVersion, "1.1.15").equals("<"))
 			UpdateUUID1_1_15();
+                        Bukkit.getServer().getScheduler().runTask(Bukkit.getPluginManager().getPlugin("WebAuctionPlus"), new PlayerConvertTask());
 	}
 
 
