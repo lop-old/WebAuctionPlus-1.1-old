@@ -98,7 +98,7 @@ public static function BuyAuction($auctionId, $qty){global $config, $user;
     echo '<p style="color: red;">Error removing/updating auction!</p>'; exit();}
   // add to inventory
   $Item->setItemQty($qty);
-  $tableRowId = ItemFuncs::AddCreateItem($user->getName(), $Item);
+  $tableRowId = ItemFuncs::AddCreateItem($user->getId(), $Item);
   if(!$tableRowId){echo '<p style="color: red;">Error adding item to your inventory!</p>'; exit();}
   // add sale log
   LogSales::addLog(
