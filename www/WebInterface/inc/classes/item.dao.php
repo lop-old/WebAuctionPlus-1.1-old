@@ -8,13 +8,17 @@ protected $itemId     =-1;
 protected $itemDamage = 0;
 protected $qty        = 0;
 protected $enchantments = array();
+protected $marketPrice = False;
+protected $marketPriceTotal = False;
 
 
-function __construct($tableRowId=0, $itemId=0, $itemDamage=0, $qty=0, $enchantments=array()){
+function __construct($tableRowId=0, $itemId=0, $itemDamage=0, $qty=0, $marketPrice = "--", $marketPriceTotal = "--", $enchantments=array()){
   $this->tableRowId = ($tableRowId<1 ? -1 : (int)$tableRowId);
   $this->itemId     = ($itemId<1     ? -1 : (int)$itemId);
   $this->itemDamage = ($itemDamage<1 ?  0 : (int)$itemDamage);
   $this->qty        = ($qty<1        ?  0 : (int)$qty);
+  $this->marketPrice = $marketPrice;
+  $this->marketPriceTotal = $marketPriceTotal;
   $this->enchantments = self::parseEnchantments($enchantments);
 }
 
@@ -28,6 +32,8 @@ public static function makeCopy($Item){
     $Item->getTableRowId(),
     $Item->getItemId(),
     $Item->getItemDamage(),
+    $Item->getMarketPrice(),
+    $Item->getMarketPriceTotal(),
     $Item->getItemQty(),
     $Item->getEnchantmentsArray()
   ));
@@ -148,6 +154,16 @@ public function getItemImageUrl(){
 // get damage/charged percent string
 public function getDamagedChargedStr(){
   return(ItemFuncs::getDamagedChargedStr($this->itemId, $this->itemDamage));
+}
+
+// item market price of one item
+public function getMarketPrice(){
+  return($this->marketPrice);
+}
+
+// item market price of the whole item stack
+public function getMarketPriceTotal(){
+  return($this->marketPriceTotal);
 }
 // get percent damaged
 //public function getPercentDamaged(){

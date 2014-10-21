@@ -80,6 +80,25 @@ function FormatPrice($price){global $config;
           SettingsClass::getString('Currency Postfix') );
 }
 
+// format prozent
+function FormatPorzent($prozent){global $config;
+  if($prozent == "--"){
+      return "--";
+  } else {
+    if($prozent <= 90 && $prozent >= 110) return ("<font color='black'>".$prozent." %</font>");
+    if($prozent > 110) return ("<font color='red'>".$prozent." %</font>");
+    if($prozent < 90) return ("<font color='green'>".$prozent." %</font>");  
+  }
+}
+
+// calculate prozent
+function CalcPorzent($proz, $tot){global $config;
+    if($tot == 0 || $proz == "--" || $tot == "--" || $proz == "--" ){
+        return "--";
+    } else {
+        return (round((100/$tot)*$proz));        
+    }
+ }
 
 // render time
 function GetTimestamp(){

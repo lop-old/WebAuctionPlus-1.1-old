@@ -81,7 +81,7 @@ function RenderPage_auctions_ajax(){global $config,$html;
         'seller'      => '<img src="./?page=mcskin&user='.$auction->getSeller().'" width="32" height="32" alt="" /><br />'.$auction->getSeller(),
         'price each'  => FormatPrice($auction->getPrice()),
         'price total' => FormatPrice($auction->getPriceTotal()),
-        'market percent' => '--',
+        'market percent' => FormatPorzent(CalcPorzent($auction->getPrice(), $Item->getMarketPrice())),
         'qty'         => (int)$Item->getItemQty(),
 //TODO:
 //allowBids

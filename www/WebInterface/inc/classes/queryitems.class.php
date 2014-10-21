@@ -2,6 +2,7 @@
 class QueryItems{
 
 protected $result = FALSE;
+protected $result_price = FALSE;
 
 
 // query inventory item stacks
@@ -27,6 +28,19 @@ protected function doQuery($WHERE){global $config;
          "FROM `".$config['table prefix']."Items` ".
          "WHERE ".$WHERE." ORDER BY `id` ASC";
   $this->result = RunQuery($query, __file__, __line__);
+  
+  if($this->result){ 
+    $row = mysql_fetch_assoc($this->result);
+  
+    $query = "SELECT AVG(price) AS MarketPrice FROM `".$config['table prefix']."LogSales` WHERE ".
+               "`itemId` = ".    ((int) $row['itemId'])." AND ".
+               "`itemDamage` = ".((int) $row['itemDamage'])." AND ".
+               "`enchantments` = '".mysql_san($row['enchantments'])."' AND ".
+               "`logType` =      'sale'".
+               "ORDER BY `id` DESC LIMIT 10";
+    $this->result_price = RunQuery($query, __file__, __line__);
+  }
+  
 }
 
 
@@ -35,11 +49,23 @@ public function getNext(){
   if(!$this->result) return(FALSE);
   $row = mysql_fetch_assoc($this->result);
   if(!$row) return(FALSE);
+  if($this->result_price){
+      $row_price = mysql_fetch_assoc($this->result_price);
+      if($row_price){
+          $marketPrice = $row_price['MarketPrice'];
+          $marketPrice_total = $marketPrice * $row['qty'];
+      } else {
+          $marketPrice = "--";
+          $marketPrice_total = "--";
+      }
+  }
   // new item dao
   return(new ItemDAO(
     $row['id'],
     $row['itemId'],
     $row['itemDamage'],
+    $marketPrice,
+    $marketPrice_total,
     $row['qty'],
     $row['enchantments']
   ));

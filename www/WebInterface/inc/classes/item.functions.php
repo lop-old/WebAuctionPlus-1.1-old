@@ -159,8 +159,8 @@ public static function getDisplay($tableRowId, $itemId, $itemDamage, $qty, $ench
     'item name'          => self::getItemName    ($itemId, $itemDamage),
     'item title'         => self::getItemTitle   ($itemId, $itemDamage),
     'item image url'     => self::getItemImageUrl($itemId, $itemDamage),
-    'market price each'  => 'market price<br />goes here',
-    'market price total' => 'market price<br />goes here',
+    'market price each'  => "--",
+    'market price total' => "--",
   );
   $itemType = self::getItemType($itemId);
   if($itemType != 'tool') $tags['enchantments'] = '';
@@ -296,6 +296,7 @@ public static function AddCreateItem($playerId, $Item){global $config;
   $tableRowId = mysql_insert_id();
   return($tableRowId);
 }
+
 // update qty / remove item stack
 public static function RemoveItem($tableRowId, $qty=-1){global $config;
   if($tableRowId < 1) return(FALSE);
@@ -312,7 +313,6 @@ public static function RemoveItem($tableRowId, $qty=-1){global $config;
   }
   return(TRUE);
 }
-
 
 }
 ?>

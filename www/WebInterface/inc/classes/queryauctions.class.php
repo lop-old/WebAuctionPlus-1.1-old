@@ -2,6 +2,7 @@
 class QueryAuctions{
 
 protected $result = FALSE;
+protected $result_price = FALSE;
 
 
 // get auctions
@@ -80,7 +81,7 @@ protected function doQuery($WHERE=''){global $config;
   $query .= $query_where.
             $query_order.
             $query_limit;
-  $this->result = RunQuery($query, __file__, __line__);
+  $this->result = RunQuery($query, __file__, __line__);  
 }
 public static function TotalDisplaying(){
   $query = "SELECT FOUND_ROWS()";
@@ -102,9 +103,29 @@ public static function TotalAllRows(){global $config;
 
 // get next auction
 public function getNext(){
+  global $config;
   if(!$this->result) return(FALSE);
   $row = mysql_fetch_assoc($this->result);
   if(!$row) return(FALSE);
+  if($this->result){ 
+    $query_price = "SELECT AVG(price) AS MarketPrice FROM `".$config['table prefix']."LogSales` WHERE ".
+               "`itemId` = ".    ((int) $row['itemId'])." AND ".
+               "`itemDamage` = ".((int) $row['itemDamage'])." AND ".
+               "`enchantments` = '".mysql_san($row['enchantments'])."' AND ".
+               "`logType` =      'sale'".
+               "ORDER BY `id` DESC LIMIT 10";
+    $this->result_price = RunQuery($query_price, __file__, __line__);
+  }
+  if($this->result_price){
+      $row_price = mysql_fetch_assoc($this->result_price);
+      if($row_price){
+          $marketPrice = $row_price['MarketPrice'];
+          $marketPrice_total = $marketPrice * $row['qty'];
+      } else {
+          $marketPrice = "--";
+          $marketPrice_total = "--";
+      }
+  }
   // new auction dao
   return(new AuctionDAO(
     $row['id'],
@@ -116,6 +137,8 @@ public function getNext(){
       $row['itemId'],
       $row['itemDamage'],
       $row['qty'],
+      $marketPrice,
+      $marketPrice_total,
       $row['enchantments']
     ),
     $row['price'],
