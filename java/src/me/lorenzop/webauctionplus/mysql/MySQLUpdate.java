@@ -49,23 +49,23 @@ public class MySQLUpdate {
 			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updating db fields for 1.1.15");
 			final String[] queries = new String[]{
 				// Add UUID support
-				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"players` ADD `uuid` VARCHAR(50) NULL DEFAULT NULL AFTER `playerName`, ADD UNIQUE (`uuid`)",
-                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"auctions` ADD `playerId` INT(11) NOT NULL DEFAULT '1' AFTER `playerName`",
-                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"auctions` ADD CONSTRAINT `fk_player_id1` FOREIGN KEY (`playerId`) REFERENCES `wa_players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
-                                "UPDATE "+WebAuctionPlus.dataQueries.dbPrefix()+"auctions JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"auctions.playerName = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Playername SET "+WebAuctionPlus.dataQueries.dbPrefix()+"auctions.playerId = wa_players.Id",
-                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"auctions` DROP `playerName`",
-                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"items` ADD `playerId` INT(11) NOT NULL DEFAULT '1' AFTER `playerName`",
-                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"items` ADD CONSTRAINT `fk_player_id2` FOREIGN KEY (`playerId`) REFERENCES `"+WebAuctionPlus.dataQueries.dbPrefix()+"players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
-                                "UPDATE "+WebAuctionPlus.dataQueries.dbPrefix()+"items JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"items.playerName = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Playername SET "+WebAuctionPlus.dataQueries.dbPrefix()+"items.playerId = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Id",
-                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"items` DROP `playerName`",
-                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"logsales` ADD `sellerId` INT(11) NOT NULL DEFAULT '1' AFTER `seller`",
-                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"logsales` ADD `buyerId` INT(11) DEFAULT NULL AFTER `buyer`",
-                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"logsales` ADD CONSTRAINT `fk_seller_id1` FOREIGN KEY (`sellerId`) REFERENCES `"+WebAuctionPlus.dataQueries.dbPrefix()+"players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
-                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"logsales` ADD CONSTRAINT `fk_buyer_id1` FOREIGN KEY (`buyerId`) REFERENCES `"+WebAuctionPlus.dataQueries.dbPrefix()+"players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
-                                "UPDATE "+WebAuctionPlus.dataQueries.dbPrefix()+"logsales JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"logsales.seller = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Playername SET "+WebAuctionPlus.dataQueries.dbPrefix()+"logsales.sellerId = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Id",
-                                "UPDATE "+WebAuctionPlus.dataQueries.dbPrefix()+"logsales JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"logsales.buyer = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Playername SET "+WebAuctionPlus.dataQueries.dbPrefix()+"logsales.buyerId = "+WebAuctionPlus.dataQueries.dbPrefix()+"players.Id",
-                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"logsales` DROP `seller`",
-                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"logsales` DROP `buyer`"
+				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players` ADD `uuid` VARCHAR(50) NULL DEFAULT NULL AFTER `playerName`, ADD UNIQUE (`uuid`)",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` ADD `playerId` INT(11) NOT NULL DEFAULT '1' AFTER `playerName`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` ADD CONSTRAINT `fk_player_id1` FOREIGN KEY (`playerId`) REFERENCES `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
+                                "UPDATE "+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"Players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions.playerName = "+WebAuctionPlus.dataQueries.dbPrefix()+"Players.Playername SET "+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions.playerId = "+WebAuctionPlus.dataQueries.dbPrefix()+"Players.Id",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` DROP `PlayerName`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` ADD `playerId` INT(11) NOT NULL DEFAULT '1' AFTER `playerName`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` ADD CONSTRAINT `fk_player_id2` FOREIGN KEY (`playerId`) REFERENCES `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
+                                "UPDATE "+WebAuctionPlus.dataQueries.dbPrefix()+"Items JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"Players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"Items.playerName = "+WebAuctionPlus.dataQueries.dbPrefix()+"Players.Playername SET "+WebAuctionPlus.dataQueries.dbPrefix()+"Items.playerId = "+WebAuctionPlus.dataQueries.dbPrefix()+"Players.Id",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` DROP `playerName`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales` ADD `sellerId` INT(11) NOT NULL DEFAULT '1' AFTER `seller`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales` ADD `buyerId` INT(11) DEFAULT NULL AFTER `buyer`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales` ADD CONSTRAINT `fk_seller_id1` FOREIGN KEY (`sellerId`) REFERENCES `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales` ADD CONSTRAINT `fk_buyer_id1` FOREIGN KEY (`buyerId`) REFERENCES `"+WebAuctionPlus.dataQueries.dbPrefix()+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
+                                "UPDATE "+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"Players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales.seller = "+WebAuctionPlus.dataQueries.dbPrefix()+"Players.Playername SET "+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales.sellerId = "+WebAuctionPlus.dataQueries.dbPrefix()+"Players.Id",
+                                "UPDATE "+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales JOIN "+WebAuctionPlus.dataQueries.dbPrefix()+"Players ON "+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales.buyer = "+WebAuctionPlus.dataQueries.dbPrefix()+"Players.Playername SET "+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales.buyerId = "+WebAuctionPlus.dataQueries.dbPrefix()+"Players.Id",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales` DROP `seller`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"LogSales` DROP `buyer`"
 			};
 			// execute queries
 			for(final String sql : queries) {
