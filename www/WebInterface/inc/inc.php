@@ -85,7 +85,7 @@ function FormatPorzent($prozent){global $config;
   if($prozent == "--"){
       return "--";
   } else {
-    if($prozent <= 90 && $prozent >= 110) return ("<font color='black'>".$prozent." %</font>");
+    if($prozent >= 90 && $prozent <= 110) return ("<font color='black'>".$prozent." %</font>");
     if($prozent > 110) return ("<font color='red'>".$prozent." %</font>");
     if($prozent < 90) return ("<font color='green'>".$prozent." %</font>");  
   }
