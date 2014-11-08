@@ -32,9 +32,9 @@ public static function makeCopy($Item){
     $Item->getTableRowId(),
     $Item->getItemId(),
     $Item->getItemDamage(),
+    $Item->getItemQty(),
     $Item->getMarketPrice(),
     $Item->getMarketPriceTotal(),
-    $Item->getItemQty(),
     $Item->getEnchantmentsArray()
   ));
 }
