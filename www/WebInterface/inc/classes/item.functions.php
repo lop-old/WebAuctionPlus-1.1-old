@@ -99,10 +99,10 @@ public static function getDisplay($tableRowId, $itemId, $itemDamage, $qty, $ench
   $nameOutput = '';
   $loreOutput = '';
   foreach($enchantments as $key=>$value){
-    if(empty($key) || empty($value)) continue;
-
+    if(!(isset($key) || isset($value))) continue;
+      
     // custom name
-    if($key == "<NAME>") {
+    if(strcasecmp ("<NAME>",$key) == 0) {
       $nameOutput = $outputs['custom name'];
       $tags = array(
         'name' => $value
@@ -113,7 +113,7 @@ public static function getDisplay($tableRowId, $itemId, $itemDamage, $qty, $ench
     }
 
     // lore
-    if($key == "<LORE>") {
+    if(strcasecmp ("<LORE>",$key) == 0) {
       $loreOutput = '';
       foreach(explode("\\\\n", trim($value)) as $line) {
         if(!empty($loreOutput))
