@@ -82,7 +82,7 @@ public class MySQLTables {
 			} else
 				setTableExists("Auctions",
 					"`id`				INT    (11)		NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
-					"`playerName`		VARCHAR(16)		NULL		DEFAULT NULL	, " +
+					"`playerId`		        INT    (11)		NOT NULL	DEFAULT '0'	, " +
 					"`itemId`			INT    (11)		NOT NULL	DEFAULT '0'		, " +
 					"`itemDamage`		INT    (11)		NOT NULL	DEFAULT '0'		, " +
 					"`qty`				INT    (11)		NOT NULL	DEFAULT '0'		, " +
@@ -102,7 +102,7 @@ public class MySQLTables {
 			} else
 				setTableExists("Items",
 					"`id`				INT    (11)		NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
-					"`playerName`		VARCHAR(16)		NULL		DEFAULT NULL	, " +
+					"`playerId`                     INT    (11)		NOT NULL	DEFAULT '0'	, " +
 					"`itemId`			INT    (11)		NOT NULL	DEFAULT '0'		, " +
 					"`itemDamage`		INT    (11)		NOT NULL	DEFAULT '0'		, " +
 					"`qty`				INT    (11)		NOT NULL	DEFAULT '0'		, " +
@@ -124,6 +124,29 @@ public class MySQLTables {
 //					"`time`				DATETIME		NOT NULL	DEFAULT '0000-00-00 00:00:00', " +
 //					"`marketprice`		DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'	, " +
 //					"`ref`				INT    (11)		NOT NULL	DEFAULT '0'		");
+		// LogSales
+		else if (tableName.equals("LogSales"))
+			if (alter) {
+				WebAuctionPlus.log.severe("Shouldn't run this!");
+			} else {
+				setTableExists("LogSales",
+					"`id`				INT(11)			NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
+					"`logType`			ENUM('', 'new','sale','cancel')	NULL	DEFAULT NULL	, " +
+					"`saleType`			ENUM('', 'buynow','auction')	NULL	DEFAULT NULL	, " +
+					"`timestamp`		DATETIME		NOT NULL	DEFAULT '0000-00-00 00:00:00'	, " +
+					"`itemType`			ENUM('', 'tool','map','book')	NULL	DEFAULT NULL	, " +
+					"`itemId`			INT(11)			NOT NULL	DEFAULT 0		, " +
+					"`itemDamage`		INT(11)			NOT NULL	DEFAULT 0		, " +
+					"`enchantments`		VARCHAR(255)	NULL		DEFAULT NULL	, " +
+					"`itemTitle`		VARCHAR(32)		NULL		DEFAULT NULL	, " +
+					"`sellerId`			INT(11)		NOT NULL	DEFAULT '0'	, " +
+					"`buyerId`			INT(11)		NOT NULL	DEFAULT '0'	, " +
+					"`qty`				INT(11)			NOT NULL	DEFAULT 0		, " +
+					"`price`			DECIMAL(11,2)	NOT NULL	DEFAULT 0.00	, " +
+					"`alert`			TINYINT(1)		NOT NULL	DEFAULT 0		");
+                                executeRawSQL("ALTER TABLE `"+dbPrefix+"LogSales` ADD CONSTRAINT `"+dbPrefix+"_fk_seller_id1` FOREIGN KEY (`sellerId`) REFERENCES `"+dbPrefix+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION");
+                                executeRawSQL("ALTER TABLE `"+dbPrefix+"LogSales` ADD CONSTRAINT `"+dbPrefix+"_fk_buyer_id1` FOREIGN KEY (`buyerId`) REFERENCES `"+dbPrefix+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION");
+                    }
 		// Players
 		else if (tableName.equals("Players"))
 			if (alter) {
@@ -135,10 +158,11 @@ public class MySQLTables {
 				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`earnt`			`earnt`			DECIMAL(11,2) 	NOT NULL	DEFAULT '0.00'");
 				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`spent`			`spent`			DECIMAL(11,2) 	NOT NULL	DEFAULT '0.00'");
 				executeRawSQL("ALTER TABLE `"+dbPrefix+"Players`	ADD			`Permissions`	SET( '', 'canBuy', 'canSell', 'isAdmin' )	NULL	DEFAULT NULL");
-			} else
+			} else {
 				setTableExists("Players",
 					"`id`				INT    (11)		NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
 					"`playerName`		VARCHAR(16)		NULL		DEFAULT NULL	, " +
+                                        "`uuid`                 VARCHAR(50)		NULL		DEFAULT NULL	, " +
 					"`password`			VARCHAR(32)		NULL		DEFAULT NULL	, " +
 					"`money`			DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'	, " +
 					"`itemsSold`		INT    (11)		NOT NULL	DEFAULT '0'		, " +
@@ -147,6 +171,9 @@ public class MySQLTables {
 					"`spent`			DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'	, " +
 					"`Permissions`		SET( '', 'canBuy', 'canSell', 'isAdmin' ) NULL DEFAULT NULL ," +
 					"`Locked`			TINYINT(1)		NOT NULL	DEFAULT '0'		");
+                                executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions` ADD CONSTRAINT `"+dbPrefix+"_fk_player_id1` FOREIGN KEY (`playerId`) REFERENCES `"+dbPrefix+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION");
+                                executeRawSQL("ALTER TABLE `"+dbPrefix+"Items` ADD CONSTRAINT `"+dbPrefix+"_fk_player_id2` FOREIGN KEY (`playerId`) REFERENCES `"+dbPrefix+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION");
+                        }
 		// RecentSigns
 		else if (tableName.equals("RecentSigns"))
 			if (alter) {
@@ -208,26 +235,6 @@ public class MySQLTables {
 					"`x`				INT(11)			NOT NULL	DEFAULT '0'		, " +
 					"`y`				INT(11)			NOT NULL	DEFAULT '0'		, " +
 					"`z`				INT(11)			NOT NULL	DEFAULT '0'		");
-		// LogSales
-		else if (tableName.equals("LogSales"))
-			if (alter) {
-				WebAuctionPlus.log.severe("Shouldn't run this!");
-			} else
-				setTableExists("LogSales",
-					"`id`				INT(11)			NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
-					"`logType`			ENUM('', 'new','sale','cancel')	NULL	DEFAULT NULL	, " +
-					"`saleType`			ENUM('', 'buynow','auction')	NULL	DEFAULT NULL	, " +
-					"`timestamp`		DATETIME		NOT NULL	DEFAULT '0000-00-00 00:00:00'	, " +
-					"`itemType`			ENUM('', 'tool','map','book')	NULL	DEFAULT NULL	, " +
-					"`itemId`			INT(11)			NOT NULL	DEFAULT 0		, " +
-					"`itemDamage`		INT(11)			NOT NULL	DEFAULT 0		, " +
-					"`enchantments`		VARCHAR(255)	NULL		DEFAULT NULL	, " +
-					"`itemTitle`		VARCHAR(32)		NULL		DEFAULT NULL	, " +
-					"`seller`			VARCHAR(16)		NULL		DEFAULT NULL	, " +
-					"`buyer`			VARCHAR(16)		NULL		DEFAULT NULL	, " +
-					"`qty`				INT(11)			NOT NULL	DEFAULT 0		, " +
-					"`price`			DECIMAL(11,2)	NOT NULL	DEFAULT 0.00	, " +
-					"`alert`			TINYINT(1)		NOT NULL	DEFAULT 0		");
 	}
 
 	// convert database tables to Plus
