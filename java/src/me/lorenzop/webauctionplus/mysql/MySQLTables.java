@@ -65,6 +65,7 @@ public class MySQLTables {
 		sqlTables(false, tableName);
 	}
 	private void sqlTables(boolean alter, String tableName) {
+                boolean sucess = false;
 		if(alter)
 			if(WebAuctionPlus.isDebug()) WebAuctionPlus.log.info("WA Query: sqlTables " + (alter?"Alter":"Create") + " " + tableName);
 		// auctions
@@ -129,7 +130,7 @@ public class MySQLTables {
 			if (alter) {
 				WebAuctionPlus.log.severe("Shouldn't run this!");
 			} else {
-				setTableExists("LogSales",
+				sucess  = setTableExists("LogSales",
 					"`id`				INT(11)			NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
 					"`logType`			ENUM('', 'new','sale','cancel')	NULL	DEFAULT NULL	, " +
 					"`saleType`			ENUM('', 'buynow','auction')	NULL	DEFAULT NULL	, " +
@@ -144,8 +145,10 @@ public class MySQLTables {
 					"`qty`				INT(11)			NOT NULL	DEFAULT 0		, " +
 					"`price`			DECIMAL(11,2)	NOT NULL	DEFAULT 0.00	, " +
 					"`alert`			TINYINT(1)		NOT NULL	DEFAULT 0		");
+                                if(sucess){
                                 executeRawSQL("ALTER TABLE `"+dbPrefix+"LogSales` ADD CONSTRAINT `"+dbPrefix+"_fk_seller_id1` FOREIGN KEY (`sellerId`) REFERENCES `"+dbPrefix+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION");
                                 executeRawSQL("ALTER TABLE `"+dbPrefix+"LogSales` ADD CONSTRAINT `"+dbPrefix+"_fk_buyer_id1` FOREIGN KEY (`buyerId`) REFERENCES `"+dbPrefix+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION");
+                                }
                     }
 		// Players
 		else if (tableName.equals("Players"))
@@ -159,7 +162,7 @@ public class MySQLTables {
 				executeRawSQL("ALTER IGNORE TABLE `"+dbPrefix+"Players`	CHANGE		`spent`			`spent`			DECIMAL(11,2) 	NOT NULL	DEFAULT '0.00'");
 				executeRawSQL("ALTER TABLE `"+dbPrefix+"Players`	ADD			`Permissions`	SET( '', 'canBuy', 'canSell', 'isAdmin' )	NULL	DEFAULT NULL");
 			} else {
-				setTableExists("Players",
+				sucess = setTableExists("Players",
 					"`id`				INT    (11)		NOT NULL	AUTO_INCREMENT	, PRIMARY KEY(`id`), " +
 					"`playerName`		VARCHAR(16)		NULL		DEFAULT NULL	, " +
                                         "`uuid`                 VARCHAR(50)		NULL		DEFAULT NULL	, " +
@@ -171,8 +174,10 @@ public class MySQLTables {
 					"`spent`			DECIMAL(11,2)	NOT NULL	DEFAULT '0.00'	, " +
 					"`Permissions`		SET( '', 'canBuy', 'canSell', 'isAdmin' ) NULL DEFAULT NULL ," +
 					"`Locked`			TINYINT(1)		NOT NULL	DEFAULT '0'		");
+                                if(sucess){
                                 executeRawSQL("ALTER TABLE `"+dbPrefix+"Auctions` ADD CONSTRAINT `"+dbPrefix+"_fk_player_id1` FOREIGN KEY (`playerId`) REFERENCES `"+dbPrefix+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION");
                                 executeRawSQL("ALTER TABLE `"+dbPrefix+"Items` ADD CONSTRAINT `"+dbPrefix+"_fk_player_id2` FOREIGN KEY (`playerId`) REFERENCES `"+dbPrefix+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION");
+                                }
                         }
 		// RecentSigns
 		else if (tableName.equals("RecentSigns"))
