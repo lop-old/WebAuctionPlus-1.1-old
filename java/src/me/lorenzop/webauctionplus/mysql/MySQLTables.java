@@ -138,13 +138,13 @@ public class MySQLTables {
 					"`itemType`			ENUM('', 'tool','map','book')	NULL	DEFAULT NULL	, " +
 					"`itemId`			INT(11)			NOT NULL	DEFAULT 0		, " +
 					"`itemDamage`		INT(11)			NOT NULL	DEFAULT 0		, " +
-					"`enchantments`		VARCHAR(255)	NULL		DEFAULT NULL	, " +
+					"`enchantments`		VARCHAR(255)	NULL                    DEFAULT NULL	, " +
 					"`itemTitle`		VARCHAR(32)		NULL		DEFAULT NULL	, " +
 					"`sellerId`			INT(11)		NOT NULL	DEFAULT '0'	, " +
-					"`buyerId`			INT(11)		NOT NULL	DEFAULT '0'	, " +
-					"`qty`				INT(11)			NOT NULL	DEFAULT 0		, " +
+					"`buyerId`			INT(11)		NULL            DEFAULT NULL	, " +
+					"`qty`				INT(11)		NOT NULL	DEFAULT 0		, " +
 					"`price`			DECIMAL(11,2)	NOT NULL	DEFAULT 0.00	, " +
-					"`alert`			TINYINT(1)		NOT NULL	DEFAULT 0		");
+					"`alert`			TINYINT(1)	NOT NULL	DEFAULT 0		");
                                 if(sucess){
                                 executeRawSQL("ALTER TABLE `"+dbPrefix+"LogSales` ADD CONSTRAINT `"+dbPrefix+"_fk_seller_id1` FOREIGN KEY (`sellerId`) REFERENCES `"+dbPrefix+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION");
                                 executeRawSQL("ALTER TABLE `"+dbPrefix+"LogSales` ADD CONSTRAINT `"+dbPrefix+"_fk_buyer_id1` FOREIGN KEY (`buyerId`) REFERENCES `"+dbPrefix+"Players` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION");
