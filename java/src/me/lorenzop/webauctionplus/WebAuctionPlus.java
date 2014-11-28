@@ -28,6 +28,7 @@ import me.lorenzop.webauctionplus.tasks.PlayerAlertTask;
 import me.lorenzop.webauctionplus.tasks.PlayerConvertTask;
 import me.lorenzop.webauctionplus.tasks.RecentSignTask;
 import me.lorenzop.webauctionplus.tasks.ShoutSignTask;
+import me.lorenzop.webauctionplus.Metrics;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
@@ -55,7 +56,7 @@ public class WebAuctionPlus extends JavaPlugin {
 	public static final String chatPrefix = ChatColor.DARK_GREEN+"["+ChatColor.WHITE+"WebAuction+"+ChatColor.DARK_GREEN+"] ";
 	public static final Logger log = Logger.getLogger("Minecraft");
 
-	public static pxnMetrics metrics;
+	public static Metrics metrics;
 	public static waStats stats;
 
 	// plugin version
@@ -577,25 +578,25 @@ public class WebAuctionPlus extends JavaPlugin {
 	public void onLoadMetrics() {
 		// usage stats
 		try {
-			metrics = new pxnMetrics(this);
+			metrics = new Metrics(this);
 			if(metrics.isOptOut()) {
 				log.info(logPrefix+"Plugin metrics are disabled, you bum");
 				return;
 			}
-//			log.info(logPrefix+"Starting metrics");
+			log.info(logPrefix+"Starting metrics");
 			// Create graphs for total Buy Nows / Auctions
-			final pxnMetrics.Graph lineGraph  = metrics.createGraph("Stacks For Sale");
-			final pxnMetrics.Graph pieGraph   = metrics.createGraph("Selling Method");
-			final pxnMetrics.Graph stockTrend = metrics.createGraph("Stock Trend");
+			final Metrics.Graph lineGraph  = metrics.createGraph("Stacks For Sale");
+			final Metrics.Graph pieGraph   = metrics.createGraph("Selling Method");
+			final Metrics.Graph stockTrend = metrics.createGraph("Stock Trend");
 			// buy now count
-			pxnMetrics.Plotter plotterBuyNows = new pxnMetrics.Plotter("Buy Nows") {
+			Metrics.Plotter plotterBuyNows = new Metrics.Plotter("Buy Nows") {
 				@Override
 				public int getValue(){
 					return stats.getTotalBuyNows();
 				}
 			};
 			// auction count
-			pxnMetrics.Plotter plotterAuctions = new pxnMetrics.Plotter("Auctions") {
+			Metrics.Plotter plotterAuctions = new Metrics.Plotter("Auctions") {
 				@Override
 				public int getValue(){
 					return stats.getTotalAuctions();
@@ -608,13 +609,13 @@ public class WebAuctionPlus extends JavaPlugin {
 			pieGraph.addPlotter(plotterBuyNows);
 			pieGraph.addPlotter(plotterAuctions);
 			// stock trends
-			stockTrend.addPlotter(new pxnMetrics.Plotter("New") {
+			stockTrend.addPlotter(new Metrics.Plotter("New") {
 				@Override
 				public int getValue() {
 					return stats.getNewAuctionsCount();
 				}
 			});
-			stockTrend.addPlotter(new pxnMetrics.Plotter("Ended") {
+			stockTrend.addPlotter(new Metrics.Plotter("Ended") {
 				@Override
 				public int getValue() {
 					return stats.getEndedAuctionsCount();
