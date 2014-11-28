@@ -84,7 +84,7 @@
       <artifactId>craftbukkit</artifactId>
       <version>1.8.0 Spigot</version>
       <scope>system</scope>
-      <systemPath>${project.basedir}/resources/spigot-1.8.jar</systemPath>
+      <systemPath>${project.basedir}/resources/craftbukkit-1.8-R0.1.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.avaje</groupId>
