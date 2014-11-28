@@ -4,11 +4,13 @@ import java.math.BigDecimal;
 import java.util.Random;
 
 import me.lorenzop.webauctionplus.WebAuctionPlus;
+import static me.lorenzop.webauctionplus.WebAuctionPlus.log;
 import me.lorenzop.webauctionplus.WebInventory;
 import me.lorenzop.webauctionplus.dao.AuctionPlayer;
 import me.lorenzop.webauctionplus.tasks.PlayerAlertTask;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -97,7 +99,15 @@ public class WebAuctionPlayerListener implements Listener {
 		if(block.getType() != Material.SIGN_POST && block.getType() != Material.WALL_SIGN) return;
 		// it's a sign
 		Sign sign = (Sign) block.getState();
-		String[] lines = sign.getLines();
+                
+                //Temporary fix for 1.8
+		String[] tmp_lines = sign.getLines();
+                String[] lines = new String[4];
+                lines[0] = ChatColor.stripColor(tmp_lines[0]);
+                lines[1] = ChatColor.stripColor(tmp_lines[1]);
+                lines[2] = ChatColor.stripColor(tmp_lines[2]);
+                lines[3] = ChatColor.stripColor(tmp_lines[3]);
+                
 		if(!lines[0].equals("[WebAuction+]")) return;
 		event.setCancelled(true);
 		// get player info
