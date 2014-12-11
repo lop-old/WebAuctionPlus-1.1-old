@@ -132,7 +132,7 @@ if(empty($username)){
   $data = getDefaultSkin();
   $cache = FALSE;
 }else{  
-  $data = @file_get_contents('http://s3.amazonaws.com/MinecraftSkins/'.$username.'.png');
+  $data = @file_get_contents('http://skins.minecraft.net/MinecraftSkins/'.$username.'.png');
   $cache = TRUE;
   if($data == FALSE) {$data = getDefaultSkin(); $cache = FALSE;}
 }
