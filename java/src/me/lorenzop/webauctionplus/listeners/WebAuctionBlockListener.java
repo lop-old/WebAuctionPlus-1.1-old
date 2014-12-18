@@ -1,6 +1,7 @@
 package me.lorenzop.webauctionplus.listeners;
 
 import me.lorenzop.webauctionplus.WebAuctionPlus;
+import org.bukkit.ChatColor;
 
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -26,7 +27,7 @@ public class WebAuctionBlockListener implements Listener {
 		Player p = event.getPlayer();
 		if(getTypeId(block) == 63 || getTypeId(block) == 68) {
 			Sign thisSign = (Sign) block.getState();
-			if(thisSign.getLine(0).equals("[WebAuction+]")) {
+			if(ChatColor.stripColor(thisSign.getLine(0)).equals("[WebAuction+]")) {
 				if(!p.hasPermission("wa.remove")) {
 					event.setCancelled(true);
 					p.sendMessage(WebAuctionPlus.chatPrefix + WebAuctionPlus.Lang.getString("no_permission"));
@@ -40,7 +41,15 @@ public class WebAuctionBlockListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onSignChange(SignChangeEvent event) {
-		String[] lines = event.getLines();
+                
+                //Temporary fix for 1.8
+		String[] tmp_lines = event.getLines();
+                String[] lines = new String[4];
+                lines[0] = ChatColor.stripColor(tmp_lines[0]);
+                lines[1] = ChatColor.stripColor(tmp_lines[1]);
+                lines[2] = ChatColor.stripColor(tmp_lines[2]);
+                lines[3] = ChatColor.stripColor(tmp_lines[3]);
+                           
 		Player p = event.getPlayer();
 		Block sign = event.getBlock();
 		World world = sign.getWorld();

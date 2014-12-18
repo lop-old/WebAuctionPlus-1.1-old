@@ -1,5 +1,3 @@
-package me.lorenzop.webauctionplus;
-
 /*
  * Copyright 2011-2013 Tyler Blair. All rights reserved.
  *
@@ -27,6 +25,7 @@ package me.lorenzop.webauctionplus;
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
+package me.lorenzop.webauctionplus;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -116,19 +115,6 @@ public class Metrics {
      * The scheduled task
      */
     private volatile BukkitTask task = null;
-
-
-	// custom functions added for pxnMetrics
-	protected String get_BASE_URL() {
-		return BASE_URL;
-	}
-	protected int get_PING_INTERVAL() {
-		return PING_INTERVAL;
-	}
-	public String get_GUID() {
-		return guid;
-	}
-
 
     public Metrics(final Plugin plugin) throws IOException {
         if (plugin == null) {
@@ -245,7 +231,7 @@ public class Metrics {
                         }
                     }
                 }
-            }, 0, get_PING_INTERVAL() * 1200);
+            }, 0, PING_INTERVAL * 1200);
 
             return true;
         }
@@ -355,7 +341,7 @@ public class Metrics {
         json.append('{');
 
         // The plugin's description file containg all of the plugin data such as name, version, author, etc
-        appendJSONPair(json, "guid", get_GUID());
+        appendJSONPair(json, "guid", guid);
         appendJSONPair(json, "plugin_version", pluginVersion);
         appendJSONPair(json, "server_version", serverVersion);
         appendJSONPair(json, "players_online", Integer.toString(playersOnline));
@@ -428,7 +414,7 @@ public class Metrics {
         json.append('}');
 
         // Create the url
-        URL url = new URL(get_BASE_URL() + String.format(REPORT_URL, urlEncode(pluginName)));
+        URL url = new URL(BASE_URL + String.format(REPORT_URL, urlEncode(pluginName)));
 
         // Connect to the website
         URLConnection connection;
