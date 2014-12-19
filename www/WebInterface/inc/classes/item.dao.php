@@ -114,7 +114,7 @@ public static function compressEnchantments($enchantments){
   $output = '';
   foreach($enchantments as $enchId => $level){
   	if(!empty($output)) $output .= ',';
-    $output .= ((int)$enchId).':'.((int)$level);
+    $output .= ($enchId).':'.($level);
   }
   return($output);
 }
