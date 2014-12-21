@@ -206,17 +206,18 @@ public class WebItemMeta {
 		final boolean isContainer = (stack.getItemMeta() instanceof EnchantmentStorageMeta);
 		if(stack == null || ench == null) return FAIL_VALUE;
 		if(level < 1) return FAIL_VALUE;
-		// can enchant item
-		if(!isContainer) {
-			if(!ench.canEnchantItem(stack)) {
-				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Removed unsafe enchantment: "+stack.toString()+"  "+ench.toString());
-				return FAIL_VALUE;
-			}
-		}
+		// Are unsave enchantments enabled?
 		if(WebAuctionPlus.timEnabled()) {
 			if(level > 127) level = 127;
 		} else {
-			// level too low
+                        // is the item enchantable?
+                        if(!isContainer) {
+                            if(!ench.canEnchantItem(stack)) {
+				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Removed unsafe enchantment: "+stack.toString()+"  "+ench.toString());
+				return FAIL_VALUE;
+                            }   
+                        }
+                    	// level too low
 			if(level < ench.getStartLevel()) {
 				WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Raised unsafe enchantment: "+
 					Integer.toString(level)+"  "+stack.toString()+"  "+ench.toString()+"  to level: "+ench.getStartLevel() );
