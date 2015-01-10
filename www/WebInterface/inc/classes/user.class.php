@@ -93,9 +93,8 @@ private function doValidate($username, $password=FALSE){global $config;
     //$result = mysql_query("SELECT `balance` FROM `".mysql_san($config['CC']['table'])."` WHERE "."LOWER(`username`)='".mysql_san(strtolower($this->Name))."' LIMIT 1", $db);
     $result = mysql_query("SELECT ".mysql_san($config['CC']['prefix'])."_balance.balance AS balance FROM cc3_balance JOIN ".mysql_san($config['CC']['prefix'])."_account ON ".
                           " ".mysql_san($config['CC']['prefix'])."_account.id = ".mysql_san($config['CC']['prefix'])."_balance.username_id ".
-                          "JOIN ".mysql_san($config['CC']['prefix'])."_currency ON ".mysql_san($config['CC']['prefix'])."_currency.id = ".mysql_san($config['CC']['prefix'])."_balance.currency_id ".
                           "WHERE ".mysql_san($config['CC']['prefix'])."_account.uuid = '".mysql_san($this->UUID)."' AND ".
-                          " LOWER(".mysql_san($config['CC']['prefix'])."_currency.name) = '".mysql_san($config['CC']['currency'])."' AND LOWER(".mysql_san($config['CC']['prefix'])."_balance.worldName) = '".mysql_san($config['CC']['group'])."';");
+                          " LOWER(".mysql_san($config['CC']['prefix'])."_balance.currency_id) = '".mysql_san($config['CC']['currency'])."' AND LOWER(".mysql_san($config['CC']['prefix'])."_balance.worldName) = '".mysql_san($config['CC']['group'])."';");
     if($result){
       $row = mysql_fetch_assoc($result);
       $this->Money = ((double)$row['balance']);
@@ -214,10 +213,9 @@ public static function PaymentQuery($playerName, $playerUUID, $amount){global $c
   } else if(toBoolean($config['CC']['use'])){
     $query = "UPDATE `".mysql_san($config['CC']['prefix'])."_balance` JOIN ".mysql_san($config['CC']['prefix'])."_account ON ".
              " ".mysql_san($config['CC']['prefix'])."_account.id = ".mysql_san($config['CC']['prefix'])."_balance.username_id ".
-             "JOIN ".mysql_san($config['CC']['prefix'])."_currency ON ".mysql_san($config['CC']['prefix'])."_currency.id = ".mysql_san($config['CC']['prefix'])."_balance.currency_id SET ".
-             "".mysql_san($config['CC']['prefix'])."_balance.balance = ".mysql_san($config['CC']['prefix'])."_balance.balance + ".((float)$amount)." ".
+             "SET ".mysql_san($config['CC']['prefix'])."_balance.balance = ".mysql_san($config['CC']['prefix'])."_balance.balance + ".((float)$amount)." ".
              "WHERE ".mysql_san($config['CC']['prefix'])."_account.uuid = '".mysql_san($playerUUID)."' AND ".
-             " LOWER(".mysql_san($config['CC']['prefix'])."_currency.name) = '".mysql_san(strtolower($config['CC']['currency']))."' AND LOWER(".mysql_san($config['CC']['prefix'])."_balance.worldName) = '".mysql_san(strtolower($config['CC']['group']))."';";
+             " LOWER(".mysql_san($config['CC']['prefix'])."_balance.currency_id) = '".mysql_san(strtolower($config['CC']['currency']))."' AND LOWER(".mysql_san($config['CC']['prefix'])."_balance.worldName) = '".mysql_san(strtolower($config['CC']['group']))."';";
   }
   else {
     $query = "UPDATE `".$config['table prefix']."Players` SET ".
