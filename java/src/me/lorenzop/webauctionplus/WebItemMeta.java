@@ -28,6 +28,7 @@ public class WebItemMeta {
 		if(stack  == null) throw new NullPointerException();
 		final Map<Enchantment, Integer> enchants = getItemEnchants(stack, player);
 		final boolean hasEnchants = !enchants.isEmpty();
+                boolean lore_set = false;
 		final StringBuilder str = new StringBuilder();
 		if(hasEnchants) {
 			// convert enchantments to int id for sorting
@@ -61,13 +62,16 @@ public class WebItemMeta {
 			}
 			// append lore to string
 			if(meta.hasLore()) {
+                                if(str.length() > 0)
+					str.append(",");
 				str.append("<LORE>:");
 				final String[] lore = meta.getLore().toArray(new String[0]);
 				for(final String line : lore) {
 					if(line == null) continue;
-					if(str.length() > 0)
-						str.append("\\n");
-					str.append( line.replace(":", "").replace(",", "").replace("\\n", "").trim() );
+					if(lore_set)
+						str.append("\n");
+					str.append( line.replace(":", "").replace(",", "").replace("\n", "").trim() );
+                                        lore_set = true;
 				}
 			}
 		}
@@ -101,7 +105,7 @@ public class WebItemMeta {
 				final ItemMeta meta = stack.getItemMeta();
 				List<String> lore = meta.getLore();
 				if(lore == null) lore = new ArrayList<String>();
-				for(final String s : split[1].split("\\n"))
+				for(final String s : split[1].split("\n"))
 					lore.add(s.trim());
 				meta.setLore(lore);
 				stack.setItemMeta(meta);
