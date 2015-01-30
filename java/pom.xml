@@ -73,18 +73,30 @@
     </plugins>
   </build>
   <repositories>
+    <!-- For spigot -->
     <repository>
-      <id>bukkit-repo</id>
-      <url>http://repo.bukkit.org/content/groups/public</url>
+        <id>spigot-repo</id>
+        <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+    </repository>
+    
+    <!-- For Vault -->
+    <repository>
+        <id>theyeticave</id>
+	<url>http://nexus.theyeticave.net/content/repositories/pub_releases/</url>
     </repository>
   </repositories>
   <dependencies>
+    <!--Spigot-API-->
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>craftbukkit</artifactId>
-      <version>1.8.0 Spigot</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/resources/craftbukkit-1.8-R0.1.jar</systemPath>
+        <groupId>org.spigotmc</groupId>
+        <artifactId>spigot-api</artifactId>
+        <version>1.8-R0.1-SNAPSHOT</version>
+    </dependency>
+    <!--Bukkit API-->
+    <dependency>
+        <groupId>org.bukkit</groupId>
+        <artifactId>bukkit</artifactId>
+        <version>1.8-R0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.avaje</groupId>
@@ -94,12 +106,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>net.milkbowl.vault</groupId>
-      <artifactId>Vault</artifactId>
-      <version>1.2.29</version>
-      <type>jar</type>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/resources/Vault-1.4.1.jar</systemPath>
+        <groupId>net.milkbowl.vault</groupId>
+	<artifactId>Vault</artifactId>
+	<version>1.5.2</version>
     </dependency>
     <dependency>
       <groupId>com.bergerkiller.bukkit.sl.SignLink</groupId>
