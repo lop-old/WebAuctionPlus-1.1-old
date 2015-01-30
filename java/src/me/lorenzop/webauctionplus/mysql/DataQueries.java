@@ -294,6 +294,24 @@ public class DataQueries extends MySQLConnPool {
 			closeResources(conn, st, rs);
 		}
 	}
+        
+        public void updatePlayerName(AuctionPlayer waPlayer, String name) {
+		Connection conn = getConnection();
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			if(isDebug()) log.info("WA Query: updatePlayerName " + waPlayer.getPlayerUUID().toString());
+			st = conn.prepareStatement("UPDATE `"+dbPrefix+"Players` SET `playerName` = ? WHERE `uuid` = ? LIMIT 1");
+			st.setString(1, name);
+			st.setString(2, waPlayer.getPlayerUUID().toString());
+			st.executeUpdate();
+		} catch(SQLException e) {
+			log.warning(logPrefix + "Unable to update name for player: " + waPlayer.getPlayerUUID().toString());
+			e.printStackTrace();
+		} finally {
+			closeResources(conn, st, rs);
+		}
+	}
 
 
 	public void updatePlayerPassword(UUID uuid, String newPass) {
