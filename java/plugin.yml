@@ -62,12 +62,21 @@ permissions:
   wa.use.mailbox:
     description: Lets you use the mailbox
     default: true
+  wa.use.command.mailbox:
+    description: Lets you use the mailbox command
+    default: false
   wa.use.withdraw.money:
     description: Lets you withdraw money from web account
     default: true
+  wa.use.command.withdraw.money:
+    description: Lets you withdraw money from web account with the /wa withraw <amount> command
+    default: false
   wa.use.deposit.money:
     description: Lets you deposit money to web account
     default: true
+  wa.use.command.deposit.money:
+    description: Lets you deposit money to web account with the /wa deposit <amount> command
+    default: false
   wa.announcer.receive:
     description: Let you see announcements in chat
     default: true
