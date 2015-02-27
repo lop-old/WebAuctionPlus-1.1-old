@@ -6,8 +6,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -34,6 +36,8 @@ public class WebInventory {
 	protected final Inventory chest;
         protected final AuctionPlayer Aplayer;
 	protected final Map<Integer, Integer> tableRowIds = new HashMap<Integer, Integer>();
+        
+        private ItemStack addStack = null;
 //	protected List<Integer> slotChanged = new ArrayList<Integer>();
 
 
@@ -209,8 +213,20 @@ public class WebInventory {
 			}
                         
                         if(stacks != null){
-                            WebAuctionPlus.log.log(Level.INFO, "Array lengh: {0} (loadInventory)", stacks.length);
                             chest.setContents(Arrays.copyOf(stacks, chest.getSize()));
+                            
+                            if(stacks.length > chest.getSize()){
+                                ItemStack[] addStacks = Arrays.copyOfRange(stacks, chest.getSize(), stacks.length);
+                                WebAuctionPlus.log.log(Level.INFO, "addStack: {0}", Arrays.toString(addStacks));
+                                addStack = addStacks[0].clone();
+                                addStack.setAmount(0); 
+                                for(i=0; i < addStacks.length; i++){
+                                    addStack.setAmount(addStack.getAmount() + addStacks[i].getAmount());
+                                    WebAuctionPlus.log.log(Level.INFO, "Array Index: {0}", i);
+                                    WebAuctionPlus.log.log(Level.INFO, "QTY: {0}", addStacks[i].getAmount());
+                                }
+                                WebAuctionPlus.log.log(Level.INFO, "addStack: {0}", addStack.toString());
+                            }
                         }
 		} catch(SQLException e) {
 			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Unable to set inventory lock");
@@ -257,7 +273,6 @@ public class WebInventory {
                 
                 // split stack
                 ItemStack[] stacks = new ItemStack[(int)Math.ceil((double)qty/(double)maxSize)];
-                WebAuctionPlus.log.log(Level.INFO, "Init Array lengh: {0}", (int)Math.ceil((double)qty/(double)maxSize));
                 
 		if(qty > maxSize) {
                 int i = 0;    
@@ -267,11 +282,9 @@ public class WebInventory {
                             stacks[i].setAmount(maxSize);
                             tmp_stack.setAmount(tmpQty-maxSize);
                             tmpQty -= maxSize;
-                            WebAuctionPlus.log.log(Level.INFO, "Item Stack: {0}", stacks[i].toString());
                         } else {
                             stacks[i] = tmp_stack;
                             tmpQty -= maxSize;
-                            WebAuctionPlus.log.log(Level.INFO, "Item Stack: {0}", stacks[i].toString());
                         }
                         i++;
                     }
@@ -279,9 +292,9 @@ public class WebInventory {
 		} else {
                     stacks[0] = tmp_stack;
                 }
-                WebAuctionPlus.log.log(Level.INFO, "Array lengh: {0} (getSplitItemStack)", stacks.length);
 		return stacks;
 	}
+        
 	// save inventory to db
 	protected void saveInventory() {
 		Connection conn = WebAuctionPlus.dataQueries.getConnection();
@@ -289,9 +302,36 @@ public class WebInventory {
 		int countInserted = 0;
 		int countUpdated  = 0;
 		int countDeleted  = 0;
-		for(int i = 0; i < chest.getSize(); i++) {
+                List<ItemStack> tmp_chest = new ArrayList<>();
+                
+                if(addStack != null){
+                    tmp_chest.add(addStack);
+                }
+                
+                //Sum qty of equal items in the chest
+                boolean item_found = false;
+                for(int i = 0; i < chest.getSize(); i++) {
+                    for(ItemStack entry : tmp_chest){
+                        if(entry != null){
+                            if(entry.isSimilar(chest.getItem(i))){
+                                entry.setAmount(entry.getAmount()+chest.getItem(i).getAmount());
+                                item_found = true;
+                                break;
+                            } 
+                        }
+                    }
+                    if(!item_found){
+                        tmp_chest.add(chest.getItem(i));
+                    } else {
+                        item_found = false;
+                    }
+                }
+                                
+                int i = -1;           
+		for(ItemStack entry : tmp_chest) {
+                        i++;
 //			if(!slotChanged.contains(i)) continue;
-			ItemStack stack = chest.getItem(i);
+			ItemStack stack = entry;
 
 			// empty slot
 			if(stack == null || getTypeId(stack) == 0) {
