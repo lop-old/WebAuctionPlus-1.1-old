@@ -56,8 +56,8 @@ public class MySQLUpdate {
 			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updating db fields for 1.2.7");
 			final String[] queries = new String[]{
 				// Save all the Item data in the Database
-				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` ADD `itemData` TEXT NULL DEFAULT NULL AFTER `itemTitle`",
-                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` ADD `itemData` TEXT  NULL DEFAULT NULL AFTER `itemTitle`",
+				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` ADD `itemData` TEXT NULL DEFAULT NULL AFTER `itemDamage`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` ADD `itemData` TEXT  NULL DEFAULT NULL AFTER `itemDamage`",
 			};
 			// execute queries
 			for(final String sql : queries) {
