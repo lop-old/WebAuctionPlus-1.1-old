@@ -25,6 +25,10 @@ public class MySQLUpdate {
 			UpdateUUID1_1_15();
                         Bukkit.getServer().getScheduler().runTask(Bukkit.getPluginManager().getPlugin("WebAuctionPlus"), new PlayerConvertTask());
                 }
+                // update db fields  (< 1.2.7)
+		if(WebAuctionPlus.compareVersions(fromVersion, "1.2.7").equals("<")){
+			UpdateItemData1_2_7();
+                }
 	}
 
 
@@ -43,6 +47,29 @@ public class MySQLUpdate {
 			DataQueries.closeResources(st, null);
 		}
 		return true;
+	}
+        
+	// ItemData update
+	private static void UpdateItemData1_2_7() {
+		final Connection conn = WebAuctionPlus.dataQueries.getConnection();
+		try {
+			WebAuctionPlus.log.warning(WebAuctionPlus.logPrefix+"Updating db fields for 1.2.7");
+			final String[] queries = new String[]{
+				// Save all the Item data in the Database
+				"ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Items` ADD `itemData` TEXT NULL DEFAULT NULL AFTER `itemTitle`",
+                                "ALTER TABLE `"+WebAuctionPlus.dataQueries.dbPrefix()+"Auctions` ADD `itemData` TEXT  NULL DEFAULT NULL AFTER `itemTitle`",
+			};
+			// execute queries
+			for(final String sql : queries) {
+				if(sql == null || sql.isEmpty()) continue;
+				if(!execQuery(conn, sql)) {
+					WebAuctionPlus.fail("Failed to update from 1.2.6! Check console log for details.");
+					throw new RuntimeException();
+				}
+			}
+		} finally {
+			WebAuctionPlus.dataQueries.closeResources(conn);
+		}
 	}
 
 	// UUID update
