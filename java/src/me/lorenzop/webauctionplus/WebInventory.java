@@ -249,7 +249,7 @@ public class WebInventory {
 		}
 		int tmpQty = qty;
                 
-                if (itemData != null) {
+                if (itemData != null && !itemData.equals("")) {
                     YamlConfiguration itemc = new YamlConfiguration();
                     try {
                         itemc.loadFromString(itemData);
